@@ -1,0 +1,177 @@
+package trolling.core
+{
+	import flash.display.Sprite;
+	import flash.display.Stage3D;
+	import flash.display3D.Context3D;
+	import flash.events.Event;
+	import flash.geom.Rectangle;
+	import flash.utils.Dictionary;
+	
+	import trolling.object.GameObject;
+	import trolling.object.Stage;
+	
+	import trolling.rendering.Painter;
+	
+	import trolling.utils.Color;
+	
+	public class Trolling
+	{        
+		private var _rootClass:Class;
+		private var _root:GameObject;
+		private var _viewPort:Rectangle;
+		private var _stage:Stage;
+		
+		private var _started:Boolean = false;
+		private var _initRender:Boolean = false;
+		
+		private var _painter:Painter;
+		
+		private var _nativeStage:flash.display.Stage;
+		private var _nativeOverlay:Sprite;
+		
+		private static var sPainters:Dictionary = new Dictionary(true);
+		private static var _current:Trolling;
+		private static var _context:Context3D;
+		
+		public function Trolling(rootClass:Class, stage:flash.display.Stage, stage3D:Stage3D = null)
+		{
+			if (stage == null) throw new ArgumentError("Stage must not be null");
+			if (stage3D == null) stage3D = stage.stage3Ds[0];
+			
+			_current = this;
+			
+			_rootClass = rootClass;
+			trace(stage.width, stage.height);
+			_viewPort = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
+			
+			_nativeOverlay = new Sprite();
+			
+			_stage = new Stage(_viewPort.width, _viewPort.height, stage.color);
+			trace("stage init");
+			_nativeStage = stage;
+			_nativeStage.addChild(_nativeOverlay);
+			trace("addNativeOverlay");
+			
+			_painter = createPainter(stage3D);
+			_painter.initPainter(onInitPainter);
+			
+			initializeRoot();
+			trace("initRoot");
+			
+			stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+			trace("successed Creater");
+		}
+		
+		public function get painter():Painter
+		{
+			return _painter;
+		}
+		
+		public function set painter(value:Painter):void
+		{
+			_painter = value;
+		}
+		
+		public static function get painter():Painter
+		{
+			return _current.painter;
+		}
+		
+		public function get profile():String
+		{
+			if(_context)
+				return _context.profile;
+			else
+				return null;
+		}
+		
+		public static function get context():Context3D
+		{
+			return _context;
+		}
+		
+		public static function set context(value:Context3D):void
+		{
+			_context = value;
+		}
+		
+		public static function get current():Trolling
+		{
+			return _current;
+		}
+		
+		public static function set current(value:Trolling):void
+		{
+			_current = value;
+		}
+		
+		public function get stage():Stage
+		{
+			return _stage;
+		}
+		
+		public function set stage(value:Stage):void
+		{
+			_stage = value;
+		}
+		
+		private function onInitPainter():void
+		{
+			_painter.configureBackBuffer(_viewPort);
+			_initRender = true;
+		}
+		
+		public function initializeRoot():void
+		{
+			if(_root == null && _rootClass != null)
+			{
+				trace("ddd");
+				_root = new _rootClass() as GameObject;
+				_root.x = _stage.x;
+				_root.y = _stage.y;
+				_root.width = _stage.width;
+				_root.height = _stage.height;
+				_stage.addChild(_root);
+				_painter.root = _root;
+			}
+		}
+		
+		public function start():void
+		{
+			//	_painter.setProgram();
+			_started = true;
+		}
+		
+		public function dispose():void
+		{
+			
+		}
+		
+		private function createPainter(stage3D:Stage3D):Painter
+		{
+			if (stage3D in sPainters)
+				return sPainters[stage3D];
+			else
+			{
+				var painter:Painter = new Painter(stage3D);
+				sPainters[stage3D] = painter;
+				return painter;
+			}
+		}
+		
+		private function onEnterFrame(event:Event):void
+		{
+			if(_started && _initRender)
+				//	trace("ddd");
+				render();
+		}
+		
+		private function render():void
+		{
+			_painter.context.clear(Color.getRed(_stage.color)/255.0, Color.getGreen(_stage.color)/255.0, Color.getBlue(_stage.color)/255.0);
+			//	_painter.triangleData.initArray();
+			_root.render(_painter);
+			_painter.present();
+		}
+	}
+}

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<flexLibProperties includeAllClasses="true" useMultiPlatformConfig="false" version="3">
+  <includeClasses>
+    <classEntry path="trolling.component.Component"/>
+    <classEntry path="trolling.object.GameObject"/>
+    <classEntry path="trolling.rendering.Painter"/>
+    <classEntry path="trolling.Scene"/>
+    <classEntry path="trolling.SceneManager"/>
+    <classEntry path="trolling.rendering.Program"/>
+    <classEntry path="trolling.object.Stage"/>
+    <classEntry path="trolling.rendering.TriangleData"/>
+    <classEntry path="trolling.core.Trolling"/>
+    <classEntry path="trolling.utils.Color"/>
+    <classEntry path="trolling.utils.TextureUtil"/>
+    <classEntry path="jimining.RenderState"/>
+    <classEntry path="trolling.component.ComponentType"/>
+    <classEntry path="trolling.component.DisplayComponent"/>
+    <classEntry path="trolling.component.animation.State"/>
+    <classEntry path="trolling.component.control.Controller"/>
+    <classEntry path="trolling.component.control.Movement"/>
+    <classEntry path="trolling.component.graphic.Image"/>
+  </includeClasses>
+  <includeResources/>
+  <namespaceManifests/>
+</flexLibProperties>
