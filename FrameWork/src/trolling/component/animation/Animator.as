@@ -5,28 +5,27 @@ package trolling.component.animation
 	
 	import trolling.component.ComponentType;
 	import trolling.component.DisplayComponent;
-	
 	import trolling.object.GameObject;
-	
+
 	public class Animator extends DisplayComponent
 	{
 		private const TAG:String = "[Animator]";
 		private const NONE:String = "none";
 		
-		private var _states:Dictionary; // key: Name, value: State
-		private var _currentState:String; // Name
-		private var _isPlaying:Boolean;
+		private var _states:Dictionary; // key: TouchEvent name, value: State
+		private var _currentState:String; // TouchEvent name
 		
 		public function Animator(name:String, parent:GameObject)
 		{
 			super(ComponentType.ANIMATOR, name, parent);
 			
 			_currentState = NONE;
-			_isPlaying = false;
 		}
-		
+				
 		public override function dispose():void
 		{
+			isActive(false);
+			
 			if (_states)
 			{
 				for (var key:String in _states)
@@ -36,48 +35,54 @@ package trolling.component.animation
 				}
 			}
 			_states = null;
-			
 			_currentState = null;
-			_isPlaying = false;
-			
-			//removeEventListener(TouchEvent.ENDED, onTouch);
 			
 			super.dispose();
 		}
 		
+		public override function set isActive(value:Boolean):void
+		{
+			if (value)
+			{
+				if (!_isActive)
+				{
+					if (!_states)
+					{
+						return;
+					}
+					//addEventListener(TouchEvent.ENDED, onTouch);
+				}
+			}
+			else
+			{
+				if (_isActive)
+				{
+					State(_states[_currentState]).stop();
+					//removeEventListener(TouchEvent.ENDED, onTouch);
+				}
+			}
+
+			_isActive = value;
+		}
+		
 		public override function getRenderingResource():BitmapData
 		{
-			// to do 
-			
-			
-			return null;
-		}
-		
-		public function play():void
-		{
-			if (!_states || _currentState == NONE)
+			if (!_isActive || !_states || _currentState == NONE)
 			{
-				return;
+				return null;
 			}
 			
-			_isPlaying = true;
-			State(_states[_currentState]).play();
+			return State(_states[_currentState]).getCurrentFrame();
 		}
-		
-		public function stop():void
+				
+		public function addState(key:String, name:String):State // 새로운 State 추가
 		{
-			if (!_states || _currentState == NONE)
+			if (!name || name == "" || name == NONE)
 			{
-				return;
+				return null;
 			}
 			
-			_isPlaying = false;
-			State(_states[_currentState]).stop();
-		}
-		
-		public function addState(key:String, name:String):State
-		{
-			if (!name || name == "")
+			if (_states && _states[key])
 			{
 				return null;
 			}
@@ -89,18 +94,12 @@ package trolling.component.animation
 				isFirst = true;
 			}
 			
-			if (_states[key])
-			{
-				return null;
-			}
-			
 			var state:State = new State(name);
 			_states[key] = state;
 			
 			if (isFirst)
 			{
 				_currentState = key;
-				//addEventListener(TouchEvent.ENDED, onTouch);
 			}
 			
 			return state;
@@ -108,7 +107,7 @@ package trolling.component.animation
 		
 		public function removeState(name:String):void
 		{
-			if (!name || name == "" || !_states)
+			if (_isActive || !name || name == "" || !_states)
 			{
 				return;
 			}
@@ -124,8 +123,43 @@ package trolling.component.animation
 			delete _states[key];
 			
 			_currentState = NONE;
+		}
+		
+		public function getState(name:String):State
+		{
+			if (!_states)
+			{
+				return null;	
+			}
 			
-			trace(TAG + " State 삭제가 완료되었습니다. State를 추가하거나 현재 State를 지정해주세요.");
+			for (var key:String in _states)
+			{
+				var state:State = _states[key];
+				if (state.name == name)
+				{
+					return state;
+				}
+			}
+			
+			return null;
+		}
+		
+		public function setState(name:String, editedState:State):void // 기존 State를 수정(교체)
+		{
+			if (_isActive || !_states)
+			{
+				return;	
+			}
+			
+			for (var key:String in _states)
+			{
+				var state:State = _states[key];
+				if (state.name == name)
+				{
+					state = editedState;
+					break;
+				}
+			}
 		}
 		
 		public function get currentState():String
@@ -133,20 +167,20 @@ package trolling.component.animation
 			return _currentState;	
 		}
 		
-		public function get isPlaying():Boolean
-		{
-			return _isPlaying;
-		}
-		
-		//		private function onTouch(event:TouchEvent):void
-		//		{
-		//			// Get key
-		//			
-		//			if (isKey(key))
-		//			{
-		//				transition(key);			
-		//			}
-		//		}
+//		private function onTouch(event:TouchEvent):void
+//		{
+//			if (!_isActive || !_states)
+//			{
+//				return;
+//			}
+//			
+//			// Get key
+//			
+//			if (isKey(key))
+//			{
+//				transition(key);			
+//			}
+//		}
 		
 		private function isKey(input:String):Boolean
 		{
@@ -190,19 +224,18 @@ package trolling.component.animation
 		
 		private function transition(key:String):void
 		{
-			if (!_states || _currentState == NONE)
+			if (!_isActive || !_states)
 			{
 				return;
 			}
-			
-			if (_isPlaying)
+
+			if (_currentState != NONE)
 			{
 				State(_states[_currentState]).stop();
-				
-				_currentState = key;
-				
-				State(_states[key]).play();
 			}
+			
+			_currentState = key;			
+			State(_states[_currentState]).play();
 		}
 	}
 }

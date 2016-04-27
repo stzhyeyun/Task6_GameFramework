@@ -7,9 +7,9 @@ package trolling.component
 	public class Component extends EventDispatcher
 	{		
 		private var _type:String;
-		private var _name:String;
-		private var _parent:GameObject;
-		private var _isActive:Boolean;
+		protected var _name:String;
+		protected var _parent:GameObject;
+		protected var _isActive:Boolean;
 		
 		public function Component(type:String, name:String, parent:GameObject)
 		{
@@ -57,7 +57,7 @@ package trolling.component
 			return _isActive;
 		}
 		
-		public function set isActive(value:Boolean):void
+		public virtual function set isActive(value:Boolean):void
 		{
 			_isActive = value;
 		}

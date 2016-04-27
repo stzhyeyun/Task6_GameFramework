@@ -4,7 +4,6 @@ package trolling.component.control
 	
 	import trolling.component.Component;
 	import trolling.component.ComponentType;
-	
 	import trolling.object.GameObject;
 	
 	public class Controller extends Component

@@ -93,6 +93,18 @@ package trolling.component.animation
 			_animation.removeAt(index);
 		}
 		
+		public function getCurrentFrame():BitmapData
+		{
+			if (!_animation || _currentIndex < 0 || !_isPlaying)
+			{
+				return null;
+			}
+			else
+			{
+				return _animation[_currentIndex];
+			}
+		}
+		
 		public function get name():String
 		{
 			return _name;	

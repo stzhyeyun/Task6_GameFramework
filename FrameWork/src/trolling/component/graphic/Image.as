@@ -4,7 +4,6 @@ package trolling.component.graphic
 	
 	import trolling.component.ComponentType;
 	import trolling.component.DisplayComponent;
-	
 	import trolling.object.GameObject;
 	
 	public class Image extends DisplayComponent
@@ -33,6 +32,11 @@ package trolling.component.graphic
 		
 		public override function getRenderingResource():BitmapData
 		{
+			if (!_isActive)
+			{
+				return null;
+			}
+			
 			if (_bitmapData)
 			{
 				return _bitmapData;
