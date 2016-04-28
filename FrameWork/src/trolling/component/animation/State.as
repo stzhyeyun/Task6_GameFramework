@@ -15,7 +15,7 @@ package trolling.component.animation
 		private var _name:String;
 		private var _animation:Vector.<Texture>;
 		private var _currentIndex:int;
-		private var _playSpeed:uint; // 다음 애니메이션 인덱스로 업데이트 하기까지의 프레임 수
+		private var _animationSpeed:uint; // 다음 애니메이션 인덱스로 업데이트 하기까지의 프레임 수
 		private var _frameCounter:uint;
 		private var _isPlaying:Boolean;
 		
@@ -23,7 +23,7 @@ package trolling.component.animation
 		{
 			_name = name;
 			_currentIndex = -1;
-			_playSpeed = 0;
+			_animationSpeed = 0;
 			_frameCounter = 0;
 			_isPlaying = false;
 		}
@@ -43,7 +43,7 @@ package trolling.component.animation
 			_animation = null;
 			
 			_currentIndex = -1;
-			_playSpeed = 0;
+			_animationSpeed = 0;
 			_frameCounter = 0;
 			_isPlaying = false;
 		}
@@ -57,9 +57,9 @@ package trolling.component.animation
 			
 			_currentIndex = 0;
 			
-			if (_playSpeed == 0) // playSpeed가 설정되어있지 않으면 1로 보정
+			if (_animationSpeed == 0) // 혜윤 :animationSpeed가 설정되어있지 않으면 1로 보정
 			{
-				_playSpeed = 1;
+				_animationSpeed = 1;
 			}
 			
 			_isPlaying = true;			
@@ -136,7 +136,7 @@ package trolling.component.animation
 		
 		public function get playSpeed():uint
 		{
-			return _playSpeed;	
+			return _animationSpeed;	
 		}
 		
 		public function set playSpeed(value:uint):void
@@ -145,7 +145,7 @@ package trolling.component.animation
 			{
 				value = 1;
 			}
-			_playSpeed = value;
+			_animationSpeed = value;
 		}
 		
 		public function get isPlaying():Boolean
@@ -162,7 +162,7 @@ package trolling.component.animation
 			
 			_frameCounter++;
 			
-			if (_frameCounter == _playSpeed)
+			if (_frameCounter == _animationSpeed)
 			{
 				_currentIndex++;
 				
