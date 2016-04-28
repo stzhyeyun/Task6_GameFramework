@@ -30,8 +30,9 @@ package trolling.component.animation
 			{
 				for (var key:String in _states)
 				{
-					State(_states[key]).dispose();
-					_states[key] = null;
+					var state:State = _states[key];
+					state.dispose();
+					state = null;
 				}
 			}
 			_states = null;
@@ -57,7 +58,8 @@ package trolling.component.animation
 			{
 				if (_isActive)
 				{
-					State(_states[_currentState]).stop();
+					var state:State = _states[_currentState];
+					state.stop();
 					//removeEventListener(TouchEvent.ENDED, onTouch);
 				}
 			}
@@ -72,7 +74,9 @@ package trolling.component.animation
 				return null;
 			}
 			
-			return State(_states[_currentState]).getCurrentFrame();
+			var state:State = _states[_currentState];
+			
+			return state.getCurrentFrame();
 		}
 				
 		public function addState(key:String, name:String):State // 새로운 State 추가
@@ -107,7 +111,7 @@ package trolling.component.animation
 		
 		public function removeState(name:String):void
 		{
-			if (_isActive || !name || name == "" || !_states)
+			if (_isActive || !name || !_states)
 			{
 				return;
 			}
@@ -118,8 +122,9 @@ package trolling.component.animation
 				return;
 			}
 			
-			State(_states[key]).dispose();
-			_states[key] = null;
+			var state:State = _states[key];
+			state.dispose();
+			state = null;
 			delete _states[key];
 			
 			_currentState = NONE;
@@ -231,11 +236,13 @@ package trolling.component.animation
 
 			if (_currentState != NONE)
 			{
-				State(_states[_currentState]).stop();
+				var currState:State = _states[_currentState];
+				currState.stop();
 			}
 			
-			_currentState = key;			
-			State(_states[_currentState]).play();
+			_currentState = key;
+			var nextState:State = _states[_currentState];
+			nextState.play();
 		}
 	}
 }

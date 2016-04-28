@@ -110,8 +110,8 @@ package trolling.object
 			
 			var triangleStartIndex:uint = _triangleData.vertexData.length;
 			
-			var renderingComponent:String = decideRenderingComponent(); // [혜윤] Render할 컴포넌트 확인 및 결정
-			if(painter.root != this && renderingComponent != NONE)
+			var renderingComponentType:String = decideRenderingComponent(); // [혜윤] Render할 컴포넌트 확인 및 결정
+			if(painter.root != this && renderingComponentType != NONE)
 			{
 				trace("_width , _height = " + _width + ", " + _height);
 //				if(_bitmapData != null)
@@ -119,7 +119,8 @@ package trolling.object
 //				_texture = TextureUtil.fromBitmap(new Bitmap(_bitmapData)); // [혜윤] Component 그리기 테스트를 위해 주석 처리
 				
 				//
-				var texture:Texture = DisplayComponent(_components[renderingComponent]).getRenderingResource();
+				var displayComponent:DisplayComponent = _components[renderingComponentType];
+				var texture:Texture = displayComponent.getRenderingResource();
 				if (!texture)
 				{
 					trace(TAG + " render : No Texture(Component).");
@@ -235,7 +236,9 @@ package trolling.object
 			// Image만 있음
 			else if (_components[ComponentType.IMAGE] && !_components[ComponentType.ANIMATOR])
 			{
-				if (Component(_components[ComponentType.IMAGE]).isActive)
+				var image:Component = _components[ComponentType.IMAGE];
+				
+				if (image.isActive)
 				{
 					return ComponentType.IMAGE;
 				}
@@ -247,7 +250,9 @@ package trolling.object
 			// Animator만 있음
 			else if (!_components[ComponentType.IMAGE] && _components[ComponentType.ANIMATOR])
 			{
-				if (Component(_components[ComponentType.ANIMATOR]).isActive)
+				var animator:Component = _components[ComponentType.ANIMATOR];
+				
+				if (animator.isActive)
 				{
 					return ComponentType.ANIMATOR;
 				}
@@ -259,18 +264,18 @@ package trolling.object
 			// Image와 Animator 둘 다 있음
 			else if (_components[ComponentType.IMAGE] && _components[ComponentType.ANIMATOR])
 			{
-				if (Component(_components[ComponentType.IMAGE]).isActive
-					&& !Component(_components[ComponentType.ANIMATOR]).isActive)
+				var image:Component = _components[ComponentType.IMAGE];
+				var animator:Component = _components[ComponentType.ANIMATOR];
+				
+				if (image.isActive && !animator.isActive)
 				{
 					return ComponentType.IMAGE;
 				}
-				else if (!Component(_components[ComponentType.IMAGE]).isActive
-					&& Component(_components[ComponentType.ANIMATOR]).isActive)
+				else if (!image.isActive && animator.isActive)
 				{
 					return ComponentType.ANIMATOR;
 				}
-				else if (Component(_components[ComponentType.IMAGE]).isActive
-					&& Component(_components[ComponentType.ANIMATOR]).isActive)
+				else if (image.isActive && animator.isActive)
 				{
 					return ComponentType.ANIMATOR; // Animator를 우선하여 그림
 				}
