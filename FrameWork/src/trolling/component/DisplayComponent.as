@@ -1,13 +1,12 @@
 package trolling.component
 {
-	import trolling.object.GameObject;
 	import trolling.rendering.Texture;
 	
 	public class DisplayComponent extends Component
 	{
-		public function DisplayComponent(type:String, name:String, parent:GameObject)
+		public function DisplayComponent(type:String, isActive:Boolean = false)
 		{
-			super(type, name, parent);
+			super(type, isActive);
 		}
 		
 		public virtual function getRenderingResource():Texture

@@ -4,7 +4,6 @@ package trolling.component.animation
 	
 	import trolling.component.ComponentType;
 	import trolling.component.DisplayComponent;
-	import trolling.object.GameObject;
 	import trolling.rendering.Texture;
 
 	public class Animator extends DisplayComponent
@@ -15,9 +14,9 @@ package trolling.component.animation
 		private var _states:Dictionary; // key: TouchEvent name, value: State
 		private var _currentState:String; // TouchEvent name
 		
-		public function Animator(name:String, parent:GameObject)
+		public function Animator(isActive:Boolean = false)
 		{
-			super(ComponentType.ANIMATOR, name, parent);
+			super(ComponentType.ANIMATOR, isActive);
 			
 			_currentState = NONE;
 		}

@@ -4,7 +4,6 @@ package trolling.component.graphic
 	
 	import trolling.component.ComponentType;
 	import trolling.component.DisplayComponent;
-	import trolling.object.GameObject;
 	import trolling.rendering.Texture;
 	
 	public class Image extends DisplayComponent
@@ -13,13 +12,13 @@ package trolling.component.graphic
 		
 		private var _texture:Texture;
 		
-		public function Image(name:String, parent:GameObject, resource:Bitmap)
+		public function Image(resource:Bitmap, isActive:Boolean = false)
 		{
-			super(ComponentType.IMAGE, name, parent);
+			super(ComponentType.IMAGE, isActive);
 			
 			if (!resource)
 			{
-				//super.dispose();
+				//super.dispose(); // ?
 				throw new ArgumentError(TAG + " ctor : No \'resource\'.");
 			}
 			
