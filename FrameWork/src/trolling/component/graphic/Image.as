@@ -23,7 +23,7 @@ package trolling.component.graphic
 				throw new ArgumentError(TAG + " ctor : No \'resource\'.");
 			}
 			
-			var texture:Texture = Texture(resource);
+			var texture:Texture = new Texture(resource);
 			
 			if (!texture)
 			{
