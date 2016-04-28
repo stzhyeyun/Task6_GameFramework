@@ -2,23 +2,36 @@ package trolling.object
 {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
-	import flash.display3D.textures.Texture;
 	import flash.events.EventDispatcher;
+	import flash.geom.Matrix3D;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.utils.Dictionary;
 	
 	import trolling.component.Component;
+<<<<<<< HEAD
 	import trolling.component.ComponentType;
 	import trolling.component.DisplayComponent;
+=======
+>>>>>>> 73a7a9025732479366c36ed15af53a6a223f2d83
 	import trolling.rendering.Painter;
+	import trolling.rendering.Texture;
 	import trolling.rendering.TriangleData;
+<<<<<<< HEAD
 	import trolling.utils.TextureUtil;
 	
 	public class GameObject extends EventDispatcher
 	{
 		private const TAG:String = "[GameObject]";
 		private const NONE:String = "none";
+=======
+	
+	
+	public class GameObject extends EventDispatcher
+	{
+		[Embed( source = "iu3.jpg" )]
+		protected const TextureBitmap:Class;
+>>>>>>> 73a7a9025732479366c36ed15af53a6a223f2d83
 		
 		private var _parent:GameObject = null;
 		private var _depth:Number;
@@ -35,6 +48,8 @@ package trolling.object
 		
 		private var _color:uint;
 		private var _bitmapData:BitmapData;
+		
+		private var _bitmap:Bitmap;
 		private var _texture:Texture;
 		
 		private var _triangleData:TriangleData;
@@ -49,7 +64,8 @@ package trolling.object
 		public function setColor(color:uint):void
 		{
 			_color = color;
-			_bitmapData = new BitmapData(_width, _height, false, _color);
+//			_bitmapData = new BitmapData(_width, _height, false, _color);
+			_bitmap = new TextureBitmap();
 		}
 		
 		public function addComponent(component:Component):void
@@ -123,19 +139,24 @@ package trolling.object
 			}
 			_triangleData.initArray();
 			
-			trace("numChildren = " + numChildren);
-			var rect:Rectangle = getRectangle();
+	//		trace("numChildren = " + numChildren);
+			var drawRect:Rectangle = getRectangle();
 			var globalPoint:Point = getGlobalPoint();
 			
-			rect.x = globalPoint.x;
-			rect.y = globalPoint.y;
+			drawRect.x = globalPoint.x;
+			drawRect.y = globalPoint.y;
 			
-			rect.x = (rect.x - (painter.viewPort.width/2)) / (painter.viewPort.width/2);
-			rect.y = ((painter.viewPort.height/2) - rect.y) / (painter.viewPort.height/2);
+			drawRect.x = (drawRect.x - (painter.viewPort.width/2)) / (painter.viewPort.width/2);
+			drawRect.y = ((painter.viewPort.height/2) - drawRect.y) / (painter.viewPort.height/2);
 			
-			rect.width = rect.width / (painter.viewPort.width/2);
-			rect.height = rect.height / (painter.viewPort.height/2);
-			trace(rect);
+			drawRect.width = drawRect.width / painter.viewPort.width;
+			drawRect.height = drawRect.height / painter.viewPort.height;
+	//		trace("drawRect =" + drawRect);
+			
+			var matrix:Matrix3D = new Matrix3D();
+			matrix.identity();
+			matrix.appendScale(drawRect.width, drawRect.height, 1);
+			matrix.appendTranslation(drawRect.x+drawRect.width, drawRect.y-drawRect.height, 0);
 			
 			var triangleIndex:Vector.<uint> = new Vector.<uint>();
 			
@@ -144,6 +165,7 @@ package trolling.object
 			var renderingComponentType:String = decideRenderingComponent(); // [혜윤] Render할 컴포넌트 확인 및 결정
 			if(painter.root != this && renderingComponentType != NONE)
 			{
+<<<<<<< HEAD
 				trace("_width , _height = " + _width + ", " + _height);
 //				if(_bitmapData != null)
 //					trace("얍얍");
@@ -160,11 +182,23 @@ package trolling.object
 				//
 				
 				painter.context.setTextureAt(0, texture);
+=======
+//				trace("_width , _height = " + _width + ", " + _height);
+				_texture = new Texture(_bitmap);
+				painter.context.setTextureAt(0, _texture.nativeTexture);
+				_triangleData.uvData[0] = _texture.u;
+				_triangleData.uvData[1] = _texture.v;
+>>>>>>> 73a7a9025732479366c36ed15af53a6a223f2d83
 				
-				_triangleData.vertexData.push(Vector.<Number>([rect.x+rect.width, rect.y, 0, 1, 0]));
-				_triangleData.vertexData.push(Vector.<Number>([rect.x+rect.width, rect.y-rect.height, 0, 1, 1]));
-				_triangleData.vertexData.push(Vector.<Number>([rect.x, rect.y-rect.height, 0, 0, 1]));
-				_triangleData.vertexData.push(Vector.<Number>([rect.x, rect.y, 0, 0, 0]));
+//				_triangleData.vertexData.push(Vector.<Number>([drawRect.x+drawRect.width, drawRect.y, 0, 1, 0]));
+//				_triangleData.vertexData.push(Vector.<Number>([drawRect.x+drawRect.width, drawRect.y-drawRect.height, 0, 1, 1]));
+//				_triangleData.vertexData.push(Vector.<Number>([drawRect.x, drawRect.y-drawRect.height, 0, 0, 1]));
+//				_triangleData.vertexData.push(Vector.<Number>([drawRect.x, drawRect.y, 0, 0, 0]));
+				
+				_triangleData.vertexData.push(Vector.<Number>([1, 1, 0, 1, 0]));
+				_triangleData.vertexData.push(Vector.<Number>([1, -1, 0, 1, 1]));
+				_triangleData.vertexData.push(Vector.<Number>([-1, -1, 0, 0, 1]));
+				_triangleData.vertexData.push(Vector.<Number>([-1, 1, 0, 0, 0]));
 				
 				triangleIndex.push(triangleStartIndex);
 				triangleIndex.push(triangleStartIndex+1);
@@ -178,6 +212,8 @@ package trolling.object
 				_triangleData.indexData.push(triangleIndex);
 				
 				_triangleData.calculData();
+				
+				painter.appendMatrix(matrix);
 				painter.setDrawData(_triangleData);
 				
 				painter.draw();
@@ -197,8 +233,37 @@ package trolling.object
 				searchObject = searchObject.parent;
 			}
 			
-			trace(globalPoint);
+//			trace(globalPoint);
 			return globalPoint;
+		}
+		
+		public function findClickedGameObject(point:Point):GameObject
+		{			
+			if(!getRectangle().containsPoint(point))
+			{
+				trace("빈공간");
+				return null;
+			}
+			
+			var target:GameObject = hitTest(point);			
+			
+			return target ? target : this; 
+		}
+		
+		public function hitTest(point:Point):GameObject
+		{
+			var target:GameObject = null;
+			for (var i:int = _children.length - 1; i >= 0; --i)
+			{
+				var child:GameObject = _children[i];
+				target = child.findClickedGameObject(point);
+				
+				if (target)
+				{
+					return target;
+				}
+			}
+			return null;
 		}
 		
 		public function getRectangle():Rectangle

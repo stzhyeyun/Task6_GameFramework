@@ -7,11 +7,23 @@ package trolling.rendering
 		private var _rawIndexData:Vector.<uint>;
 		private var _indexData:Array;
 		
+		private var _uvData:Vector.<Number> = new <Number>[1, 1, 1, 1];
+		
 		public function TriangleData()
 		{
 			initArray();
 		}
 		
+		public function get uvData():Vector.<Number>
+		{
+			return _uvData;
+		}
+
+		public function set uvData(value:Vector.<Number>):void
+		{
+			_uvData = value;
+		}
+
 		public function initArray():void
 		{
 			_vertexData = new Array();

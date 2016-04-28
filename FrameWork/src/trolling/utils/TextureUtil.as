@@ -1,11 +1,11 @@
 package trolling.utils
 {
-	import flash.display.Bitmap;
 	import flash.display.BitmapData;
-	import flash.display3D.Context3D;
 	import flash.display3D.Context3DTextureFormat;
 	import flash.display3D.textures.Texture;
 	import flash.geom.Matrix;
+	import flash.geom.Point;
+	import flash.geom.Rectangle;
 	
 	import trolling.core.Trolling;
 	
@@ -16,9 +16,11 @@ package trolling.utils
 			
 		}
 		
-		public static function fromBitmap(bitmap:Bitmap):flash.display3D.textures.Texture
+		public static function fromBitmapData(bitmap:BitmapData):Array
 		{
-			var _nativeTexture:flash.display3D.textures.Texture;
+			var textureInfo:Array = new Array();
+			
+			var _nativeTexture:Texture;
 			
 			var binaryWidth:Number = nextPowerOfTwo(bitmap.width);
 			var binaryHeight:Number = nextPowerOfTwo(bitmap.height);
@@ -30,10 +32,21 @@ package trolling.utils
 			_nativeTexture = Trolling.current.context.createTexture(binaryWidth, binaryHeight, Context3DTextureFormat.BGRA, false);
 			//	_nativeTexture.uploadFromBitmapData(bitmap.bitmapData);
 			
-			var bitmapData:BitmapData = new BitmapData(binaryWidth, binaryHeight);
-			bitmapData.draw(bitmap.bitmapData, matrix);
+			var bitmapData:BitmapData = new BitmapData(binaryWidth, binaryHeight, bitmap.transparent);
+//			bitmapData.draw(bitmap, matrix);
+			var rect:Rectangle = new Rectangle();
+			rect.width = bitmap.width;
+			rect.height = bitmap.height;
+			bitmapData.copyPixels(bitmap, rect, new Point());
+//			trace("bitmapData.widthScale =" + (binaryWidth / bitmap.width));
+//			trace("bitmapData.widthScale =" + (binaryHeight / bitmap.height));
 			_nativeTexture.uploadFromBitmapData(bitmapData);
-			return _nativeTexture;
+			
+			textureInfo.push(_nativeTexture);
+			textureInfo.push((binaryWidth / bitmap.width));
+			textureInfo.push((binaryHeight / bitmap.height));
+			
+			return textureInfo;
 		}
 		
 		public static function nextPowerOfTwo(v:uint): uint

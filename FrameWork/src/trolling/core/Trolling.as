@@ -4,13 +4,18 @@ package trolling.core
 	import flash.display.Stage3D;
 	import flash.display3D.Context3D;
 	import flash.events.Event;
+	import flash.events.MouseEvent;
+	import flash.events.TouchEvent;
+	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import flash.ui.Mouse;
 	import flash.utils.Dictionary;
 	
 	import trolling.object.GameObject;
 	import trolling.object.Stage;
 	import trolling.rendering.Painter;
 	import trolling.utils.Color;
+	import trolling.utils.TouchPhase;
 	
 	public class Trolling
 	{        
@@ -58,6 +63,89 @@ package trolling.core
 			
 			stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
 			trace("successed Creater");
+			
+			stage.addEventListener(TouchEvent.TOUCH_BEGIN, onTouch); 
+			stage.addEventListener(TouchEvent.TOUCH_MOVE, onTouch); 
+			stage.addEventListener(TouchEvent.TOUCH_END, onTouch);
+			stage.addEventListener(MouseEvent.MOUSE_DOWN, onTouch);
+			stage.addEventListener(MouseEvent.MOUSE_MOVE, onTouch);
+			stage.addEventListener(MouseEvent.MOUSE_UP, onTouch);
+		}
+		
+		private function onTouch(event:Event):void
+		{
+			//trace("onTouch");
+			
+			var globalX:Number;
+			var globalY:Number;
+			var touchID:int;
+			var phase:String;
+			var pressure:Number = 1.0;
+			var width:Number = 1.0;
+			var height:Number = 1.0;
+			
+			// figure out general touch properties
+			if (event is MouseEvent)
+			{
+				var mouseEvent:MouseEvent = event as MouseEvent;
+				globalX = mouseEvent.stageX;
+				globalY = mouseEvent.stageY;
+				touchID = 0;
+				
+				// MouseEvent.buttonDown returns true for both left and right button (AIR supports
+				// the right mouse button). We only want to react on the left button for now,
+				// so we have to save the state for the left button manually.
+				//if (event.type == MouseEvent.MOUSE_DOWN)    _leftMouseDown = true;
+				//else if (event.type == MouseEvent.MOUSE_UP) _leftMouseDown = false;
+			}
+			else
+			{
+				var touchEvent:TouchEvent = event as TouchEvent;
+				
+				// On a system that supports both mouse and touch input, the primary touch point
+				// is dispatched as mouse event as well. Since we don't want to listen to that
+				// event twice, we ignore the primary touch in that case.
+				
+				if (Mouse.supportsCursor && touchEvent.isPrimaryTouchPoint) return;
+				else
+				{
+					globalX  = touchEvent.stageX;
+					globalY  = touchEvent.stageY;
+					touchID  = touchEvent.touchPointID;
+					pressure = touchEvent.pressure;
+					width    = touchEvent.sizeX;
+					height   = touchEvent.sizeY;
+				}
+			}
+			
+			switch (event.type) 
+			{
+				case TouchEvent.TOUCH_BEGIN: phase = TouchPhase.BEGAN; break;
+				case TouchEvent.TOUCH_MOVE:  phase = TouchPhase.MOVED; break;
+				case TouchEvent.TOUCH_END:   phase = TouchPhase.ENDED; break;
+				case MouseEvent.MOUSE_DOWN:  phase = TouchPhase.BEGAN; break;
+				case MouseEvent.MOUSE_UP:    phase = TouchPhase.ENDED; break;
+				//case MouseEvent.MOUSE_MOVE: 
+				//phase = (_leftMouseDown ? TouchPhase.MOVED : TouchPhase.HOVER); break;
+			}
+			
+			
+			// move position into viewport bounds
+			globalX = _stage.stageWidth  * (globalX - _viewPort.x) / _viewPort.width;
+			globalY = _stage.stageHeight * (globalY - _viewPort.y) / _viewPort.height;
+			
+			//trace("globalX = " + globalX + " globalY = " + globalY);
+			
+			if(phase == TouchPhase.ENDED)
+			{
+				//_root.dispatchEvent(new Event("b"));
+				var point:Point = new Point(globalX, globalY);
+				var hit:GameObject = _root.findClickedGameObject(point);
+				//				if(hit)
+				//					trace(hit.getRectangle());
+				if(hit != null)
+					hit.dispatchEvent(new Event("a"));
+			}
 		}
 		
 		public function get painter():Painter
