@@ -1,19 +1,15 @@
 package trolling.component.animation
 {
-	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	
-	import trolling.rendering.Texture;
-	
 	public class State extends EventDispatcher
 	{
-		private const TAG:String = "[State]";
-		
 		private var _name:String;
-		private var _animation:Vector.<Texture>;
+		private var _animation:Vector.<BitmapData>;
 		private var _currentIndex:int;
-		private var _animationSpeed:uint; // 다음 애니메이션 인덱스로 업데이트 하기까지의 프레임 수
+		private var _playSpeed:uint; // 다음 애니메이션 인덱스로 업데이트 하기까지의 프레임 수
 		private var _frameCounter:uint;
 		private var _isPlaying:Boolean;
 		
@@ -21,7 +17,7 @@ package trolling.component.animation
 		{
 			_name = name;
 			_currentIndex = -1;
-			_animationSpeed = 0;
+			_playSpeed = 0;
 			_frameCounter = 0;
 			_isPlaying = false;
 		}
@@ -34,14 +30,14 @@ package trolling.component.animation
 			{
 				for (var i:int = 0; i < _animation.length; i++)
 				{
-					_animation[i].dispose();
+					//_animation[i].dispose();
 					_animation[i] = null;
 				}
 			}
 			_animation = null;
 			
 			_currentIndex = -1;
-			_animationSpeed = 0;
+			_playSpeed = 0;
 			_frameCounter = 0;
 			_isPlaying = false;
 		}
@@ -55,9 +51,9 @@ package trolling.component.animation
 			
 			_currentIndex = 0;
 			
-			if (_animationSpeed == 0) // 혜윤 :animationSpeed가 설정되어있지 않으면 1로 보정
+			if (_playSpeed == 0) // playSpeed가 설정되어있지 않으면 1로 보정
 			{
-				_animationSpeed = 1;
+				_playSpeed = 1;
 			}
 			
 			_isPlaying = true;			
@@ -71,24 +67,16 @@ package trolling.component.animation
 			removeEventListener(Event.ENTER_FRAME, onEnterFrame);
 		}
 		
-		public function addFrame(resource:Bitmap):void
+		public function addFrame(frame:BitmapData):void
 		{
-			if (!resource)
-			{
-				trace(TAG + " addFrame : No \'resource\'.");
-				return;
-			}
-			
-			var frame:Texture = Texture(resource);
-			
 			if (!frame)
 			{
-				throw new ArgumentError(TAG + " addFrame : Failed to create a Texture.");
+				return;
 			}
 			
 			if (!_animation)
 			{
-				_animation = new Vector.<Texture>();
+				_animation = new Vector.<BitmapData>();
 			}
 			_animation.push(frame);
 		}
@@ -100,12 +88,12 @@ package trolling.component.animation
 				return;
 			}
 			
-			_animation[index].dispose();
+			//_animation[index].dispose();
 			_animation[index] = null;
 			_animation.removeAt(index);
 		}
 		
-		public function getCurrentFrame():Texture
+		public function getCurrentFrame():BitmapData
 		{
 			if (!_animation || _currentIndex < 0 || !_isPlaying)
 			{
@@ -134,7 +122,7 @@ package trolling.component.animation
 		
 		public function get playSpeed():uint
 		{
-			return _animationSpeed;	
+			return _playSpeed;	
 		}
 		
 		public function set playSpeed(value:uint):void
@@ -143,7 +131,7 @@ package trolling.component.animation
 			{
 				value = 1;
 			}
-			_animationSpeed = value;
+			_playSpeed = value;
 		}
 		
 		public function get isPlaying():Boolean
@@ -160,7 +148,7 @@ package trolling.component.animation
 			
 			_frameCounter++;
 			
-			if (_frameCounter == _animationSpeed)
+			if (_frameCounter == _playSpeed)
 			{
 				_currentIndex++;
 				
