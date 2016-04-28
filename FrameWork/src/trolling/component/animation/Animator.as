@@ -11,8 +11,8 @@ package trolling.component.animation
 		private const TAG:String = "[Animator]";
 		private const NONE:String = "none";
 		
-		private var _states:Dictionary; // key: TouchEvent name, value: State
-		private var _currentState:String; // TouchEvent name
+		private var _states:Dictionary; // key: State name, value: State
+		private var _currentState:String; // State name
 		
 		public function Animator(isActive:Boolean = false)
 		{
@@ -50,7 +50,6 @@ package trolling.component.animation
 					{
 						return;
 					}
-					//addEventListener(TouchEvent.ENDED, onTouch);
 				}
 			}
 			else
@@ -59,7 +58,6 @@ package trolling.component.animation
 				{
 					var state:State = _states[_currentState];
 					state.stop();
-					//removeEventListener(TouchEvent.ENDED, onTouch);
 				}
 			}
 
@@ -108,23 +106,17 @@ package trolling.component.animation
 			return state;
 		}
 		
-		public function removeState(name:String):void
+		public function removeState(stateName:String):void
 		{
-			if (_isActive || !name || !_states)
+			if (_isActive || !stateName || !_states || !_states[stateName])
 			{
 				return;
 			}
-			
-			var key:String = isState(name);
-			if (key == NONE)
-			{
-				return;
-			}
-			
-			var state:State = _states[key];
+
+			var state:State = _states[stateName];
 			state.dispose();
 			state = null;
-			delete _states[key];
+			delete _states[stateName];
 			
 			_currentState = NONE;
 		}
@@ -166,82 +158,27 @@ package trolling.component.animation
 			}
 		}
 		
-		public function get currentState():String
+		public function transition(nextStateName:String):void
 		{
-			return _currentState;	
-		}
-		
-//		private function onTouch(event:TouchEvent):void
-//		{
-//			if (!_isActive || !_states)
-//			{
-//				return;
-//			}
-//			
-//			// Get key
-//			
-//			if (isKey(key))
-//			{
-//				transition(key);			
-//			}
-//		}
-		
-		private function isKey(input:String):Boolean
-		{
-			if (!_states)
-			{
-				return false;	
-			}
-			
-			var result:Boolean = false;
-			
-			for (var key:String in _states)
-			{
-				if (key == input)
-				{
-					result = true;
-					break;
-				}
-			}
-			
-			return result;
-		}
-		
-		private function isState(input:String):String
-		{
-			if (!_states)
-			{
-				return NONE;	
-			}
-			
-			for (var key:String in _states)
-			{
-				var state:State = _states[key];
-				if (state.name == input)
-				{
-					return key;
-				}
-			}
-			
-			return NONE;
-		}
-		
-		private function transition(key:String):void
-		{
-			if (!_isActive || !_states)
+			if (!_isActive || !_states || !_states[nextStateName])
 			{
 				return;
 			}
-
+			
 			if (_currentState != NONE)
 			{
 				var currState:State = _states[_currentState];
 				currState.stop();
 			}
 			
-			_currentState = key;
+			_currentState = nextStateName;
 			var nextState:State = _states[_currentState];
 			nextState.play();
+		}
+		
+		public function get currentState():String
+		{
+			return _currentState;	
 		}
 	}
 }

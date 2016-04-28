@@ -1,10 +1,8 @@
 package trolling.component
 {
-	import flash.events.EventDispatcher;
-	
 	import trolling.object.GameObject;
 	
-	public class Component extends EventDispatcher
+	public class Component
 	{		
 		private var _type:String;
 		protected var _parent:GameObject;
