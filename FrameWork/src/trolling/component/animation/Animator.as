@@ -4,6 +4,7 @@ package trolling.component.animation
 	
 	import trolling.component.ComponentType;
 	import trolling.component.DisplayComponent;
+	import trolling.rendering.Texture;
 
 	public class Animator extends DisplayComponent
 	{
@@ -13,9 +14,9 @@ package trolling.component.animation
 		private var _states:Dictionary; // key: TouchEvent name, value: State
 		private var _currentState:String; // TouchEvent name
 		
-		public function Animator(name:String)
+		public function Animator(isActive:Boolean = false)
 		{
-			super(ComponentType.ANIMATOR, name);
+			super(ComponentType.ANIMATOR, isActive);
 			
 			_currentState = NONE;
 		}
@@ -28,8 +29,9 @@ package trolling.component.animation
 			{
 				for (var key:String in _states)
 				{
-					State(_states[key]).dispose();
-					_states[key] = null;
+					var state:State = _states[key];
+					state.dispose();
+					state = null;
 				}
 			}
 			_states = null;
@@ -55,7 +57,8 @@ package trolling.component.animation
 			{
 				if (_isActive)
 				{
-					State(_states[_currentState]).stop();
+					var state:State = _states[_currentState];
+					state.stop();
 					//removeEventListener(TouchEvent.ENDED, onTouch);
 				}
 			}
@@ -63,19 +66,21 @@ package trolling.component.animation
 			_isActive = value;
 		}
 		
-//		public override function getRenderingResource():Texture
-//		{
-//			if (!_isActive || !_states || _currentState == NONE)
-//			{
-//				return null;
-//			}
-//			
-//			return State(_states[_currentState]).getCurrentFrame();
-//		}
+		public override function getRenderingResource():Texture
+		{
+			if (!_isActive || !_states || _currentState == NONE)
+			{
+				return null;
+			}
+			
+			var state:State = _states[_currentState];
+			
+			return state.getCurrentFrame();
+		}
 				
 		public function addState(key:String, name:String):State // 새로운 State 추가
 		{
-			if (!name || name == "" || name == NONE)
+			if (!key || key == "" || !name || name == "" || name == NONE)
 			{
 				return null;
 			}
@@ -105,7 +110,7 @@ package trolling.component.animation
 		
 		public function removeState(name:String):void
 		{
-			if (_isActive || !name || name == "" || !_states)
+			if (_isActive || !name || !_states)
 			{
 				return;
 			}
@@ -116,8 +121,9 @@ package trolling.component.animation
 				return;
 			}
 			
-			State(_states[key]).dispose();
-			_states[key] = null;
+			var state:State = _states[key];
+			state.dispose();
+			state = null;
 			delete _states[key];
 			
 			_currentState = NONE;
@@ -229,11 +235,13 @@ package trolling.component.animation
 
 			if (_currentState != NONE)
 			{
-				State(_states[_currentState]).stop();
+				var currState:State = _states[_currentState];
+				currState.stop();
 			}
 			
-			_currentState = key;			
-			State(_states[_currentState]).play();
+			_currentState = key;
+			var nextState:State = _states[_currentState];
+			nextState.play();
 		}
 	}
 }

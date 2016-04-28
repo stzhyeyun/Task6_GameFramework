@@ -19,6 +19,9 @@ package trolling.object
 	
 	public class GameObject extends EventDispatcher
 	{	
+		private const TAG:String = "[GameObject]";
+		private const NONE:String = "none";
+		
 		private var _parent:GameObject = null;
 		private var _depth:Number;
 		
@@ -49,11 +52,20 @@ package trolling.object
 //			_bitmap = new TextureBitmap();
 //		}
 		
-		public function addComponent(property:Component):void
+		public function addComponent(component:Component):void
 		{
-			_components[property.type] = property;
-			property.isActive = true;
-			property.parent = this;
+			if(_components && _components[component.type])
+			{
+				trace(TAG + " addComponent : GameObject already has the component of this type.");
+				return;
+			}
+			
+			if (!_components)
+			{
+				_components = new Dictionary();
+			}
+			component.parent = this;
+			_components[component.type] = component;
 		}
 		
 		public function addChild(child:GameObject):void
@@ -67,46 +79,49 @@ package trolling.object
 		
 		public function render(painter:Painter):void
 		{	
-			var numChildren:int = _children.length;
-			
-			if(_components[ComponentType.IMAGE] != null)
+			if(_children && _components) // [혜윤] Render 대상이 없으면 함수 종료
 			{
-				var triangleData:TriangleData = new TriangleData();
+				var numChildren:int = _children.length;
 				
-				var drawRect:Rectangle = getRectangle();
-				var globalPoint:Point = getGlobalPoint();
-				
-				drawRect.x = globalPoint.x;
-				drawRect.y = globalPoint.y;
-				
-				drawRect.x = (drawRect.x - (painter.viewPort.width/2)) / (painter.viewPort.width/2);
-				drawRect.y = ((painter.viewPort.height/2) - drawRect.y) / (painter.viewPort.height/2);
-				
-				drawRect.width = drawRect.width / painter.viewPort.width;
-				drawRect.height = drawRect.height / painter.viewPort.height;
-				
-				var matrix:Matrix3D = new Matrix3D();
-				matrix.identity();
-				matrix.appendScale(drawRect.width, drawRect.height, 1);
-				matrix.appendTranslation(drawRect.x+drawRect.width, drawRect.y-drawRect.height, 0);
-				
-			//	painter.context.setDepthTest(false, Context3DCompareMode.ALWAYS);
-			//	_texture = new Texture(_bitmap);
-				trace(_components[ComponentType.IMAGE])
-				_texture = Image(_components[ComponentType.IMAGE]).getRenderingResource();
-				painter.context.setTextureAt(0, _texture.nativeTexture);
-				triangleData.uvData[0] = _texture.u;
-				triangleData.uvData[1] = _texture.v;
-				
-				
-				painter.pushState();
-				
-				painter.appendMatrix(matrix);  
-		//		painter.setUVVector(triangleData);
-				painter.setDrawData(triangleData);
-				painter.draw();
-				
-				painter.popState();
+				if(_components[ComponentType.IMAGE] != null)
+				{
+					var triangleData:TriangleData = new TriangleData();
+					
+					var drawRect:Rectangle = getRectangle();
+					var globalPoint:Point = getGlobalPoint();
+					
+					drawRect.x = globalPoint.x;
+					drawRect.y = globalPoint.y;
+					
+					drawRect.x = (drawRect.x - (painter.viewPort.width/2)) / (painter.viewPort.width/2);
+					drawRect.y = ((painter.viewPort.height/2) - drawRect.y) / (painter.viewPort.height/2);
+					
+					drawRect.width = drawRect.width / painter.viewPort.width;
+					drawRect.height = drawRect.height / painter.viewPort.height;
+					
+					var matrix:Matrix3D = new Matrix3D();
+					matrix.identity();
+					matrix.appendScale(drawRect.width, drawRect.height, 1);
+					matrix.appendTranslation(drawRect.x+drawRect.width, drawRect.y-drawRect.height, 0);
+					
+				//	painter.context.setDepthTest(false, Context3DCompareMode.ALWAYS);
+				//	_texture = new Texture(_bitmap);
+					trace(_components[ComponentType.IMAGE])
+					_texture = Image(_components[ComponentType.IMAGE]).getRenderingResource();
+					painter.context.setTextureAt(0, _texture.nativeTexture);
+					triangleData.uvData[0] = _texture.u;
+					triangleData.uvData[1] = _texture.v;
+					
+					
+					painter.pushState();
+					
+					painter.appendMatrix(matrix);  
+			//		painter.setUVVector(triangleData);
+					painter.setDrawData(triangleData);
+					painter.draw();
+					
+					painter.popState();
+				}
 			}
 			
 			for(var i:int = 0; i < numChildren; i++)
@@ -215,6 +230,71 @@ package trolling.object
 		public function set x(value:Number):void
 		{
 			_x = value;
+		}
+		
+		private function decideRenderingComponent():String
+		{
+			// 컴포넌트가 없음
+			if (!_components)
+			{
+				return NONE;
+			}
+				// Image만 있음
+			else if (_components[ComponentType.IMAGE] && !_components[ComponentType.ANIMATOR])
+			{
+				var image:Component = _components[ComponentType.IMAGE];
+				
+				if (image.isActive)
+				{
+					return ComponentType.IMAGE;
+				}
+				else
+				{
+					return NONE;
+				}
+			}
+				// Animator만 있음
+			else if (!_components[ComponentType.IMAGE] && _components[ComponentType.ANIMATOR])
+			{
+				var animator:Component = _components[ComponentType.ANIMATOR];
+				
+				if (animator.isActive)
+				{
+					return ComponentType.ANIMATOR;
+				}
+				else
+				{
+					return NONE;
+				}
+			}
+				// Image와 Animator 둘 다 있음
+			else if (_components[ComponentType.IMAGE] && _components[ComponentType.ANIMATOR])
+			{
+				var image:Component = _components[ComponentType.IMAGE];
+				var animator:Component = _components[ComponentType.ANIMATOR];
+				
+				if (image.isActive && !animator.isActive)
+				{
+					return ComponentType.IMAGE;
+				}
+				else if (!image.isActive && animator.isActive)
+				{
+					return ComponentType.ANIMATOR;
+				}
+				else if (image.isActive && animator.isActive)
+				{
+					return ComponentType.ANIMATOR; // Animator를 우선하여 그림
+				}
+				else
+				{
+					return NONE;
+				}
+			}
+				// 컴포넌트가 없음
+			else
+			{
+				return NONE;
+			}
 		}
 	}
 }

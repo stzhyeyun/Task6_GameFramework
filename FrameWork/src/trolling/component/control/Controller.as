@@ -18,9 +18,9 @@ package trolling.component.control
 		private var _id:String;
 		private var _movements:Dictionary; 
 		
-		public function Controller(name:String, id:String)
+		public function Controller(id:String, isActive:Boolean = false)
 		{
-			super(ComponentType.CONTROLLER, name);
+			super(ComponentType.CONTROLLER, isActive);
 			
 			_id = id;
 		}

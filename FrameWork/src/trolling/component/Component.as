@@ -7,21 +7,17 @@ package trolling.component
 	public class Component extends EventDispatcher
 	{		
 		private var _type:String;
-		protected var _name:String;
 		protected var _parent:GameObject;
 		protected var _isActive:Boolean;
 		
-		public function Component(type:String, name:String)
+		public function Component(type:String, isActive:Boolean = false)
 		{
 			_type = type;
-			_name = name;
-			_parent = parent;
-			_isActive = false;
+			_isActive = isActive;
 		}
 		
 		public function dispose():void
 		{
-			_name = null;
 			_type = null;
 			_parent = null;
 			_isActive = false;
@@ -30,16 +26,6 @@ package trolling.component
 		public function get type():String
 		{
 			return _type;
-		}
-		
-		public function get name():String
-		{
-			return _name;
-		}
-		
-		public function set name(value:String):void
-		{
-			_name = value;
 		}
 		
 		public function get parent():GameObject

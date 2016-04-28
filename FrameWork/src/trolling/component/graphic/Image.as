@@ -12,13 +12,13 @@ package trolling.component.graphic
 		
 		private var _texture:Texture;
 		
-		public function Image(name:String, resource:Bitmap)
+		public function Image(resource:Bitmap, isActive:Boolean = false)
 		{
-			super(ComponentType.IMAGE, name);
+			super(ComponentType.IMAGE, isActive);
 			
 			if (!resource)
 			{
-				//super.dispose();
+				//super.dispose(); // ?
 				throw new ArgumentError(TAG + " ctor : No \'resource\'.");
 			}
 			
@@ -34,10 +34,10 @@ package trolling.component.graphic
 		
 		public override function dispose():void
 		{
-			//            if (_texture)
-			//            {
-			//                _texture.dispose();
-			//            }
+//			if (_texture)
+//			{
+//				_texture.dispose();
+//			}
 			_texture = null;
 			
 			super.dispose();
@@ -47,13 +47,11 @@ package trolling.component.graphic
 		{
 			if (!_isActive)
 			{
-				trace("isActive");
 				return null;
 			}
 			
 			if (_texture)
 			{
-				trace("아아아");
 				return _texture;
 			}
 			else

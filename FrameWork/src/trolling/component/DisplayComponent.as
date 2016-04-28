@@ -4,9 +4,9 @@ package trolling.component
 	
 	public class DisplayComponent extends Component
 	{
-		public function DisplayComponent(type:String, name:String)
+		public function DisplayComponent(type:String, isActive:Boolean = false)
 		{
-			super(type, name);
+			super(type, isActive);
 		}
 		
 		public virtual function getRenderingResource():Texture
