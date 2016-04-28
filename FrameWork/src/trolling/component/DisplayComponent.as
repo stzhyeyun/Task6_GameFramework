@@ -1,6 +1,6 @@
 package trolling.component
 {
-	import flash.display.BitmapData;
+	import flash.display3D.textures.Texture;
 	
 	import trolling.object.GameObject;
 	
@@ -11,7 +11,7 @@ package trolling.component
 			super(type, name, parent);
 		}
 		
-		public virtual function getRenderingResource():BitmapData
+		public virtual function getRenderingResource():Texture
 		{
 			return null;
 		}

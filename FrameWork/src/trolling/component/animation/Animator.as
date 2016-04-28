@@ -1,6 +1,6 @@
 package trolling.component.animation
 {
-	import flash.display.BitmapData;
+	import flash.display3D.textures.Texture;
 	import flash.utils.Dictionary;
 	
 	import trolling.component.ComponentType;
@@ -65,7 +65,7 @@ package trolling.component.animation
 			_isActive = value;
 		}
 		
-		public override function getRenderingResource():BitmapData
+		public override function getRenderingResource():Texture
 		{
 			if (!_isActive || !_states || _currentState == NONE)
 			{

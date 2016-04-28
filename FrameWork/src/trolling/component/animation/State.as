@@ -1,13 +1,19 @@
 package trolling.component.animation
 {
+	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.display3D.textures.Texture;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	
+	import trolling.utils.TextureUtil;
+	
 	public class State extends EventDispatcher
 	{
+		private const TAG:String = "[State]";
+		
 		private var _name:String;
-		private var _animation:Vector.<BitmapData>;
+		private var _animation:Vector.<Texture>;
 		private var _currentIndex:int;
 		private var _playSpeed:uint; // 다음 애니메이션 인덱스로 업데이트 하기까지의 프레임 수
 		private var _frameCounter:uint;
@@ -30,7 +36,7 @@ package trolling.component.animation
 			{
 				for (var i:int = 0; i < _animation.length; i++)
 				{
-					//_animation[i].dispose();
+					_animation[i].dispose();
 					_animation[i] = null;
 				}
 			}
@@ -67,16 +73,24 @@ package trolling.component.animation
 			removeEventListener(Event.ENTER_FRAME, onEnterFrame);
 		}
 		
-		public function addFrame(frame:BitmapData):void
+		public function addFrame(resource:BitmapData):void
 		{
+			if (!resource)
+			{
+				trace(TAG + " addFrame : No \'resource\'.");
+				return;
+			}
+			
+			var frame:Texture = TextureUtil.fromBitmap(new Bitmap(resource));
+			
 			if (!frame)
 			{
-				return;
+				throw new ArgumentError(TAG + " addFrame : Failed to create a Texture.");
 			}
 			
 			if (!_animation)
 			{
-				_animation = new Vector.<BitmapData>();
+				_animation = new Vector.<Texture>();
 			}
 			_animation.push(frame);
 		}
@@ -88,12 +102,12 @@ package trolling.component.animation
 				return;
 			}
 			
-			//_animation[index].dispose();
+			_animation[index].dispose();
 			_animation[index] = null;
 			_animation.removeAt(index);
 		}
 		
-		public function getCurrentFrame():BitmapData
+		public function getCurrentFrame():Texture
 		{
 			if (!_animation || _currentIndex < 0 || !_isPlaying)
 			{
