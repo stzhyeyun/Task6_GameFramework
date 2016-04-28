@@ -2,11 +2,10 @@ package trolling.component.animation
 {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
-	import flash.display3D.textures.Texture;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	
-	import trolling.utils.TextureUtil;
+	import trolling.rendering.Texture;
 	
 	public class State extends EventDispatcher
 	{
@@ -81,7 +80,7 @@ package trolling.component.animation
 				return;
 			}
 			
-			var frame:Texture = TextureUtil.fromBitmap(new Bitmap(resource));
+			var frame:Texture = Texture(new Bitmap(resource));
 			
 			if (!frame)
 			{

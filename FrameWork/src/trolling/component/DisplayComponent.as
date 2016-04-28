@@ -1,8 +1,7 @@
 package trolling.component
 {
-	import flash.display3D.textures.Texture;
-	
 	import trolling.object.GameObject;
+	import trolling.rendering.Texture;
 	
 	public class DisplayComponent extends Component
 	{

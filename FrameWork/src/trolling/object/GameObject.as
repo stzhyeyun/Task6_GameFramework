@@ -9,38 +9,19 @@ package trolling.object
 	import flash.utils.Dictionary;
 	
 	import trolling.component.Component;
-<<<<<<< HEAD
-<<<<<<< HEAD
 	import trolling.component.ComponentType;
 	import trolling.component.DisplayComponent;
-=======
->>>>>>> 73a7a9025732479366c36ed15af53a6a223f2d83
 	import trolling.rendering.Painter;
 	import trolling.rendering.Texture;
 	import trolling.rendering.TriangleData;
-<<<<<<< HEAD
-	import trolling.utils.TextureUtil;
-	
-	public class GameObject extends EventDispatcher
-	{
-		private const TAG:String = "[GameObject]";
-		private const NONE:String = "none";
-=======
-=======
-	import trolling.rendering.Painter;
-	import trolling.rendering.Texture;
-	import trolling.rendering.TriangleData;
->>>>>>> 73a7a9025732479366c36ed15af53a6a223f2d83
-	
 	
 	public class GameObject extends EventDispatcher
 	{
 		[Embed( source = "iu3.jpg" )]
 		protected const TextureBitmap:Class;
-<<<<<<< HEAD
->>>>>>> 73a7a9025732479366c36ed15af53a6a223f2d83
-=======
->>>>>>> 73a7a9025732479366c36ed15af53a6a223f2d83
+
+		private const TAG:String = "[GameObject]";
+		private const NONE:String = "none";
 		
 		private var _parent:GameObject = null;
 		private var _depth:Number;
@@ -154,7 +135,7 @@ package trolling.object
 			
 			drawRect.x = globalPoint.x;
 			drawRect.y = globalPoint.y;
-<<<<<<< HEAD
+
 			
 			drawRect.x = (drawRect.x - (painter.viewPort.width/2)) / (painter.viewPort.width/2);
 			drawRect.y = ((painter.viewPort.height/2) - drawRect.y) / (painter.viewPort.height/2);
@@ -163,7 +144,7 @@ package trolling.object
 			drawRect.height = drawRect.height / painter.viewPort.height;
 	//		trace("drawRect =" + drawRect);
 			
-=======
+
 			
 			drawRect.x = (drawRect.x - (painter.viewPort.width/2)) / (painter.viewPort.width/2);
 			drawRect.y = ((painter.viewPort.height/2) - drawRect.y) / (painter.viewPort.height/2);
@@ -172,7 +153,7 @@ package trolling.object
 			drawRect.height = drawRect.height / painter.viewPort.height;
 	//		trace("drawRect =" + drawRect);
 			
->>>>>>> 73a7a9025732479366c36ed15af53a6a223f2d83
+
 			var matrix:Matrix3D = new Matrix3D();
 			matrix.identity();
 			matrix.appendScale(drawRect.width, drawRect.height, 1);
@@ -185,40 +166,38 @@ package trolling.object
 			var renderingComponentType:String = decideRenderingComponent(); // [혜윤] Render할 컴포넌트 확인 및 결정
 			if(painter.root != this && renderingComponentType != NONE)
 			{
-<<<<<<< HEAD
-<<<<<<< HEAD
 				trace("_width , _height = " + _width + ", " + _height);
 //				if(_bitmapData != null)
 //					trace("얍얍");
-//				_texture = TextureUtil.fromBitmap(new Bitmap(_bitmapData)); // [혜윤] Component 그리기 테스트를 위해 주석 처리
+//				_texture = TextureUtil.fromBitmap(new Bitmap(_bitmapData));
 				
+				// [혜윤] Component 렌더 코드
+//				var displayComponent:DisplayComponent = _components[renderingComponentType];
+//				var texture:Texture = displayComponent.getRenderingResource();
+//				if (!texture)
+//				{
+//					trace(TAG + " render : No Texture(Component).");
+//					return;					
+//				}
+//				
+//				painter.context.setTextureAt(0, texture.nativeTexture);
 				//
-				var displayComponent:DisplayComponent = _components[renderingComponentType];
-				var texture:Texture = displayComponent.getRenderingResource();
-				if (!texture)
-				{
-					trace(TAG + " render : No Texture(Component).");
-					return;					
-				}
-				//
-				
-				painter.context.setTextureAt(0, texture);
-=======
+
 //				trace("_width , _height = " + _width + ", " + _height);
 				_texture = new Texture(_bitmap);
 				painter.context.setTextureAt(0, _texture.nativeTexture);
 				_triangleData.uvData[0] = _texture.u;
 				_triangleData.uvData[1] = _texture.v;
->>>>>>> 73a7a9025732479366c36ed15af53a6a223f2d83
+
 				
-=======
+
 //				trace("_width , _height = " + _width + ", " + _height);
 				_texture = new Texture(_bitmap);
 				painter.context.setTextureAt(0, _texture.nativeTexture);
 				_triangleData.uvData[0] = _texture.u;
 				_triangleData.uvData[1] = _texture.v;
 				
->>>>>>> 73a7a9025732479366c36ed15af53a6a223f2d83
+
 //				_triangleData.vertexData.push(Vector.<Number>([drawRect.x+drawRect.width, drawRect.y, 0, 1, 0]));
 //				_triangleData.vertexData.push(Vector.<Number>([drawRect.x+drawRect.width, drawRect.y-drawRect.height, 0, 1, 1]));
 //				_triangleData.vertexData.push(Vector.<Number>([drawRect.x, drawRect.y-drawRect.height, 0, 0, 1]));

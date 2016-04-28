@@ -2,12 +2,11 @@ package trolling.component.graphic
 {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
-	import flash.display3D.textures.Texture;
 	
 	import trolling.component.ComponentType;
 	import trolling.component.DisplayComponent;
 	import trolling.object.GameObject;
-	import trolling.utils.TextureUtil;
+	import trolling.rendering.Texture;
 	
 	public class Image extends DisplayComponent
 	{
@@ -25,7 +24,7 @@ package trolling.component.graphic
 				throw new ArgumentError(TAG + " ctor : No \'resource\'.");
 			}
 			
-			var texture:Texture = TextureUtil.fromBitmap(new Bitmap(resource));
+			var texture:Texture = Texture(new Bitmap(resource));
 			
 			if (!texture)
 			{
@@ -37,10 +36,10 @@ package trolling.component.graphic
 		
 		public override function dispose():void
 		{
-			if (_texture)
-			{
-				_texture.dispose();
-			}
+//			if (_texture)
+//			{
+//				_texture.dispose();
+//			}
 			_texture = null;
 			
 			super.dispose();

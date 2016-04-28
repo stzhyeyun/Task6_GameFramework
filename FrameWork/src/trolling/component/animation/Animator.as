@@ -1,11 +1,11 @@
 package trolling.component.animation
 {
-	import flash.display3D.textures.Texture;
 	import flash.utils.Dictionary;
 	
 	import trolling.component.ComponentType;
 	import trolling.component.DisplayComponent;
 	import trolling.object.GameObject;
+	import trolling.rendering.Texture;
 
 	public class Animator extends DisplayComponent
 	{
