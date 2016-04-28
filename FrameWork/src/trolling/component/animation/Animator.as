@@ -77,7 +77,7 @@ package trolling.component.animation
 				
 		public function addState(key:String, name:String):State // 새로운 State 추가
 		{
-			if (!name || name == "" || name == NONE)
+			if (!key || key == "" || !name || name == "" || name == NONE)
 			{
 				return null;
 			}
