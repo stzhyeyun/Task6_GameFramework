@@ -54,15 +54,46 @@ package trolling.object
 		
 		public function addComponent(component:Component):void
 		{
-			if(_components[component.type])
+			if(_components && _components[component.type])
 			{
 				trace(TAG + " addComponent : GameObject already has the component of this type.");
 				return;
 			}
-
+			
+			if (!_components)
+			{
+				_components = new Dictionary();
+			}
 			_components[component.type] = component;
 		}
+		
+		public function removeComponent(componentType:String):void
 		{
+			if (!_components || !_components[componentType])
+			{
+				return;
+			}
+			
+			var component:Component = _components[componentType];
+			component.dispose();
+			component = null;
+			delete _components[componentType];
+		}
+		
+		public function getComponent(componentType:String):Component
+		{
+			if (!_components || !_components[componentType])
+			{
+				return null;
+			}
+			
+			return _components[componentType];
+		}
+		
+		public function setComponent(component:Component):void
+		{
+			// to do
+			
 			
 		}
 		
