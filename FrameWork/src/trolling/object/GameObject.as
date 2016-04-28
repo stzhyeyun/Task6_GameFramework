@@ -102,7 +102,7 @@ package trolling.object
 				trace("_width , _height = " + _width + ", " + _height);
 				if(_bitmapData != null)
 					trace("얍얍");
-				_texture = TextureUtil.fromBitmap(painter.context, new Bitmap(_bitmapData));
+				_texture = TextureUtil.fromBitmap(new Bitmap(_bitmapData));
 				painter.context.setTextureAt(0, _texture);
 				
 				_triangleData.vertexData.push(Vector.<Number>([rect.x+rect.width, rect.y, 0, 1, 0]));

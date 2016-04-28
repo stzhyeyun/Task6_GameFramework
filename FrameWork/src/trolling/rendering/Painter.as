@@ -56,7 +56,7 @@ package trolling.rendering
 		private function initMolehill(event:Event):void
 		{
 			_context = _stage3D.context3D;	
-			_moleCallBack();
+			_moleCallBack(_context);
 			_program.initProgram(_context);
 			setProgram();
 		}
