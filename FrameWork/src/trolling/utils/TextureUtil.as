@@ -7,6 +7,8 @@ package trolling.utils
 	import flash.display3D.textures.Texture;
 	import flash.geom.Matrix;
 	
+	import trolling.core.Trolling;
+	
 	public class TextureUtil
 	{	
 		public function TextureUtil()
@@ -14,7 +16,7 @@ package trolling.utils
 			
 		}
 		
-		public static function fromBitmap(context:Context3D, bitmap:Bitmap):flash.display3D.textures.Texture
+		public static function fromBitmap(bitmap:Bitmap):flash.display3D.textures.Texture
 		{
 			var _nativeTexture:flash.display3D.textures.Texture;
 			
@@ -25,7 +27,7 @@ package trolling.utils
 			matrix.scale(binaryWidth/bitmap.width, binaryHeight/bitmap.height);
 			
 			//	var _nativeTexture:flash.display3D.textures.Texture;
-			_nativeTexture = context.createTexture(binaryWidth, binaryHeight, Context3DTextureFormat.BGRA, false);
+			_nativeTexture = Trolling.current.context.createTexture(binaryWidth, binaryHeight, Context3DTextureFormat.BGRA, false);
 			//	_nativeTexture.uploadFromBitmapData(bitmap.bitmapData);
 			
 			var bitmapData:BitmapData = new BitmapData(binaryWidth, binaryHeight);

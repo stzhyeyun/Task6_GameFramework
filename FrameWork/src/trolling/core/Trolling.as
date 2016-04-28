@@ -9,9 +9,7 @@ package trolling.core
 	
 	import trolling.object.GameObject;
 	import trolling.object.Stage;
-	
 	import trolling.rendering.Painter;
-	
 	import trolling.utils.Color;
 	
 	public class Trolling
@@ -31,7 +29,7 @@ package trolling.core
 		
 		private static var sPainters:Dictionary = new Dictionary(true);
 		private static var _current:Trolling;
-		private static var _context:Context3D;
+		private var _context:Context3D;
 		
 		public function Trolling(rootClass:Class, stage:flash.display.Stage, stage3D:Stage3D = null)
 		{
@@ -85,12 +83,12 @@ package trolling.core
 				return null;
 		}
 		
-		public static function get context():Context3D
+		public function get context():Context3D
 		{
 			return _context;
 		}
 		
-		public static function set context(value:Context3D):void
+		public function set context(value:Context3D):void
 		{
 			_context = value;
 		}
@@ -115,10 +113,11 @@ package trolling.core
 			_stage = value;
 		}
 		
-		private function onInitPainter():void
+		private function onInitPainter(context:Context3D):void
 		{
 			_painter.configureBackBuffer(_viewPort);
 			_initRender = true;
+			_context = context;
 		}
 		
 		public function initializeRoot():void
