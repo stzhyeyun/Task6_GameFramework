@@ -2,8 +2,8 @@ package trolling.rendering
 {
 	import flash.display.Stage3D;
 	import flash.display3D.Context3D;
+	import flash.display3D.Context3DCompareMode;
 	import flash.display3D.Context3DProgramType;
-	import flash.display3D.Context3DTriangleFace;
 	import flash.display3D.Context3DVertexBufferFormat;
 	import flash.display3D.IndexBuffer3D;
 	import flash.display3D.VertexBuffer3D;
@@ -19,6 +19,8 @@ package trolling.rendering
 	public class Painter
 	{	
 		private static const X_AXIS:Vector3D = Vector3D.X_AXIS;
+		private static const Y_AXIS:Vector3D = Vector3D.Y_AXIS;
+		private static const Z_AXIS:Vector3D = Vector3D.Z_AXIS;
 		
 		private var _root:GameObject;
 		
@@ -73,13 +75,14 @@ package trolling.rendering
 		private function initMolehill(event:Event):void
 		{
 			_context = _stage3D.context3D;	
-			_moleCallBack(_context);
 			_program.initProgram(_context);
 			setProgram();
 			createVertexBuffer();
 			createIndexBuffer();
 			setVertextBuffer();
-		//	_matrix.appendRotation(1, X_AXIS);
+			_context.setDepthTest(true, Context3DCompareMode.ALWAYS);
+			_moleCallBack(_context);
+		//	_context.set
 		}
 		
 		public function configureBackBuffer(viewPort:Rectangle, antiAlias:Boolean = true):void
@@ -97,15 +100,17 @@ package trolling.rendering
 			
 			trace(viewPort.width + ", " + viewPort.height);
 			_context.configureBackBuffer(viewPort.width, viewPort.height, alias, true);
-			_context.setCulling(Context3DTriangleFace.BACK);
+		//	_context.setCulling(Context3DTriangleFace.BACK);
 			
 			_backBufferWidth = viewPort.width;
 			_backBufferHeight = viewPort.height;
 		}
 		
-		public function setDrawData(triagleData:TriangleData):void
+		public function setDrawData(triangleData:TriangleData):void
 		{
-			setUVVector(triagleData);
+			setUVVector(triangleData);
+			_matrix.appendRotation(0, X_AXIS);
+		//	_matrix.appendTranslation(0, -0.5, 0);
 			setMatrix();
 		}
 		
@@ -124,7 +129,7 @@ package trolling.rendering
 			_matrix.append(matrix);
 		}
 		
-		private function setUVVector(triagleData:TriangleData):void
+		public function setUVVector(triagleData:TriangleData):void
 		{
 			_context.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 4, triagleData.uvData);
 		}

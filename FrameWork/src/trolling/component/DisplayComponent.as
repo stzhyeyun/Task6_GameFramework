@@ -1,17 +1,15 @@
 package trolling.component
 {
-	import flash.display.BitmapData;
-	
-	import trolling.object.GameObject;
+	import trolling.rendering.Texture;
 	
 	public class DisplayComponent extends Component
 	{
-		public function DisplayComponent(type:String, name:String, parent:GameObject)
+		public function DisplayComponent(type:String, name:String)
 		{
-			super(type, name, parent);
+			super(type, name);
 		}
 		
-		public virtual function getRenderingResource():BitmapData
+		public virtual function getRenderingResource():Texture
 		{
 			return null;
 		}

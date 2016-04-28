@@ -1,45 +1,60 @@
 package trolling.component.graphic
 {
-	import flash.display.BitmapData;
+	import flash.display.Bitmap;
 	
 	import trolling.component.ComponentType;
 	import trolling.component.DisplayComponent;
-	import trolling.object.GameObject;
+	import trolling.rendering.Texture;
 	
 	public class Image extends DisplayComponent
 	{
 		private const TAG:String = "[Image]";
 		
-		private var _bitmapData:BitmapData;
+		private var _texture:Texture;
 		
-		public function Image(name:String, parent:GameObject, resource:BitmapData)
+		public function Image(name:String, resource:Bitmap)
 		{
-			super(ComponentType.IMAGE, name, parent);
+			super(ComponentType.IMAGE, name);
 			
-			_bitmapData = resource;
+			if (!resource)
+			{
+				//super.dispose();
+				throw new ArgumentError(TAG + " ctor : No \'resource\'.");
+			}
+			
+			var texture:Texture = new Texture(resource);
+			
+			if (!texture)
+			{
+				throw new ArgumentError(TAG + " ctor : Failed to create a Texture.");
+			}
+			
+			_texture = texture;
 		}
 		
 		public override function dispose():void
 		{
-			if (_bitmapData)
-			{
-				//_bitmapData.dispose();
-			}
-			_bitmapData = null;
+			//            if (_texture)
+			//            {
+			//                _texture.dispose();
+			//            }
+			_texture = null;
 			
 			super.dispose();
 		}
 		
-		public override function getRenderingResource():BitmapData
+		public override function getRenderingResource():Texture
 		{
 			if (!_isActive)
 			{
+				trace("isActive");
 				return null;
 			}
 			
-			if (_bitmapData)
+			if (_texture)
 			{
-				return _bitmapData;
+				trace("아아아");
+				return _texture;
 			}
 			else
 			{

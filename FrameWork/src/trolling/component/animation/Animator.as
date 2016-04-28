@@ -1,11 +1,9 @@
 package trolling.component.animation
 {
-	import flash.display.BitmapData;
 	import flash.utils.Dictionary;
 	
 	import trolling.component.ComponentType;
 	import trolling.component.DisplayComponent;
-	import trolling.object.GameObject;
 
 	public class Animator extends DisplayComponent
 	{
@@ -15,9 +13,9 @@ package trolling.component.animation
 		private var _states:Dictionary; // key: TouchEvent name, value: State
 		private var _currentState:String; // TouchEvent name
 		
-		public function Animator(name:String, parent:GameObject)
+		public function Animator(name:String)
 		{
-			super(ComponentType.ANIMATOR, name, parent);
+			super(ComponentType.ANIMATOR, name);
 			
 			_currentState = NONE;
 		}
@@ -65,15 +63,15 @@ package trolling.component.animation
 			_isActive = value;
 		}
 		
-		public override function getRenderingResource():BitmapData
-		{
-			if (!_isActive || !_states || _currentState == NONE)
-			{
-				return null;
-			}
-			
-			return State(_states[_currentState]).getCurrentFrame();
-		}
+//		public override function getRenderingResource():Texture
+//		{
+//			if (!_isActive || !_states || _currentState == NONE)
+//			{
+//				return null;
+//			}
+//			
+//			return State(_states[_currentState]).getCurrentFrame();
+//		}
 				
 		public function addState(key:String, name:String):State // 새로운 State 추가
 		{

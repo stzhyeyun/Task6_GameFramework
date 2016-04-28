@@ -7,7 +7,6 @@ package trolling.component.control
 	
 	import trolling.component.Component;
 	import trolling.component.ComponentType;
-	import trolling.object.GameObject;
 	
 	public class Controller extends Component
 	{
@@ -19,9 +18,9 @@ package trolling.component.control
 		private var _id:String;
 		private var _movements:Dictionary; 
 		
-		public function Controller(name:String, parent:GameObject, id:String)
+		public function Controller(name:String, id:String)
 		{
-			super(ComponentType.CONTROLLER, name, parent);
+			super(ComponentType.CONTROLLER, name);
 			
 			_id = id;
 		}

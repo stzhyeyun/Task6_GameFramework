@@ -58,9 +58,6 @@ package trolling.core
 			_painter = createPainter(stage3D);
 			_painter.initPainter(onInitPainter);
 			
-			initializeRoot();
-			trace("initRoot");
-			
 			stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
 			trace("successed Creater");
 			
@@ -206,13 +203,14 @@ package trolling.core
 			_painter.configureBackBuffer(_viewPort);
 			_initRender = true;
 			_context = context;
+			initializeRoot();
+			trace("initRoot");
 		}
 		
 		public function initializeRoot():void
 		{
 			if(_root == null && _rootClass != null)
 			{
-				trace("ddd");
 				_root = new _rootClass() as GameObject;
 				_root.x = _stage.x;
 				_root.y = _stage.y;
@@ -255,6 +253,10 @@ package trolling.core
 		
 		private function render():void
 		{
+			if(_painter.context == null)
+				return;
+			
+			_painter.context.setRenderToBackBuffer();
 			_painter.context.clear(Color.getRed(_stage.color)/255.0, Color.getGreen(_stage.color)/255.0, Color.getBlue(_stage.color)/255.0);
 			//	_painter.triangleData.initArray();
 			_root.render(_painter);

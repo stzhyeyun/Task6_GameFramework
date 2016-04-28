@@ -11,7 +11,7 @@ package trolling.component
 		protected var _parent:GameObject;
 		protected var _isActive:Boolean;
 		
-		public function Component(type:String, name:String, parent:GameObject)
+		public function Component(type:String, name:String)
 		{
 			_type = type;
 			_name = name;

@@ -2,6 +2,7 @@ package trolling.object
 {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.display3D.Context3DCompareMode;
 	import flash.events.EventDispatcher;
 	import flash.geom.Matrix3D;
 	import flash.geom.Point;
@@ -9,16 +10,15 @@ package trolling.object
 	import flash.utils.Dictionary;
 	
 	import trolling.component.Component;
+	import trolling.component.ComponentType;
+	import trolling.component.graphic.Image;
 	import trolling.rendering.Painter;
 	import trolling.rendering.Texture;
 	import trolling.rendering.TriangleData;
 	
 	
 	public class GameObject extends EventDispatcher
-	{
-		[Embed( source = "iu3.jpg" )]
-		protected const TextureBitmap:Class;
-		
+	{	
 		private var _parent:GameObject = null;
 		private var _depth:Number;
 		
@@ -44,17 +44,16 @@ package trolling.object
 			_components = new Dictionary();
 		}
 		
-		public function setTestBitmap():void
-		{
-			_bitmap = new TextureBitmap();
-		}
+//		public function setTestBitmap():void
+//		{
+//			_bitmap = new TextureBitmap();
+//		}
 		
 		public function addComponent(property:Component):void
 		{
-			if(_components[property.type] == null)
-				_components[property.type] = new Vector.<Component>();
-			
-			_components[property.type].insertAt(_components[property.type].length, property);
+			_components[property.type] = property;
+			property.isActive = true;
+			property.parent = this;
 		}
 		
 		public function addChild(child:GameObject):void
@@ -70,33 +69,31 @@ package trolling.object
 		{	
 			var numChildren:int = _children.length;
 			
-			for(var i:int = numChildren-1; i >= 0; i--)
+			if(_components[ComponentType.IMAGE] != null)
 			{
-				var child:GameObject = _children[i];
-				child.render(painter);
-			}
-			var triangleData:TriangleData = new TriangleData();
-			
-			var drawRect:Rectangle = getRectangle();
-			var globalPoint:Point = getGlobalPoint();
-			
-			drawRect.x = globalPoint.x;
-			drawRect.y = globalPoint.y;
-			
-			drawRect.x = (drawRect.x - (painter.viewPort.width/2)) / (painter.viewPort.width/2);
-			drawRect.y = ((painter.viewPort.height/2) - drawRect.y) / (painter.viewPort.height/2);
-			
-			drawRect.width = drawRect.width / painter.viewPort.width;
-			drawRect.height = drawRect.height / painter.viewPort.height;
-			
-			var matrix:Matrix3D = new Matrix3D();
-			matrix.identity();
-			matrix.appendScale(drawRect.width, drawRect.height, 1);
-			matrix.appendTranslation(drawRect.x+drawRect.width, drawRect.y-drawRect.height, 0);
-					
-			if(painter.root != this)
-			{
-				_texture = new Texture(_bitmap);
+				var triangleData:TriangleData = new TriangleData();
+				
+				var drawRect:Rectangle = getRectangle();
+				var globalPoint:Point = getGlobalPoint();
+				
+				drawRect.x = globalPoint.x;
+				drawRect.y = globalPoint.y;
+				
+				drawRect.x = (drawRect.x - (painter.viewPort.width/2)) / (painter.viewPort.width/2);
+				drawRect.y = ((painter.viewPort.height/2) - drawRect.y) / (painter.viewPort.height/2);
+				
+				drawRect.width = drawRect.width / painter.viewPort.width;
+				drawRect.height = drawRect.height / painter.viewPort.height;
+				
+				var matrix:Matrix3D = new Matrix3D();
+				matrix.identity();
+				matrix.appendScale(drawRect.width, drawRect.height, 1);
+				matrix.appendTranslation(drawRect.x+drawRect.width, drawRect.y-drawRect.height, 0);
+				
+			//	painter.context.setDepthTest(false, Context3DCompareMode.ALWAYS);
+			//	_texture = new Texture(_bitmap);
+				trace(_components[ComponentType.IMAGE])
+				_texture = Image(_components[ComponentType.IMAGE]).getRenderingResource();
 				painter.context.setTextureAt(0, _texture.nativeTexture);
 				triangleData.uvData[0] = _texture.u;
 				triangleData.uvData[1] = _texture.v;
@@ -104,11 +101,18 @@ package trolling.object
 				
 				painter.pushState();
 				
-				painter.appendMatrix(matrix);
+				painter.appendMatrix(matrix);  
+		//		painter.setUVVector(triangleData);
 				painter.setDrawData(triangleData);
 				painter.draw();
 				
 				painter.popState();
+			}
+			
+			for(var i:int = 0; i < numChildren; i++)
+			{
+				var child:GameObject = _children[i];
+				child.render(painter);
 			}
 		}
 		
