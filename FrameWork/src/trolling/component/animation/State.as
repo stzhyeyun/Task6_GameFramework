@@ -1,7 +1,6 @@
 package trolling.component.animation
 {
 	import flash.display.Bitmap;
-	import flash.display.BitmapData;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	
@@ -72,7 +71,7 @@ package trolling.component.animation
 			removeEventListener(Event.ENTER_FRAME, onEnterFrame);
 		}
 		
-		public function addFrame(resource:BitmapData):void
+		public function addFrame(resource:Bitmap):void
 		{
 			if (!resource)
 			{
@@ -80,7 +79,7 @@ package trolling.component.animation
 				return;
 			}
 			
-			var frame:Texture = Texture(new Bitmap(resource));
+			var frame:Texture = Texture(resource);
 			
 			if (!frame)
 			{

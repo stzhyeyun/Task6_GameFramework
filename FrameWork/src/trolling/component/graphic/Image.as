@@ -1,7 +1,6 @@
 package trolling.component.graphic
 {
 	import flash.display.Bitmap;
-	import flash.display.BitmapData;
 	
 	import trolling.component.ComponentType;
 	import trolling.component.DisplayComponent;
@@ -14,7 +13,7 @@ package trolling.component.graphic
 		
 		private var _texture:Texture;
 		
-		public function Image(name:String, parent:GameObject, resource:BitmapData)
+		public function Image(name:String, parent:GameObject, resource:Bitmap)
 		{
 			super(ComponentType.IMAGE, name, parent);
 			
@@ -24,7 +23,7 @@ package trolling.component.graphic
 				throw new ArgumentError(TAG + " ctor : No \'resource\'.");
 			}
 			
-			var texture:Texture = Texture(new Bitmap(resource));
+			var texture:Texture = Texture(resource);
 			
 			if (!texture)
 			{
