@@ -52,12 +52,18 @@ package trolling.object
 			_bitmapData = new BitmapData(_width, _height, false, _color);
 		}
 		
-		public function addComponent(property:Component):void
+		public function addComponent(component:Component):void
 		{
-			if(_components[property.type] == null)
-				_components[property.type] = new Vector.<Component>();
+			if(_components[component.type])
+			{
+				trace(TAG + " addComponent : GameObject already has the component of this type.");
+				return;
+			}
+
+			_components[component.type] = component;
+		}
+		{
 			
-			_components[property.type].insertAt(_components[property.type].length, property);
 		}
 		
 		public function addChild(child:GameObject):void
