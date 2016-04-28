@@ -1,3 +1,6 @@
+/*
+	[!] DISUSE Currently
+*/
 package trolling.component.control
 {
 	import flash.utils.Dictionary;
