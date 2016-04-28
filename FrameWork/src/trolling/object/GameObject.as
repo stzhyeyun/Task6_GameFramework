@@ -9,15 +9,17 @@ package trolling.object
 	import flash.utils.Dictionary;
 	
 	import trolling.component.Component;
-	
+	import trolling.component.ComponentType;
+	import trolling.component.DisplayComponent;
 	import trolling.rendering.Painter;
 	import trolling.rendering.TriangleData;
-	
 	import trolling.utils.TextureUtil;
-	
 	
 	public class GameObject extends EventDispatcher
 	{
+		private const TAG:String = "[GameObject]";
+		private const NONE:String = "none";
+		
 		private var _parent:GameObject = null;
 		private var _depth:Number;
 		
@@ -69,6 +71,11 @@ package trolling.object
 		
 		public function render(painter:Painter):void
 		{	
+			if (!_children && !_components) // [혜윤] Render 대상이 없으면 함수 종료
+			{
+				return;
+			}
+			
 			_depth = 0;
 			var numChildren:int = _children.length;
 			
@@ -97,13 +104,24 @@ package trolling.object
 			
 			var triangleStartIndex:uint = _triangleData.vertexData.length;
 			
-			if(painter.root != this)
+			var renderingComponent:String = decideRenderingComponent(); // [혜윤] Render할 컴포넌트 확인 및 결정
+			if(painter.root != this && renderingComponent != NONE)
 			{
 				trace("_width , _height = " + _width + ", " + _height);
-				if(_bitmapData != null)
-					trace("얍얍");
-				_texture = TextureUtil.fromBitmap(new Bitmap(_bitmapData));
-				painter.context.setTextureAt(0, _texture);
+//				if(_bitmapData != null)
+//					trace("얍얍");
+//				_texture = TextureUtil.fromBitmap(new Bitmap(_bitmapData)); // [혜윤] Component 그리기 테스트를 위해 주석 처리
+				
+				//
+				var texture:Texture = DisplayComponent(_components[renderingComponent]).getRenderingResource();
+				if (!texture)
+				{
+					trace(TAG + " render : No Texture(Component).");
+					return;					
+				}
+				//
+				
+				painter.context.setTextureAt(0, texture);
 				
 				_triangleData.vertexData.push(Vector.<Number>([rect.x+rect.width, rect.y, 0, 1, 0]));
 				_triangleData.vertexData.push(Vector.<Number>([rect.x+rect.width, rect.y-rect.height, 0, 1, 1]));
@@ -199,6 +217,67 @@ package trolling.object
 		public function set x(value:Number):void
 		{
 			_x = value;
+		}
+		
+		private function decideRenderingComponent():String
+		{
+			// 컴포넌트가 없음
+			if (!_components)
+			{
+				return NONE;
+			}
+			// Image만 있음
+			else if (_components[ComponentType.IMAGE] && !_components[ComponentType.ANIMATOR])
+			{
+				if (Component(_components[ComponentType.IMAGE]).isActive)
+				{
+					return ComponentType.IMAGE;
+				}
+				else
+				{
+					return NONE;
+				}
+			}
+			// Animator만 있음
+			else if (!_components[ComponentType.IMAGE] && _components[ComponentType.ANIMATOR])
+			{
+				if (Component(_components[ComponentType.ANIMATOR]).isActive)
+				{
+					return ComponentType.ANIMATOR;
+				}
+				else
+				{
+					return NONE;
+				}
+			}
+			// Image와 Animator 둘 다 있음
+			else if (_components[ComponentType.IMAGE] && _components[ComponentType.ANIMATOR])
+			{
+				if (Component(_components[ComponentType.IMAGE]).isActive
+					&& !Component(_components[ComponentType.ANIMATOR]).isActive)
+				{
+					return ComponentType.IMAGE;
+				}
+				else if (!Component(_components[ComponentType.IMAGE]).isActive
+					&& Component(_components[ComponentType.ANIMATOR]).isActive)
+				{
+					return ComponentType.ANIMATOR;
+				}
+				else if (Component(_components[ComponentType.IMAGE]).isActive
+					&& Component(_components[ComponentType.ANIMATOR]).isActive)
+				{
+					return ComponentType.ANIMATOR; // Animator를 우선하여 그림
+				}
+				else
+				{
+					return NONE;
+				}
+			}
+			// 컴포넌트가 없음
+			else
+			{
+				return NONE;
+			}
 		}
 	}
 }
