@@ -18,7 +18,7 @@ package trolling.rendering
 	
 	public class Painter
 	{	
-		private static const Z_AXIS:Vector3D = Vector3D.Z_AXIS;
+		private static const X_AXIS:Vector3D = Vector3D.X_AXIS;
 		
 		private var _root:GameObject;
 		
@@ -50,6 +50,19 @@ package trolling.rendering
 			trace("Painter Creater");
 		}
 		
+		public function pushState():void
+		{
+			var state:RenderState = new RenderState();
+			state.matrix = _matrix.clone();
+			_stateStack.push(state);
+		}
+		
+		public function popState():void
+		{
+			var state:RenderState = _stateStack.pop();
+			_matrix = state.matrix.clone();
+		}
+		
 		public function initPainter(resultFunc:Function):void
 		{
 			_stage3D.addEventListener(Event.CONTEXT3D_CREATE, initMolehill);
@@ -63,6 +76,10 @@ package trolling.rendering
 			_moleCallBack(_context);
 			_program.initProgram(_context);
 			setProgram();
+			createVertexBuffer();
+			createIndexBuffer();
+			setVertextBuffer();
+		//	_matrix.appendRotation(1, X_AXIS);
 		}
 		
 		public function configureBackBuffer(viewPort:Rectangle, antiAlias:Boolean = true):void
@@ -88,10 +105,7 @@ package trolling.rendering
 		
 		public function setDrawData(triagleData:TriangleData):void
 		{
-			createVertexBuffer(triagleData);
-			createIndexBuffer(triagleData);
 			setUVVector(triagleData);
-			setVertextBuffer();
 			setMatrix();
 		}
 		
@@ -107,8 +121,7 @@ package trolling.rendering
 		
 		public function appendMatrix(matrix:Matrix3D):void
 		{
-//			_matrix.append(matrix);
-			_matrix = matrix;
+			_matrix.append(matrix);
 		}
 		
 		private function setUVVector(triagleData:TriangleData):void
@@ -116,21 +129,16 @@ package trolling.rendering
 			_context.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 4, triagleData.uvData);
 		}
 		
-		private function createVertexBuffer(triangleData:TriangleData):void
+		private function createVertexBuffer():void
 		{
-			_vertexBuffer = _context.createVertexBuffer(triangleData.vertexData.length, 5);
-//			trace("triangleData.rawVertexData = " + triangleData.rawVertexData.length);
-			_vertexBuffer.uploadFromVector(triangleData.rawVertexData, 0, triangleData.vertexData.length);
-//			trace("triangleData.vertexData.length = " + triangleData.vertexData.length);
-//			trace("triangleData.vertexData = " + triangleData.rawVertexData);
+			_vertexBuffer = _context.createVertexBuffer(4, 5);
+			_vertexBuffer.uploadFromVector(TriangleData.rawVertexData, 0, 4);
 		}
 		
-		private function createIndexBuffer(triangleData:TriangleData):void
+		private function createIndexBuffer():void
 		{
-			_indexBuffer = _context.createIndexBuffer(triangleData.rawIndexData.length);
-//			trace("triangleData.rawIndexData.length = " + triangleData.rawIndexData.length);
-			_indexBuffer.uploadFromVector(triangleData.rawIndexData, 0, triangleData.rawIndexData.length);
-//			trace("triangleData.rawIndexData = " + triangleData.rawIndexData);
+			_indexBuffer = _context.createIndexBuffer(TriangleData.rawIndexData.length);
+			_indexBuffer.uploadFromVector(TriangleData.rawIndexData, 0, TriangleData.rawIndexData.length);
 		}
 		
 		private function setVertextBuffer():void
@@ -141,7 +149,6 @@ package trolling.rendering
 		
 		private function setMatrix():void
 		{
-		
 			_context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, _matrix, true);
 		}
 		
