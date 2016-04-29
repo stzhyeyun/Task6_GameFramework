@@ -118,12 +118,12 @@ package trolling.component.animation
 				isFirst = true;
 			}
 			
-			var state:State = new State(name);
-			_states[key] = state;
+			var state:State = new State(stateName);
+			_states[stateName] = state;
 			
 			if (isFirst)
 			{
-				_currentState = key;
+				_currentState = stateName;
 			}
 			
 			return state;
