@@ -11,6 +11,7 @@ package trolling.object
 	
 	import trolling.component.Component;
 	import trolling.component.ComponentType;
+	import trolling.component.animation.Animator;
 	import trolling.component.graphic.Image;
 	import trolling.rendering.Painter;
 	import trolling.rendering.Texture;

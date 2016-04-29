@@ -55,7 +55,7 @@ package trolling.component.animation
 			
 			_currentIndex = 0;
 			
-			if (_animationSpeed == 0) // 혜윤 :animationSpeed가 설정되어있지 않으면 1로 보정
+			if (_animationSpeed == 0) // [혜윤] animationSpeed가 설정되어있지 않으면 1로 보정
 			{
 				_animationSpeed = 1;
 			}
