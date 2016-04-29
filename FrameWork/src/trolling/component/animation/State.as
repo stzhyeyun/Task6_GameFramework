@@ -61,14 +61,14 @@ package trolling.component.animation
 			}
 			
 			_isPlaying = true;			
-			addEventListener(Event.ENTER_FRAME, onEnterFrame);
+			addEventListener(Event.ENTER_FRAME, onNextFrame);
 		}
 		
 		public function stop():void
 		{
 			_currentIndex = -1;
 			_isPlaying = false;
-			removeEventListener(Event.ENTER_FRAME, onEnterFrame);
+			removeEventListener(Event.ENTER_FRAME, onNextFrame);
 		}
 		
 		public function addFrame(resource:Bitmap):void
@@ -151,7 +151,7 @@ package trolling.component.animation
 			return _isPlaying;	
 		}
 		
-		private function onEnterFrame(event:Event):void
+		private function onNextFrame(event:Event):void
 		{
 			if (!_isPlaying)
 			{

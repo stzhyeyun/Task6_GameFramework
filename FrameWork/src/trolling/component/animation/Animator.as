@@ -1,5 +1,6 @@
 package trolling.component.animation
 {
+	import flash.events.Event;
 	import flash.utils.Dictionary;
 	
 	import trolling.component.ComponentType;
@@ -50,6 +51,9 @@ package trolling.component.animation
 					{
 						return;
 					}
+					
+					addEventListener(Event.ENTER_FRAME, onNextFrame);
+					addEventListener(Event.DEACTIVATE, onDeactivateScene);
 				}
 			}
 			else
@@ -58,6 +62,9 @@ package trolling.component.animation
 				{
 					var state:State = _states[_currentState];
 					state.stop();
+					
+					removeEventListener(Event.ENTER_FRAME, onNextFrame);
+					removeEventListener(Event.DEACTIVATE, onDeactivateScene);
 				}
 			}
 
@@ -74,6 +81,20 @@ package trolling.component.animation
 			var state:State = _states[_currentState];
 			
 			return state.getCurrentFrame();
+		}
+		
+		protected override function onNextFrame(event:Event):void
+		{
+			if (_isActive && _states && _currentState != NONE)
+			{
+				var state:State = _states[_currentState];
+				state.dispatchEvent(new Event(Event.ENTER_FRAME));
+			}
+		}
+		
+		protected override function onDeactivateScene(event:Event):void
+		{
+			isActive(false);
 		}
 				
 		public function addState(key:String, name:String):State // 새로운 State 추가

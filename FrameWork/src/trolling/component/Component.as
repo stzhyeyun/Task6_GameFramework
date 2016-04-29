@@ -1,8 +1,11 @@
 package trolling.component
 {
+	import flash.events.Event;
+	import flash.events.EventDispatcher;
+	
 	import trolling.object.GameObject;
 	
-	public class Component
+	public class Component extends EventDispatcher
 	{		
 		private var _type:String;
 		protected var _parent:GameObject;
@@ -44,6 +47,21 @@ package trolling.component
 		public virtual function set isActive(value:Boolean):void
 		{
 			_isActive = value;
+		}
+		
+		protected virtual function onNextFrame(event:Event):void
+		{
+			// Empty
+		}
+		
+		protected virtual function onActivateScene(event:Event):void
+		{
+			// Empty
+		}
+		
+		protected virtual function onDeactivateScene(event:Event):void
+		{
+			// Empty
 		}
 	}
 }
