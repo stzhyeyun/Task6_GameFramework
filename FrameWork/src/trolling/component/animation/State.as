@@ -109,6 +109,11 @@ package trolling.component.animation
 		{
 			if (!_animation || _currentIndex < 0 || !_isPlaying)
 			{
+				if (!_animation || _currentIndex < 0)
+					trace(TAG + " getCurrentFrame : No animating resource.");
+				else if (!_isPlaying)
+					trace(TAG + " getCurrentFrame : Animation is not playing.");
+				
 				return null;
 			}
 			else

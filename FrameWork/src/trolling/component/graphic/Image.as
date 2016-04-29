@@ -47,6 +47,7 @@ package trolling.component.graphic
 		{
 			if (!_isActive)
 			{
+				trace(TAG + " getRenderingResource : Image is inactive now.");
 				return null;
 			}
 			
@@ -56,6 +57,7 @@ package trolling.component.graphic
 			}
 			else
 			{
+				trace(TAG + " getRenderingResource : No texture.");
 				return null;
 			}
 		}

@@ -75,6 +75,13 @@ package trolling.component.animation
 		{
 			if (!_isActive || !_states || _currentState == NONE)
 			{
+				if (!_isActive)
+					trace(TAG + " getRenderingResource : Animator is inactive now.");
+				else if (!_states)
+					trace(TAG + " getRenderingResource : No State.");
+				else if (_currentState == NONE)
+					trace(TAG + " getRenderingResource : No current State.");
+				
 				return null;
 			}
 			
