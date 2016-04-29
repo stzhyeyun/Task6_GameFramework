@@ -176,6 +176,17 @@ package trolling.object
 			return null;
 		}
 		
+		public function transition(nextStateName:String):void // [혜윤] 애니메이터에게 지정 상태로 전이하도록 합니다.
+		{
+			if (!_components || !_components[ComponentType.ANIMATOR])
+			{
+				return;
+			}
+			
+			var animator:Animator = _components[ComponentType.ANIMATOR];
+			animator.transition(nextStateName);
+		}
+		
 		public function getRectangle():Rectangle
 		{
 			var rectangle:Rectangle = new Rectangle(_x, _y, _width, _height);
