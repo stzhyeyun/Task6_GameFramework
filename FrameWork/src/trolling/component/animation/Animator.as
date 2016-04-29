@@ -97,15 +97,17 @@ package trolling.component.animation
 			isActive(false);
 		}
 				
-		public function addState(key:String, name:String):State // 새로운 State 추가
+		public function addState(stateName:String):State // 새로운 State 추가
 		{
-			if (!key || key == "" || !name || name == "" || name == NONE)
+			if (!stateName || stateName == "" || stateName == NONE)
 			{
+				trace(TAG + " addState : Inappropriate state name.");
 				return null;
 			}
 			
-			if (_states && _states[key])
+			if (_states && _states[stateName])
 			{
+				trace(TAG + " addState : Animator already has the state of same name.");
 				return null;
 			}
 			
