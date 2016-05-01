@@ -39,6 +39,7 @@ package trolling.component.physics
 			addEventListener(TrollingEvent.DEACTIVATE, onDeactivateScene);
 			
 			// ColliderManager에 등록
+			ColliderManager.addCollider(this);
 		}
 		
 		public override function dispose():void

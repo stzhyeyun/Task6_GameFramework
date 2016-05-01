@@ -14,6 +14,8 @@ package trolling.core
 	import trolling.utils.TouchManager;
 	
 	import trolling.Scene;
+	import trolling.component.physics.Collider;
+	import trolling.event.TrollingEvent;
 	import trolling.object.GameObject;
 	import trolling.object.Stage;
 	import trolling.rendering.Painter;
@@ -23,6 +25,8 @@ package trolling.core
 	
 	public class Trolling
 	{        
+		private const TAG:String = "[Trolling]";
+		
 		private var _sceneDic:Dictionary;
 		private var _createQueue:Array = new Array();
 		
@@ -43,6 +47,12 @@ package trolling.core
 		private var _context:Context3D = null;
 		
 		private var _touchManager:TouchManager = new TouchManager();
+		
+		
+		// Collider Management
+		private var _colliders:Vector.<Collider>;
+		private var _colliderActivated = true;
+		//
 		
 		public function Trolling(stage:flash.display.Stage, stage3D:Stage3D = null)
 		{
@@ -337,6 +347,7 @@ package trolling.core
 			if(_touchManager.hoverFlag)
 				_touchManager.hoverTarget.dispatchEvent(new EventWith(TouchPhase.HOVER, _touchManager.points));
 			nextFrame();
+			detectCollision();
 			render();
 		}
 		
@@ -351,5 +362,98 @@ package trolling.core
 			_currentScene.render(_painter);
 			_painter.present();
 		}
+		
+		// ColliderManagement //////////////////////////////////////// 
+		
+		public function addCollider(collider:Collider):void
+		{
+			if (!_colliders)
+			{
+				_colliders = new Vector.<Collider>();
+			}
+			_colliders.push(collider);
+		}
+		
+		public function removeCollider(collider:Collider):void
+		{
+			if (!_colliders || !collider)
+			{
+				return;
+			}
+			
+			for (var i:int = 0; i < _colliders.length; i++)
+			{
+				if (_colliders[i] == collider)
+				{
+					_colliders.removeAt(i);
+					break;
+				}
+			}
+		}
+		
+		public function set colliderActivated(value:Boolean):void
+		{
+			_colliderActivated = value;
+		}
+		
+		private function detectCollision():void
+		{
+			if (!_colliderActivated || !_colliders || _colliders.length <= 1)
+			{
+				return;
+			}
+			
+			var index:int = 0;
+			var collidedIndices:Vector.<int>;
+			var detectionObjects:Vector.<Collider> = new Vector.<Collider>();
+			for (var i:int = 0; i < _colliders.length; i++)
+			{
+				detectionObjects.push(_colliders[i]);	
+			}
+			
+			if (!detectionObjects)
+			{
+				throw new ArgumentError(TAG + " detectCollision : Failed to clone Colliders.");
+			}
+			
+			while (index < detectionObjects.length - 1)
+			{
+				for (var i:int = index + 1; i < detectionObjects.length; i++)
+				{
+					if (detectionObjects[index].isCollision(detectionObjects[i]))
+					{
+						// Dispatch event
+						detectionObjects[index].parent.dispatchEvent(
+							new TrollingEvent(TrollingEvent.COLLIDE, detectionObjects[i].parent));
+						detectionObjects[i].parent.dispatchEvent(
+							new TrollingEvent(TrollingEvent.COLLIDE, detectionObjects[index].parent));
+						
+						// Store collided objects' indices for deletion from detectionObjects
+						if (!collidedIndices)
+						{
+							collidedIndices = new Vector.<int>();
+						}
+						collidedIndices.push(i);
+					}
+				}
+				
+				// Remove collided objects from detectionObjects
+				if (collidedIndices)
+				{
+					for (var j:int = 0; j < collidedIndices.length; j++)
+					{
+						detectionObjects.removeAt(collidedIndices[j]);
+					}
+				}
+				collidedIndices = null;
+				
+				index++;
+			}
+			
+			collidedIndices = null;
+			detectionObjects = null;
+		}
+		
+		// End of ColliderManagement 
 	}
 }
