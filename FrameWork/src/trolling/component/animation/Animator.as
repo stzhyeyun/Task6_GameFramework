@@ -20,6 +20,7 @@ package trolling.component.animation
 			super(ComponentType.ANIMATOR);
 			
 			_currentState = NONE;
+			
 			addEventListener(Event.ENTER_FRAME, onNextFrame);
 			addEventListener(Event.DEACTIVATE, onDeactivateScene);
 		}

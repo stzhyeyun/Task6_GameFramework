@@ -43,6 +43,8 @@ package trolling.component.physics
 		
 		public override function dispose():void
 		{
+			this.isActive = false;
+			
 			_id = ID_NONE;
 			_rect = null;
 			_circle = null;

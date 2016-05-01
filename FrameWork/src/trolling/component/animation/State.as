@@ -28,6 +28,8 @@ package trolling.component.animation
 		
 		public function dispose():void
 		{
+			stop();
+			
 			_name = null;
 			
 			if (_animation && _animation.length > 0)
@@ -43,7 +45,6 @@ package trolling.component.animation
 			_currentIndex = -1;
 			_animationSpeed = 0;
 			_frameCounter = 0;
-			_isPlaying = false;
 		}
 		
 		public function play():void
