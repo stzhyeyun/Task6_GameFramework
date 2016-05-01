@@ -6,13 +6,15 @@ package trolling.component.physics
 	
 	import trolling.component.Component;
 	import trolling.component.ComponentType;
+	import trolling.core.ColliderManager;
+	import trolling.event.TrollingEvent;
 	import trolling.utils.Circle;
 
 	public class Collider extends Component
 	{
 		public const ID_NONE:int = -1;
 		public const ID_RECT:int = 0;
-		public const ID_CIRCLE:int = 0;
+		public const ID_CIRCLE:int = 1;
 		
 		private const TAG:String = "[Collider]";
 		
@@ -152,9 +154,27 @@ package trolling.component.physics
 			return _rect;
 		}
 		
+		public function set rect(collider:Rectangle):void
+		{
+			_id = ID_RECT;
+			_rect = collider;
+			
+			_dxFromParent = _rect.x;
+			_dyFromParent = _rect.y
+		}
+		
 		public function get circle():Circle
 		{
 			return _circle;
+		}
+		
+		public function set circle(collider:Circle):void
+		{
+			_id = ID_CIRCLE;
+			_circle = collider;
+			
+			_dxFromParent = _circle.center.x
+			_dyFromParent = _circle.center.y
 		}
 		
 		public function get isVisible():Boolean
@@ -165,24 +185,6 @@ package trolling.component.physics
 		public function set isVisible(value:Boolean):void
 		{
 			_isVisible = value;
-		}
-		
-		public function setRect(parentLocalPos:Point, collider:Rectangle):void
-		{
-			_id = ID_RECT;
-			_rect = collider;
-			
-			_dxFromParent = _rect.x - parentLocalPos.x;
-			_dyFromParent = _rect.y - parentLocalPos.y;
-		}
-		
-		public function setCircle(parentLocalPos:Point, collider:Circle):void
-		{
-			_id = ID_CIRCLE;
-			_circle = collider;
-			
-			_dxFromParent = _circle.center.x - parentLocalPos.x;
-			_dyFromParent = _circle.center.y - parentLocalPos.y;
 		}
 		
 		private function detectCollisionRectToCircle(rect:Rectangle, circle:Circle):Boolean
