@@ -6,6 +6,7 @@ package trolling.component.animation
 	import trolling.component.ComponentType;
 	import trolling.component.DisplayComponent;
 	import trolling.rendering.Texture;
+	import trolling.event.TrollingEvent;
 
 	public class Animator extends DisplayComponent
 	{
@@ -22,7 +23,7 @@ package trolling.component.animation
 			_currentState = NONE;
 			
 			addEventListener(Event.ENTER_FRAME, onNextFrame);
-			addEventListener(Event.DEACTIVATE, onDeactivateScene);
+			addEventListener(TrollingEvent.DEACTIVATE, onDeactivateScene);
 		}
 				
 		public override function dispose():void
@@ -56,7 +57,7 @@ package trolling.component.animation
 					}
 					
 					addEventListener(Event.ENTER_FRAME, onNextFrame);
-					addEventListener(Event.DEACTIVATE, onDeactivateScene);
+					addEventListener(TrollingEvent.DEACTIVATE, onDeactivateScene);
 				}
 			}
 			else
@@ -67,7 +68,7 @@ package trolling.component.animation
 					state.stop();
 					
 					removeEventListener(Event.ENTER_FRAME, onNextFrame);
-					removeEventListener(Event.DEACTIVATE, onDeactivateScene);
+					removeEventListener(TrollingEvent.DEACTIVATE, onDeactivateScene);
 				}
 			}
 
