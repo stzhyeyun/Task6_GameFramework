@@ -9,8 +9,8 @@ package trolling.utils
 		
 		public function Circle(center:Point, radius:Number)
 		{
-			center = center;
-			radius = radius
+			this.center = center;
+			this.radius = radius
 		}
 		
 		public function containsPoint(point:Point):Boolean
