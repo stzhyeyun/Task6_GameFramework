@@ -144,12 +144,12 @@ package trolling.component.animation
 			return _currentIndex;	
 		}
 		
-		public function get playSpeed():uint
+		public function get animationSpeed():uint
 		{
 			return _animationSpeed;	
 		}
 		
-		public function set playSpeed(value:uint):void
+		public function set animationSpeed(value:uint):void
 		{
 			if (value <= 0)
 			{
