@@ -1,6 +1,6 @@
 package trolling.object
 {	
-	public class Stage extends GameObject
+	public class Stage
 	{	
 		private var _width:int;
 		private var _height:int;
@@ -8,8 +8,8 @@ package trolling.object
 		
 		public function Stage(stageWidth:int, stageHeight:int, color:uint=0)
 		{
-			width = stageWidth;
-			height = stageHeight;
+			_width = stageWidth;
+			_height = stageHeight;
 			_color = color;
 		}
 		
@@ -25,22 +25,22 @@ package trolling.object
 		
 		public function get stageHeight():int
 		{
-			return this.height;
+			return _height;
 		}
 		
 		public function set stageHeight(value:int):void
 		{
-			this.height = value;
+			_height = value;
 		}
 		
 		public function get stageWidth():int
 		{
-			return this.width;
+			return _width;
 		}
 		
 		public function set stageWidth(value:int):void
 		{
-			this.width = value;
+			_width = value;
 		}
 	}
 }

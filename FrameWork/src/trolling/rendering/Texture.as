@@ -25,6 +25,16 @@ package trolling.rendering
 			_u = textureInfo[1];
 			_v = textureInfo[2];
 		}
+		
+		public function get height():Number
+		{
+			return _height;
+		}
+		
+		public function get width():Number
+		{
+			return _width;
+		}
 
 		public function get v():Number
 		{

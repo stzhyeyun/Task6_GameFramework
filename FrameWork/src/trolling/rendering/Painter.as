@@ -2,6 +2,7 @@ package trolling.rendering
 {
 	import flash.display.Stage3D;
 	import flash.display3D.Context3D;
+	import flash.display3D.Context3DBlendFactor;
 	import flash.display3D.Context3DCompareMode;
 	import flash.display3D.Context3DProgramType;
 	import flash.display3D.Context3DVertexBufferFormat;
@@ -12,17 +13,11 @@ package trolling.rendering
 	import flash.geom.Rectangle;
 	import flash.geom.Vector3D;
 	
-	import jimining.RenderState;
-	
-	import trolling.object.GameObject;
-	
 	public class Painter
 	{	
 		private static const X_AXIS:Vector3D = Vector3D.X_AXIS;
 		private static const Y_AXIS:Vector3D = Vector3D.Y_AXIS;
 		private static const Z_AXIS:Vector3D = Vector3D.Z_AXIS;
-		
-		private var _root:GameObject;
 		
 		private var _stage3D:Stage3D;
 		private var _context:Context3D;
@@ -81,8 +76,12 @@ package trolling.rendering
 			createIndexBuffer();
 			setVertextBuffer();
 			_context.setDepthTest(true, Context3DCompareMode.ALWAYS);
+			_context.setBlendFactors(
+				Context3DBlendFactor.SOURCE_ALPHA,
+				Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA
+			);
 			_moleCallBack(_context);
-		//	_context.set
+			//	_context.set
 		}
 		
 		public function configureBackBuffer(viewPort:Rectangle, antiAlias:Boolean = true):void
@@ -100,7 +99,7 @@ package trolling.rendering
 			
 			trace(viewPort.width + ", " + viewPort.height);
 			_context.configureBackBuffer(viewPort.width, viewPort.height, alias, true);
-		//	_context.setCulling(Context3DTriangleFace.BACK);
+			//	_context.setCulling(Context3DTriangleFace.BACK);
 			
 			_backBufferWidth = viewPort.width;
 			_backBufferHeight = viewPort.height;
@@ -110,7 +109,7 @@ package trolling.rendering
 		{
 			setUVVector(triangleData);
 			_matrix.appendRotation(0, X_AXIS);
-		//	_matrix.appendTranslation(0, -0.5, 0);
+			//	_matrix.appendTranslation(0, -0.5, 0);
 			setMatrix();
 		}
 		
@@ -210,16 +209,6 @@ package trolling.rendering
 		public function set program(value:Program):void
 		{
 			_program = value;
-		}
-		
-		public function get root():GameObject
-		{
-			return _root;
-		}
-		
-		public function set root(value:GameObject):void
-		{
-			_root = value;
 		}
 		
 		public function get context():Context3D

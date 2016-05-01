@@ -1,42 +1,30 @@
 package trolling
 {
 	import trolling.object.GameObject;
-	
-	import trolling.rendering.Painter;
 
-	public class Scene
+	public class Scene extends GameObject
 	{
+		private const TAG:String = "[Scene]";
+		
 		private var _name:String;
-		private var _children:Vector.<GameObject>;
 		private var _isActive:Boolean;
-		
-		public function Scene(name:String)
+	
+		public function Scene()
 		{
-			_name = name;
+			super();
 		}
 		
-		public function dispose():void
+		public override function dispose():void
 		{
+			_name = null;
+			_isActive = false;
 			
-		}
-		
-		public function addChild(child:GameObject):void
-		{
-			if(_children == null)
-				_children = new Vector.<GameObject>();
-			_children.insertAt(_children.length, child);
-		}
-		
-		public function render(painter:Painter):void
-		{
-			var numChildren:int = _children.length;
-			
-			// to do
+			super.dispose();
 		}
 		
 		public function activate():void
 		{
-			// to do
+			// activate children
 			
 			
 			_isActive = true;
@@ -44,20 +32,30 @@ package trolling
 		
 		public function deactivate():void
 		{
-			// to do
-			
+			// deactive children
+
 			
 			_isActive = false;
 		}
 		
-		public function get type():String
+		public function get name():String
 		{
 			return _name;
+		}
+		
+		public function set name(name:String):void
+		{
+			_name = name;
 		}
 		
 		public function get isActive():Boolean
 		{
 			return _isActive;
+		}
+		
+		public override function set pivot(value:String):void
+		{
+			return;
 		}
 	}
 }

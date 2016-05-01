@@ -11,16 +11,22 @@ package trolling.core
 	import flash.ui.Mouse;
 	import flash.utils.Dictionary;
 	
+	import trolling.utils.TouchManager;
+	
+	import trolling.Scene;
 	import trolling.object.GameObject;
 	import trolling.object.Stage;
 	import trolling.rendering.Painter;
 	import trolling.utils.Color;
+	import trolling.utils.EventWith;
 	import trolling.utils.TouchPhase;
 	
 	public class Trolling
 	{        
-		private var _rootClass:Class;
-		private var _root:GameObject;
+		private var _sceneDic:Dictionary;
+		private var _createQueue:Array = new Array();
+		
+		private var _currentScene:GameObject;
 		private var _viewPort:Rectangle;
 		private var _stage:Stage;
 		
@@ -34,16 +40,17 @@ package trolling.core
 		
 		private static var sPainters:Dictionary = new Dictionary(true);
 		private static var _current:Trolling;
-		private var _context:Context3D;
+		private var _context:Context3D = null;
 		
-		public function Trolling(rootClass:Class, stage:flash.display.Stage, stage3D:Stage3D = null)
+		private var _touchManager:TouchManager = new TouchManager();
+		
+		public function Trolling(stage:flash.display.Stage, stage3D:Stage3D = null)
 		{
 			if (stage == null) throw new ArgumentError("Stage must not be null");
 			if (stage3D == null) stage3D = stage.stage3Ds[0];
 			
 			_current = this;
 			
-			_rootClass = rootClass;
 			trace(stage.width, stage.height);
 			_viewPort = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
 			
@@ -67,10 +74,13 @@ package trolling.core
 			stage.addEventListener(MouseEvent.MOUSE_DOWN, onTouch);
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, onTouch);
 			stage.addEventListener(MouseEvent.MOUSE_UP, onTouch);
+			stage.addEventListener(TouchEvent.TOUCH_OVER, onTouch);
 		}
 		
 		private function onTouch(event:Event):void
 		{
+			if(_currentScene == null)
+				return;
 			//trace("onTouch");
 			
 			var globalX:Number;
@@ -120,30 +130,54 @@ package trolling.core
 				case TouchEvent.TOUCH_BEGIN: phase = TouchPhase.BEGAN; break;
 				case TouchEvent.TOUCH_MOVE:  phase = TouchPhase.MOVED; break;
 				case TouchEvent.TOUCH_END:   phase = TouchPhase.ENDED; break;
+				case MouseEvent.MOUSE_MOVE:  phase = TouchPhase.MOVED; break;
 				case MouseEvent.MOUSE_DOWN:  phase = TouchPhase.BEGAN; break;
 				case MouseEvent.MOUSE_UP:    phase = TouchPhase.ENDED; break;
+				case TouchEvent.TOUCH_OVER:  phase = TouchPhase.HOVER; break;
 				//case MouseEvent.MOUSE_MOVE: 
 				//phase = (_leftMouseDown ? TouchPhase.MOVED : TouchPhase.HOVER); break;
 			}
 			
-			
 			// move position into viewport bounds
 			globalX = _stage.stageWidth  * (globalX - _viewPort.x) / _viewPort.width;
 			globalY = _stage.stageHeight * (globalY - _viewPort.y) / _viewPort.height;
+			var point:Point = new Point(globalX, globalY);
+			_touchManager.pushPoint(point);
+			var hit:GameObject;
 			
 			//trace("globalX = " + globalX + " globalY = " + globalY);
 			
-			if(phase == TouchPhase.ENDED)
+			if(phase == TouchPhase.BEGAN)
 			{
-				//_root.dispatchEvent(new Event("b"));
-				var point:Point = new Point(globalX, globalY);
-				var hit:GameObject = _root.findClickedGameObject(point);
-				//				if(hit)
-				//					trace(hit.getRectangle());
+				hit = _currentScene.findClickedGameObject(point);
 				if(hit != null)
-					hit.dispatchEvent(new Event("a"));
+					hit.dispatchEvent(new EventWith(phase, _touchManager.points));
+				_touchManager.hoverFlag = true;
+				_touchManager.hoverTarget = hit;
+			}
+			else if(phase == TouchPhase.MOVED)
+			{
+				hit = _currentScene.findClickedGameObject(point);
+				if(hit != null)
+					hit.dispatchEvent(new EventWith(phase, _touchManager.points));
+				//	_touchManager.pushPoint(point);
+				if(hit != _touchManager.hoverTarget)
+					_touchManager.hoverTarget = hit;
+			}
+			else if(phase == TouchPhase.ENDED)
+			{
+				hit = _currentScene.findClickedGameObject(point);
+				if(hit != null)
+					hit.dispatchEvent(new EventWith(phase, _touchManager.points));
+				_touchManager.hoverFlag = false;
 			}
 		}
+		
+		//		private function seekHover():void
+		//		{
+		//			if(!_touchManager.hoverFlag)
+		//				return;
+		//		}
 		
 		public function get painter():Painter
 		{
@@ -203,27 +237,79 @@ package trolling.core
 			_painter.configureBackBuffer(_viewPort);
 			_initRender = true;
 			_context = context;
-			initializeRoot();
+			trace("createContext");
+			//	initializeRoot();
+			createSceneFromQueue();
 			trace("initRoot");
 		}
 		
-		public function initializeRoot():void
+		private function createSceneFromQueue():void
 		{
-			if(_root == null && _rootClass != null)
+			var arrayTemp:Array;
+			while(_createQueue.length != 0)
 			{
-				_root = new _rootClass() as GameObject;
-				_root.x = _stage.x;
-				_root.y = _stage.y;
-				_root.width = _stage.width;
-				_root.height = _stage.height;
-				_stage.addChild(_root);
-				_painter.root = _root;
+				arrayTemp = _createQueue.shift();
+				addScene(arrayTemp[0], arrayTemp[1]);
 			}
+			arrayTemp = null;
+			_createQueue = null;
 		}
+		
+		private function nextFrame():void
+		{
+			_currentScene.dispatchEvent(new Event(Event.ENTER_FRAME));
+		}
+		
+		public function addScene(sceneClass:Class, key:String):void
+		{
+			if(_sceneDic && _sceneDic[key] != null)
+				return;
+			if(_context == null)
+			{
+				var addArray:Array = new Array();
+				addArray.push(sceneClass);
+				addArray.push(key);
+				_createQueue.push(addArray);
+				return;	
+			}
+			var scene:Scene = new sceneClass() as Scene;
+			if(!_sceneDic)
+			{
+				_sceneDic = new Dictionary();
+				_currentScene = scene;
+			}
+			_sceneDic[key] = scene;
+			if(scene == null)
+				trace("scene is null");
+			if(_stage == null)
+				trace("_stage is null");
+			scene.width = _stage.stageWidth;
+			scene.height = _stage.stageHeight;
+			scene.name = key;
+		}
+		
+		public function switchScene(key:String):void
+		{
+			if(_sceneDic == null || _sceneDic[key] == null)
+				return;
+			_currentScene = _sceneDic[key];
+		}
+		
+		//		public function initializeRoot():void
+		//		{
+		//			if(_currentScene == null && _rootClass != null)
+		//			{
+		//				_currentScene = new _rootClass() as GameObject;
+		//				_currentScene.x = _stage.x;
+		//				_currentScene.y = _stage.y;
+		//				_currentScene.width = _stage.width;
+		//				_currentScene.height = _stage.height;
+		//				_stage.addChild(_currentScene);
+		//			}
+		//		}
 		
 		public function start():void
 		{
-			//	_painter.setProgram();
 			_started = true;
 		}
 		
@@ -246,9 +332,12 @@ package trolling.core
 		
 		private function onEnterFrame(event:Event):void
 		{
-			if(_started && _initRender)
-				//	trace("ddd");
-				render();
+			if(!_started || !_initRender || !_currentScene)
+				return;
+			if(_touchManager.hoverFlag)
+				_touchManager.hoverTarget.dispatchEvent(new EventWith(TouchPhase.HOVER, _touchManager.points));
+			nextFrame();
+			render();
 		}
 		
 		private function render():void
@@ -259,7 +348,7 @@ package trolling.core
 			_painter.context.setRenderToBackBuffer();
 			_painter.context.clear(Color.getRed(_stage.color)/255.0, Color.getGreen(_stage.color)/255.0, Color.getBlue(_stage.color)/255.0);
 			//	_painter.triangleData.initArray();
-			_root.render(_painter);
+			_currentScene.render(_painter);
 			_painter.present();
 		}
 	}
