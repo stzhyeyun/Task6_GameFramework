@@ -79,7 +79,7 @@ package trolling.component.animation
 				return;
 			}
 			
-			var frame:Texture = Texture(resource);
+			var frame:Texture = new Texture(resource);
 			
 			if (!frame)
 			{

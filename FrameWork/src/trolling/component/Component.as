@@ -11,10 +11,10 @@ package trolling.component
 		protected var _parent:GameObject;
 		protected var _isActive:Boolean;
 		
-		public function Component(type:String, isActive:Boolean = false)
+		public function Component(type:String)
 		{
 			_type = type;
-			_isActive = isActive;
+			_isActive = true;
 		}
 		
 		public function dispose():void

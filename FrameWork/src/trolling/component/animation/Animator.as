@@ -15,16 +15,18 @@ package trolling.component.animation
 		private var _states:Dictionary; // key: State name, value: State
 		private var _currentState:String; // State name
 		
-		public function Animator(isActive:Boolean = false)
+		public function Animator()
 		{
-			super(ComponentType.ANIMATOR, isActive);
+			super(ComponentType.ANIMATOR);
 			
 			_currentState = NONE;
+			addEventListener(Event.ENTER_FRAME, onNextFrame);
+			addEventListener(Event.DEACTIVATE, onDeactivateScene);
 		}
 				
 		public override function dispose():void
 		{
-			isActive(false);
+			this.isActive = false;
 			
 			if (_states)
 			{
@@ -95,13 +97,13 @@ package trolling.component.animation
 			if (_isActive && _states && _currentState != NONE)
 			{
 				var state:State = _states[_currentState];
-				state.dispatchEvent(new Event(Event.ENTER_FRAME));
+				state.dispatchEvent(event);
 			}
 		}
 		
 		protected override function onDeactivateScene(event:Event):void
 		{
-			isActive(false);
+			this.isActive = false;
 		}
 				
 		public function addState(stateName:String):State // 새로운 State 추가

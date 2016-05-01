@@ -24,15 +24,19 @@ package trolling.component.physics
 		
 		private var _isVisible:Boolean;
 		
-		public function Collider(isActive:Boolean = false)
+		public function Collider()
 		{
-			super(ComponentType.COLLIDER, isActive);
+			super(ComponentType.COLLIDER);
 			
 			_id = ID_NONE;
 			_rect = null;
 			_circle = null;
 			
 			_isVisible = false;
+			
+			addEventListener(Event.ENTER_FRAME, onNextFrame);
+			addEventListener(Event.ACTIVATE, onActivateScene);
+			addEventListener(Event.DEACTIVATE, onDeactivateScene);
 			
 			// ColliderManager에 등록
 		}
@@ -86,12 +90,12 @@ package trolling.component.physics
 		
 		protected override function onActivateScene(event:Event):void
 		{
-			isActive(true);
+			this.isActive = true;
 		}
 		
 		protected override function onDeactivateScene(event:Event):void
 		{
-			isActive(false);
+			this.isActive = false;
 		}
 		
 		public function isCollision(object:Collider):Boolean

@@ -12,9 +12,9 @@ package trolling.component.graphic
 		
 		private var _texture:Texture;
 		
-		public function Image(resource:Bitmap, isActive:Boolean = false)
+		public function Image(resource:Bitmap)
 		{
-			super(ComponentType.IMAGE, isActive);
+			super(ComponentType.IMAGE);
 			
 			if (!resource)
 			{
