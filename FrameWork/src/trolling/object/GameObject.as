@@ -10,11 +10,10 @@ package trolling.object
 	import trolling.component.Component;
 	import trolling.component.ComponentType;
 	import trolling.component.DisplayComponent;
+	import trolling.component.animation.Animator;
 	import trolling.rendering.Painter;
 	import trolling.rendering.TriangleData;
 	import trolling.utils.PivotType;
-	import trolling.component.animation.Animator;
-	
 	
 	public class GameObject extends EventDispatcher
 	{	
@@ -59,10 +58,13 @@ package trolling.object
 			component.parent = this;
 			_components[component.type] = component;
 			
-			if(DisplayComponent(component).getRenderingResource() != null)
+			if (component is DisplayComponent)
 			{
-				var compare:Rectangle = new Rectangle(0, 0, DisplayComponent(component).getRenderingResource().width, DisplayComponent(component).getRenderingResource().height);
-				setBound(compare);
+				if(DisplayComponent(component).getRenderingResource() != null)
+				{
+					var compare:Rectangle = new Rectangle(0, 0, DisplayComponent(component).getRenderingResource().width, DisplayComponent(component).getRenderingResource().height);
+					setBound(compare);
+				}
 			}
 		}
 		
