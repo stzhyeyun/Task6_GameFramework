@@ -11,17 +11,15 @@ package trolling.core
 	import flash.ui.Mouse;
 	import flash.utils.Dictionary;
 	
-	import trolling.utils.TouchManager;
-	
-	import trolling.Scene;
 	import trolling.component.physics.Collider;
+	import trolling.event.TouchManager;
+	import trolling.event.TouchPhase;
 	import trolling.event.TrollingEvent;
 	import trolling.object.GameObject;
+	import trolling.object.Scene;
 	import trolling.object.Stage;
 	import trolling.rendering.Painter;
 	import trolling.utils.Color;
-	import trolling.utils.EventWith;
-	import trolling.utils.TouchPhase;
 	
 	public class Trolling
 	{        
@@ -161,7 +159,7 @@ package trolling.core
 			{
 				hit = _currentScene.findClickedGameObject(point);
 				if(hit != null)
-					hit.dispatchEvent(new EventWith(phase, _touchManager.points));
+					hit.dispatchEvent(new TrollingEvent(phase, _touchManager.points));
 				_touchManager.hoverFlag = true;
 				_touchManager.hoverTarget = hit;
 			}
@@ -169,7 +167,7 @@ package trolling.core
 			{
 				hit = _currentScene.findClickedGameObject(point);
 				if(hit != null)
-					hit.dispatchEvent(new EventWith(phase, _touchManager.points));
+					hit.dispatchEvent(new TrollingEvent(phase, _touchManager.points));
 				//	_touchManager.pushPoint(point);
 				if(hit != _touchManager.hoverTarget)
 					_touchManager.hoverTarget = hit;
@@ -178,7 +176,7 @@ package trolling.core
 			{
 				hit = _currentScene.findClickedGameObject(point);
 				if(hit != null)
-					hit.dispatchEvent(new EventWith(phase, _touchManager.points));
+					hit.dispatchEvent(new TrollingEvent(phase, _touchManager.points));
 				_touchManager.hoverFlag = false;
 			}
 		}
@@ -345,7 +343,7 @@ package trolling.core
 			if(!_started || !_initRender || !_currentScene)
 				return;
 			if(_touchManager.hoverFlag)
-				_touchManager.hoverTarget.dispatchEvent(new EventWith(TouchPhase.HOVER, _touchManager.points));
+				_touchManager.hoverTarget.dispatchEvent(new TrollingEvent(TouchPhase.HOVER, _touchManager.points));
 			nextFrame();
 			detectCollision();
 			render();

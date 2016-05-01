@@ -1,4 +1,4 @@
-package trolling.utils
+package trolling.event
 {
 	import flash.geom.Point;
 	

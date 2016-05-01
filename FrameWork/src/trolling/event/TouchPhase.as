@@ -1,4 +1,4 @@
-package trolling.utils
+package trolling.event
 {
 	
 	/** A class that provides constant values for the phases of a touch object. 

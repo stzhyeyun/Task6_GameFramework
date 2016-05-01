@@ -4,7 +4,7 @@
     <classEntry path="trolling.component.Component"/>
     <classEntry path="trolling.object.GameObject"/>
     <classEntry path="trolling.rendering.Painter"/>
-    <classEntry path="trolling.Scene"/>
+    <classEntry path="trolling.object.Scene"/>
     <classEntry path="trolling.rendering.Program"/>
     <classEntry path="trolling.object.Stage"/>
     <classEntry path="trolling.rendering.TriangleData"/>
@@ -19,10 +19,11 @@
     <classEntry path="trolling.component.graphic.Image"/>
     <classEntry path="jimining.Stage3DSprite"/>
     <classEntry path="trolling.rendering.Texture"/>
-    <classEntry path="trolling.utils.TouchPhase"/>
+    <classEntry path="trolling.event.TouchPhase"/>
     <classEntry path="trolling.component.physics.Collider"/>
     <classEntry path="trolling.utils.Circle"/>
     <classEntry path="trolling.utils.PivotType"/>
+    <classEntry path="trolling.core.ColliderManager"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

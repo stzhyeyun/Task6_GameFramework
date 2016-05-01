@@ -1,6 +1,5 @@
-package trolling
+package trolling.object
 {
-	import trolling.object.GameObject;
 
 	public class Scene extends GameObject
 	{
