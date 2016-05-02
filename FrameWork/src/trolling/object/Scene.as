@@ -5,7 +5,6 @@ package trolling.object
 	{
 		private const TAG:String = "[Scene]";
 		
-		private var _name:String;
 		private var _isActive:Boolean;
 	
 		public function Scene()
@@ -15,7 +14,6 @@ package trolling.object
 		
 		public override function dispose():void
 		{
-			_name = null;
 			_isActive = false;
 			
 			super.dispose();
@@ -36,17 +34,7 @@ package trolling.object
 			
 			_isActive = false;
 		}
-		
-		public function get name():String
-		{
-			return _name;
-		}
-		
-		public function set name(name:String):void
-		{
-			_name = name;
-		}
-		
+
 		public function get isActive():Boolean
 		{
 			return _isActive;
