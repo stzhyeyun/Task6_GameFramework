@@ -293,7 +293,6 @@ package trolling.core
 				trace("_stage is null");
 			scene.width = _stage.stageWidth;
 			scene.height = _stage.stageHeight;
-			scene.name = key;
 		}
 		
 		public function switchScene(key:String):void
