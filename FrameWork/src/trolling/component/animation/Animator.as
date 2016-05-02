@@ -56,6 +56,9 @@ package trolling.component.animation
 						return;
 					}
 					
+					var state:State = _states[_currentState];
+					state.play();
+					
 					addEventListener(Event.ENTER_FRAME, onNextFrame);
 					addEventListener(TrollingEvent.DEACTIVATE, onDeactivateScene);
 				}
