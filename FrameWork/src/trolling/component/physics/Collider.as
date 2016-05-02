@@ -12,9 +12,9 @@ package trolling.component.physics
 
 	public class Collider extends Component
 	{
-		public const ID_NONE:int = -1;
-		public const ID_RECT:int = 0;
-		public const ID_CIRCLE:int = 1;
+		public const ID_NONE:int = 0;
+		public const ID_RECT:int = 1;
+		public const ID_CIRCLE:int = 2;
 		
 		private const TAG:String = "[Collider]";
 		
