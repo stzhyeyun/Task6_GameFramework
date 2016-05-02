@@ -437,9 +437,11 @@ package trolling.core
 				// Remove collided objects from detectionObjects
 				if (collidedIndices)
 				{
+					var numRemove:int = 0;
 					for (var j:int = 0; j < collidedIndices.length; j++)
 					{
-						detectionObjects.removeAt(collidedIndices[j]);
+						detectionObjects.removeAt(collidedIndices[j] - numRemove);
+						numRemove++;
 					}
 				}
 				collidedIndices = null;
