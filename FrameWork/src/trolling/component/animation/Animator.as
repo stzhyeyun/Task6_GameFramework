@@ -13,7 +13,7 @@ package trolling.component.animation
 		private const TAG:String = "[Animator]";
 		private const NONE:String = "none";
 		
-		private var _states:Dictionary; // key: State name, value: State
+		private var _states:Dictionary; // key: String(Name), value: State
 		private var _currentState:String; // State name
 		
 		public function Animator()
@@ -108,18 +108,18 @@ package trolling.component.animation
 			this.isActive = false;
 		}
 				
-		public function addState(stateName:String):State // 새로운 State 추가
+		public function addState(state:State):void // 새로운 State 추가
 		{
-			if (!stateName || stateName == "" || stateName == NONE)
+			if (!state)
 			{
-				trace(TAG + " addState : Inappropriate state name.");
-				return null;
+				trace(TAG + " addState : No state.");
+				return;
 			}
 			
-			if (_states && _states[stateName])
+			if (_states && _states[state.name])
 			{
 				trace(TAG + " addState : Animator already has the state of same name.");
-				return null;
+				return;
 			}
 			
 			var isFirst:Boolean = false;
@@ -129,15 +129,13 @@ package trolling.component.animation
 				isFirst = true;
 			}
 			
-			var state:State = new State(stateName);
-			_states[stateName] = state;
-			
 			if (isFirst)
 			{
-				_currentState = stateName;
+				_currentState = state.name;
+				state.play();
 			}
 			
-			return state;
+			_states[state.name] = state;
 		}
 		
 		public function removeState(stateName:String):void
