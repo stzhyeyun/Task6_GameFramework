@@ -37,8 +37,8 @@ package trolling.component.physics
 			_isVisible = false;
 			
 			addEventListener(Event.ENTER_FRAME, onNextFrame);
-			addEventListener(TrollingEvent.ACTIVATE, onActivateScene);
-			addEventListener(TrollingEvent.DEACTIVATE, onDeactivateScene);
+			addEventListener(Event.ACTIVATE, onActivateScene);
+			addEventListener(Event.DEACTIVATE, onDeactivateScene);
 			
 			// ColliderManager에 등록
 			ColliderManager.addCollider(this);
@@ -56,6 +56,8 @@ package trolling.component.physics
 			
 			_isVisible = false;
 			
+			ColliderManager.removeCollider(this);
+			
 			super.dispose();
 		}
 		
@@ -66,8 +68,8 @@ package trolling.component.physics
 				if (!_isActive)
 				{
 					addEventListener(Event.ENTER_FRAME, onNextFrame);
-					addEventListener(TrollingEvent.ACTIVATE, onActivateScene);
-					addEventListener(TrollingEvent.DEACTIVATE, onDeactivateScene);
+					addEventListener(Event.ACTIVATE, onActivateScene);
+					addEventListener(Event.DEACTIVATE, onDeactivateScene);
 				}
 			}
 			else
@@ -75,8 +77,8 @@ package trolling.component.physics
 				if (_isActive)
 				{
 					removeEventListener(Event.ENTER_FRAME, onNextFrame);
-					removeEventListener(TrollingEvent.ACTIVATE, onActivateScene);
-					removeEventListener(TrollingEvent.DEACTIVATE, onDeactivateScene);
+					removeEventListener(Event.ACTIVATE, onActivateScene);
+					removeEventListener(Event.DEACTIVATE, onDeactivateScene);
 					
 					_isVisible = false;
 				}

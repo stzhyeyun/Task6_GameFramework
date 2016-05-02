@@ -85,6 +85,11 @@ package trolling.core
 			stage.addEventListener(TouchEvent.TOUCH_OVER, onTouch);
 		}
 		
+		public function get currentScene():GameObject
+		{
+			return _currentScene;
+		}
+
 		private function onTouch(event:Event):void
 		{
 			if(_currentScene == null)
@@ -150,13 +155,14 @@ package trolling.core
 			globalX = _stage.stageWidth  * (globalX - _viewPort.x) / _viewPort.width;
 			globalY = _stage.stageHeight * (globalY - _viewPort.y) / _viewPort.height;
 			var point:Point = new Point(globalX, globalY);
-			_touchManager.pushPoint(point);
 			var hit:GameObject;
 			
 			//trace("globalX = " + globalX + " globalY = " + globalY);
 			
 			if(phase == TouchPhase.BEGAN)
 			{
+				_touchManager.initPoints();
+				_touchManager.pushPoint(point);
 				hit = _currentScene.findClickedGameObject(point);
 				if(hit != null)
 					hit.dispatchEvent(new TrollingEvent(phase, _touchManager.points));
@@ -165,9 +171,10 @@ package trolling.core
 			}
 			else if(phase == TouchPhase.MOVED)
 			{
+				_touchManager.pushPoint(point);
 				hit = _currentScene.findClickedGameObject(point);
-				if(hit != null)
-					hit.dispatchEvent(new TrollingEvent(phase, _touchManager.points));
+				//				if(hit != null)
+				//					hit.dispatchEvent(new TrollingEvent(phase, _touchManager.points));
 				//	_touchManager.pushPoint(point);
 				if(hit != _touchManager.hoverTarget)
 					_touchManager.hoverTarget = hit;
@@ -180,12 +187,6 @@ package trolling.core
 				_touchManager.hoverFlag = false;
 			}
 		}
-		
-		//		private function seekHover():void
-		//		{
-		//			if(!_touchManager.hoverFlag)
-		//				return;
-		//		}
 		
 		public function get painter():Painter
 		{
@@ -302,27 +303,9 @@ package trolling.core
 			_currentScene = _sceneDic[key];
 		}
 		
-		//		public function initializeRoot():void
-		//		{
-		//			if(_currentScene == null && _rootClass != null)
-		//			{
-		//				_currentScene = new _rootClass() as GameObject;
-		//				_currentScene.x = _stage.x;
-		//				_currentScene.y = _stage.y;
-		//				_currentScene.width = _stage.width;
-		//				_currentScene.height = _stage.height;
-		//				_stage.addChild(_currentScene);
-		//			}
-		//		}
-		
 		public function start():void
 		{
 			_started = true;
-		}
-		
-		public function dispose():void
-		{
-			
 		}
 		
 		private function createPainter(stage3D:Stage3D):Painter

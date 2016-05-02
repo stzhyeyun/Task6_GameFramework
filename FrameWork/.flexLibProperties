@@ -24,6 +24,8 @@
     <classEntry path="trolling.utils.Circle"/>
     <classEntry path="trolling.utils.PivotType"/>
     <classEntry path="trolling.core.ColliderManager"/>
+    <classEntry path="trolling.media.SoundManager"/>
+    <classEntry path="trolling.media.Sound"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

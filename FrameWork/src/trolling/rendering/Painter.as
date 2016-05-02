@@ -72,9 +72,7 @@ package trolling.rendering
 			_context = _stage3D.context3D;	
 			_program.initProgram(_context);
 			setProgram();
-			createVertexBuffer();
 			createIndexBuffer();
-			setVertextBuffer();
 			_context.setDepthTest(true, Context3DCompareMode.ALWAYS);
 			_context.setBlendFactors(
 				Context3DBlendFactor.SOURCE_ALPHA,
@@ -107,10 +105,13 @@ package trolling.rendering
 		
 		public function setDrawData(triangleData:TriangleData):void
 		{
+			createVertexBuffer(triangleData);
+			setVertextBuffer();
 			setUVVector(triangleData);
-			_matrix.appendRotation(0, X_AXIS);
-			//	_matrix.appendTranslation(0, -0.5, 0);
+			//			_matrix.appendRotation(90, Z_AXIS);
+			//				_matrix.appendTranslation(0, -0.5, 0);
 			setMatrix();
+			//			_context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, _matrix, true);
 		}
 		
 		public function present():void
@@ -123,20 +124,21 @@ package trolling.rendering
 			_context.drawTriangles(_indexBuffer);
 		}
 		
-		public function appendMatrix(matrix:Matrix3D):void
-		{
-			_matrix.append(matrix);
-		}
+		//		public function appendMatrix(matrix:Matrix3D):void
+		//		{
+		//			_matrix.append(matrix);
+		//		}
 		
 		public function setUVVector(triagleData:TriangleData):void
 		{
 			_context.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 4, triagleData.uvData);
 		}
 		
-		private function createVertexBuffer():void
+		private function createVertexBuffer(triangleData:TriangleData):void
 		{
 			_vertexBuffer = _context.createVertexBuffer(4, 5);
-			_vertexBuffer.uploadFromVector(TriangleData.rawVertexData, 0, 4);
+			//			trace(triangleData.rawVertexData);
+			_vertexBuffer.uploadFromVector(triangleData.rawVertexData, 0, 4);
 		}
 		
 		private function createIndexBuffer():void
