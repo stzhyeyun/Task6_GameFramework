@@ -22,6 +22,7 @@ package trolling.component.animation
 			_currentState = NONE;
 			
 			addEventListener(Event.ENTER_FRAME, onNextFrame);
+			addEventListener(Event.ACTIVATE, onActivateScene);
 			addEventListener(Event.DEACTIVATE, onDeactivateScene);
 		}
 				
@@ -59,6 +60,7 @@ package trolling.component.animation
 					state.play();
 					
 					addEventListener(Event.ENTER_FRAME, onNextFrame);
+					addEventListener(Event.ACTIVATE, onActivateScene);
 					addEventListener(Event.DEACTIVATE, onDeactivateScene);
 				}
 			}
@@ -70,6 +72,7 @@ package trolling.component.animation
 					state.stop();
 					
 					removeEventListener(Event.ENTER_FRAME, onNextFrame);
+					removeEventListener(Event.ACTIVATE, onActivateScene);
 					removeEventListener(Event.DEACTIVATE, onDeactivateScene);
 				}
 			}
@@ -103,6 +106,11 @@ package trolling.component.animation
 				var state:State = _states[_currentState];
 				state.dispatchEvent(event);
 			}
+		}
+		
+		protected override function onActivateScene(event:Event):void
+		{
+			this.isActive = true;
 		}
 		
 		protected override function onDeactivateScene(event:Event):void
