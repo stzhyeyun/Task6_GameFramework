@@ -13,7 +13,7 @@ package trolling.component.animation
 		private var _name:String;
 		private var _animation:Vector.<Texture>;
 		private var _currentIndex:int;
-		private var _animationSpeed:uint; // 다음 애니메이션 인덱스로 업데이트 하기까지의 프레임 수
+		private var _interval:uint; // 다음 애니메이션 인덱스로 업데이트 하기까지의 프레임 수
 		private var _frameCounter:uint;
 		private var _isPlaying:Boolean;
 		
@@ -21,7 +21,7 @@ package trolling.component.animation
 		{
 			_name = name;
 			_currentIndex = -1;
-			_animationSpeed = 0;
+			_interval = 0;
 			_frameCounter = 0;
 			_isPlaying = false;
 		}
@@ -43,7 +43,7 @@ package trolling.component.animation
 			_animation = null;
 			
 			_currentIndex = -1;
-			_animationSpeed = 0;
+			_interval = 0;
 			_frameCounter = 0;
 		}
 		
@@ -58,9 +58,9 @@ package trolling.component.animation
 				
 				_currentIndex = 0;
 				
-				if (_animationSpeed == 0) // [혜윤] animationSpeed가 설정되어있지 않으면 1로 보정
+				if (_interval == 0) // [혜윤] animationSpeed가 설정되어있지 않으면 1로 보정
 				{
-					_animationSpeed = 1;
+					_interval = 1;
 				}
 				
 				_isPlaying = true;			
@@ -144,18 +144,18 @@ package trolling.component.animation
 			return _currentIndex;	
 		}
 		
-		public function get animationSpeed():uint
+		public function get interval():uint
 		{
-			return _animationSpeed;	
+			return _interval;	
 		}
 		
-		public function set animationSpeed(value:uint):void
+		public function set interval(value:uint):void
 		{
 			if (value <= 0)
 			{
 				value = 1;
 			}
-			_animationSpeed = value;
+			_interval = value;
 		}
 		
 		public function get isPlaying():Boolean
@@ -172,7 +172,7 @@ package trolling.component.animation
 			
 			_frameCounter++;
 			
-			if (_frameCounter == _animationSpeed)
+			if (_frameCounter >= _interval)
 			{
 				_currentIndex++;
 				
