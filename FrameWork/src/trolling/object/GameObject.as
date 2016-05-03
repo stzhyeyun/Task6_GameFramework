@@ -58,6 +58,7 @@ package trolling.object
 		public function set visable(value:Boolean):void
 		{
 			_visable = value;
+			
 			for(var componentType:String in _components)
 			{
 				var component:Component = _components[componentType];

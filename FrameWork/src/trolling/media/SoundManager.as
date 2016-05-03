@@ -2,7 +2,6 @@ package trolling.media
 {
 	import flash.events.Event;
 	import flash.media.SoundChannel;
-	import flash.media.SoundMixer;
 	import flash.media.SoundTransform;
 	import flash.utils.Dictionary;
 	
@@ -13,7 +12,7 @@ package trolling.media
 		
 		private const TAG:String = "[SoundManager]";
 		private const MAX_CHANNEL:int = 32; 
-		
+
 		private static var _instance:SoundManager;
 		
 		private var _sounds:Dictionary; // key: String(Name), value: Sound
@@ -36,8 +35,6 @@ package trolling.media
 		
 		public function dispose():void
 		{
-			//stopAll();
-			
 			if (_channels)
 			{
 				for (var i:int = 0; i < _channels.length; i++)

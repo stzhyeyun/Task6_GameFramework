@@ -1,6 +1,5 @@
 package trolling.core
 {
-
 	public class SceneManager
 	{
 		public function SceneManager()
