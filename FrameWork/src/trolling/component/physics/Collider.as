@@ -69,6 +69,8 @@ package trolling.component.physics
 					addEventListener(Event.ENTER_FRAME, onNextFrame);
 					addEventListener(Event.ACTIVATE, onActivateScene);
 					addEventListener(Event.DEACTIVATE, onDeactivateScene);
+					
+					ColliderManager.addCollider(this);
 				}
 			}
 			else
@@ -78,6 +80,8 @@ package trolling.component.physics
 					removeEventListener(Event.ENTER_FRAME, onNextFrame);
 					removeEventListener(Event.ACTIVATE, onActivateScene);
 					removeEventListener(Event.DEACTIVATE, onDeactivateScene);
+					
+					ColliderManager.removeCollider(this);
 					
 					_isVisible = false;
 				}
