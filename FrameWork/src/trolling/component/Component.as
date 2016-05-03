@@ -34,7 +34,7 @@ package trolling.component
 			return _parent;
 		}
 		
-		public function set parent(value:GameObject):void
+		public virtual function set parent(value:GameObject):void
 		{
 			_parent = value;
 		}

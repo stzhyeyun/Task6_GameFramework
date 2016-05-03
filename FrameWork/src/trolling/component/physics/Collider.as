@@ -7,6 +7,7 @@ package trolling.component.physics
 	import trolling.component.Component;
 	import trolling.component.ComponentType;
 	import trolling.core.ColliderManager;
+	import trolling.object.GameObject;
 	import trolling.utils.Circle;
 
 	public class Collider extends Component
@@ -28,6 +29,8 @@ package trolling.component.physics
 		public function Collider()
 		{
 			super(ComponentType.COLLIDER);
+			
+			_isActive = false;
 			
 			_id = ID_NONE;
 			_rect = null;
@@ -58,6 +61,25 @@ package trolling.component.physics
 			ColliderManager.removeCollider(this);
 			
 			super.dispose();
+		}
+		
+		public override function set parent(value:GameObject):void
+		{
+			var isFirst:Boolean = false;
+			if (!_parent)
+			{
+				isFirst = true;
+			}
+			
+			_parent = value;
+			update();
+			
+			_isActive = true;
+			
+			if (isFirst)
+			{
+				ColliderManager.addCollider(this);
+			}
 		}
 		
 		public override function set isActive(value:Boolean):void
