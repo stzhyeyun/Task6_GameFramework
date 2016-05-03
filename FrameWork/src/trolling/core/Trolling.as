@@ -300,7 +300,10 @@ package trolling.core
 		{
 			if(_sceneDic == null || _sceneDic[key] == null)
 				return;
+			
+			_currentScene.visable = false;
 			_currentScene = _sceneDic[key];
+			_currentScene.visable = true;
 		}
 		
 		public function start():void
