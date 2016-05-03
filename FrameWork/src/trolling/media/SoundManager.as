@@ -16,7 +16,7 @@ package trolling.media
 		private static var _instance:SoundManager;
 		
 		private var _sounds:Dictionary; // key: String(Name), value: Sound
-		private var _channels:Vector.<SoundChannel>; // key: String(Name), value: SoundChannel // 동시에 32개까지 사용 가능
+		private var _channels:Vector.<SoundChannel>; // 동시에 32개까지 사용 가능
 		private var _bgm:Sound;
 		
 		public function SoundManager()
