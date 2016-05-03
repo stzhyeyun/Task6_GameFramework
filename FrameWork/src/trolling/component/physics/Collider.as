@@ -21,8 +21,9 @@ package trolling.component.physics
 		private var _id:int;
 		private var _rect:Rectangle;
 		private var _circle:Circle;
-		private var _dxFromParent:Number;
-		private var _dyFromParent:Number;
+		private var _originalWidth:Number;
+		private var _originalHeight:Number;
+		private var _originalRadius:Number;
 		
 		private var _isVisible:Boolean;
 		
@@ -35,6 +36,9 @@ package trolling.component.physics
 			_id = ID_NONE;
 			_rect = null;
 			_circle = null;
+			_originalWidth = 0;
+			_originalHeight = 0;
+			_originalRadius = 0;
 			
 			_isVisible = false;
 			
@@ -50,8 +54,9 @@ package trolling.component.physics
 			_id = ID_NONE;
 			_rect = null;
 			_circle = null;
-			_dxFromParent = 0;
-			_dyFromParent = 0;
+			_originalWidth = 0;
+			_originalHeight = 0;
+			_originalRadius = 0;
 			
 			_isVisible = false;
 			
@@ -113,7 +118,7 @@ package trolling.component.physics
 		{
 			if (_isActive)
 			{
-				updatePosition();
+				update();
 			}
 		}
 		
@@ -182,9 +187,8 @@ package trolling.component.physics
 		{
 			_id = ID_RECT;
 			_rect = collider;
-			
-			_dxFromParent = _rect.x;
-			_dyFromParent = _rect.y
+			_originalWidth = _rect.width;
+			_originalHeight = _rect.height;
 		}
 		
 		public function get circle():Circle
@@ -196,9 +200,7 @@ package trolling.component.physics
 		{
 			_id = ID_CIRCLE;
 			_circle = collider;
-			
-			_dxFromParent = _circle.center.x
-			_dyFromParent = _circle.center.y
+			_originalRadius = _circle.radius;
 		}
 		
 		public function get isVisible():Boolean
@@ -228,7 +230,7 @@ package trolling.component.physics
 			return rect.intersects(outerRect);
 		}
 		
-		private function updatePosition():void
+		private function update():void
 		{
 			if (!_parent || _id == ID_NONE)
 			{
@@ -236,16 +238,21 @@ package trolling.component.physics
 			}
 			
 			var parentGlobalPos:Point = _parent.getGlobalPoint();
+			var parentWidth:Number = _parent.width * _parent.scaleX;
+			var parentHeight:Number = _parent.height * _parent.scaleY;
 			
 			if (_id == ID_RECT)
 			{
-				_rect.x = parentGlobalPos.x + _dxFromParent;
-				_rect.y = parentGlobalPos.y + _dyFromParent;
+				_rect.width = _originalWidth * _parent.scaleX;
+				_rect.height = _originalHeight * _parent.scaleY;
+				_rect.x = parentGlobalPos.x + (parentWidth / 2 - _rect.width / 2);
+				_rect.y = parentGlobalPos.y + (parentHeight / 2 - _rect.height / 2);
 			}
 			else if (_id == ID_CIRCLE)
 			{
-				_circle.center.x = parentGlobalPos.x + _dxFromParent;
-				_circle.center.y = parentGlobalPos.y + _dyFromParent;
+				_circle.radius = _originalRadius * _parent.scaleX;
+				_circle.center.x = parentGlobalPos.x + parentWidth / 2;
+				_circle.center.y = parentGlobalPos.y + parentHeight / 2;
 			}
 		}
 	}
