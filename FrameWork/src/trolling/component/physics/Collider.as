@@ -41,9 +41,6 @@ package trolling.component.physics
 			addEventListener(Event.ENTER_FRAME, onNextFrame);
 			addEventListener(Event.ACTIVATE, onActivateScene);
 			addEventListener(Event.DEACTIVATE, onDeactivateScene);
-			
-			// ColliderManager에 등록
-			ColliderManager.addCollider(this);
 		}
 		
 		public override function dispose():void
