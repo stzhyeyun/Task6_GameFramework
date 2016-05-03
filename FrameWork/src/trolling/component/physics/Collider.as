@@ -7,7 +7,6 @@ package trolling.component.physics
 	import trolling.component.Component;
 	import trolling.component.ComponentType;
 	import trolling.core.ColliderManager;
-	import trolling.event.TrollingEvent;
 	import trolling.utils.Circle;
 
 	public class Collider extends Component

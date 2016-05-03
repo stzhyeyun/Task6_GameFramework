@@ -4,7 +4,6 @@ package trolling.component.animation
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	
-	import trolling.event.Event;
 	import trolling.rendering.Texture;
 	
 	public class State extends EventDispatcher

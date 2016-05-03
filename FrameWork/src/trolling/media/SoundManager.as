@@ -6,8 +6,6 @@ package trolling.media
 	import flash.media.SoundTransform;
 	import flash.utils.Dictionary;
 	
-	import trolling.event.Event;
-	
 	public class SoundManager
 	{
 		public static const ALL:String = "all";

@@ -6,7 +6,6 @@ package trolling.component.animation
 	import trolling.component.ComponentType;
 	import trolling.component.DisplayComponent;
 	import trolling.rendering.Texture;
-	import trolling.event.Event;
 
 	public class Animator extends DisplayComponent
 	{
