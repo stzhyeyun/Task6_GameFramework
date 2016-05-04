@@ -10,30 +10,19 @@ package trolling.media
 		public static const ALL:String = "all";
 		public static const SELECT:String = "select";
 		
-		private const TAG:String = "[SoundManager]";
-		private const MAX_CHANNEL:int = 32; 
+		private static const TAG:String = "[SoundManager]";
+		private static const MAX_CHANNEL:int = 32; 
 
-		private static var _instance:SoundManager;
-		
-		private var _sounds:Dictionary; // key: String(Name), value: Sound
-		private var _channels:Vector.<SoundChannel>; // 동시에 32개까지 사용 가능
-		private var _bgm:Sound;
+		private static var _sounds:Dictionary; // key: String(Name), value: Sound
+		private static var _channels:Vector.<SoundChannel>; // 동시에 32개까지 사용 가능
+		private static var _bgm:Sound;
 		
 		public function SoundManager()
 		{
-			_instance = this;
+
 		}
 		
-		public static function getInstance():SoundManager
-		{
-			if (!_instance)
-			{
-				_instance = new SoundManager();
-			}
-			return _instance;
-		}
-		
-		public function dispose():void
+		public static function dispose():void
 		{
 			if (_channels)
 			{
@@ -66,7 +55,7 @@ package trolling.media
 			_bgm = null;
 		}
 		
-		public function addSound(name:String, sound:Sound):void
+		public static function addSound(name:String, sound:Sound):void
 		{
 			if (!sound)
 			{
@@ -87,7 +76,7 @@ package trolling.media
 			_sounds[name] = sound;
 		}
 		
-		public function removeSound(name:String):void
+		public static function removeSound(name:String):void
 		{
 			if (!_sounds || !_sounds[name])
 			{
@@ -109,7 +98,7 @@ package trolling.media
 			delete _sounds[name];
 		}
 		
-		public function play(name:String):void
+		public static function play(name:String):void
 		{
 			if (!_sounds || !_sounds[name])
 			{
@@ -177,7 +166,7 @@ package trolling.media
 			}
 		}
 		
-		public function stopBgm():void
+		public static function stopBgm():void
 		{
 			if (!_bgm || !_channels)
 			{
@@ -200,7 +189,7 @@ package trolling.media
 			_bgm = null;
 		}
 				
-		public function setVolume(target:String, volume:Number, name:String = null):void
+		public static function setVolume(target:String, volume:Number, name:String = null):void
 		{
 			if (!_channels)
 			{
@@ -235,7 +224,7 @@ package trolling.media
 			}
 		}
 		
-		public function setPan(target:String, pan:Number, name:String = null):void
+		public static function setPanning(target:String, pan:Number, name:String = null):void
 		{
 			if (!_channels)
 			{
@@ -270,7 +259,7 @@ package trolling.media
 			}
 		}
 		
-		private function onEnd(event:Event):void
+		private static function onEnd(event:Event):void
 		{
 			var channel:SoundChannel = event.target as SoundChannel;
 			
@@ -281,7 +270,7 @@ package trolling.media
 			}
 		}
 		
-		private function onEndBgm(event:Event):void
+		private static function onEndBgm(event:Event):void
 		{
 			var channel:SoundChannel = event.target as SoundChannel;
 			
