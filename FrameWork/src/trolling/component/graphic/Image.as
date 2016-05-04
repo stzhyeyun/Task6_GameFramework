@@ -24,6 +24,11 @@ package trolling.component.graphic
 			super.dispose();
 		}
 		
+		/**
+		 * 현재 프레임에 Render해야 하는 Texture를 반환합니다. 
+		 * @return Image가 비활성화 상태이거나 지정된 Texture가 없을 경우 null을 반환합니다.
+		 * 
+		 */
 		public override function getRenderingResource():Texture
 		{
 			if (!_isActive)

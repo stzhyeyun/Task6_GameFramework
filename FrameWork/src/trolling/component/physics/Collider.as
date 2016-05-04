@@ -28,7 +28,7 @@ package trolling.component.physics
 		{
 			super(ComponentType.COLLIDER);
 			
-			_isActive = false;
+			_isActive = false; // Collider는 지정된 rect 또는 circle의 위치 및 크기를 최초로 update한 후 활성화됩니다.
 			
 			_id = ID_NONE;
 			_rect = null;
@@ -56,6 +56,11 @@ package trolling.component.physics
 			super.dispose();
 		}
 		
+		/**
+		 * parent가 지정되면 소유한 rect 또는 circle의 위치 및 크기를 계산합니다. parent가 최초로 지정된 경우에만 ColliderManager에 자신을 추가합니다.
+		 * @param value Collider를 소유하는 GameObject입니다.
+		 * 
+		 */
 		public override function set parent(value:GameObject):void
 		{
 			var isFirst:Boolean = false;
@@ -75,6 +80,11 @@ package trolling.component.physics
 			}
 		}
 		
+		/**
+		 * Collider를 활성화 또는 비활성화합니다. EventListener에 대한 작업과 ColliderManager에 대한 작업을 포함합니다. 
+		 * @param value
+		 * 
+		 */
 		public override function set isActive(value:Boolean):void
 		{
 			if (value)
@@ -103,6 +113,11 @@ package trolling.component.physics
 			_isActive = value;
 		}
 		
+		/**
+		 *  
+		 * @param event
+		 * 
+		 */
 		protected override function onNextFrame(event:Event):void
 		{
 			if (_isActive)

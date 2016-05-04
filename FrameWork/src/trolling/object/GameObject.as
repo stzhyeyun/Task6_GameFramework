@@ -43,8 +43,8 @@ package trolling.object
 		private var _height:Number;
 		private var _scaleX:Number;
 		private var _scaleY:Number;
-		
 		private var _rotate:Number;
+		private var _name:String;
 		
 		private var _visable:Boolean;
 		private var _colliderRender:Boolean;
@@ -258,12 +258,13 @@ package trolling.object
 				
 				triangleData.calculVertex();
 				
+				//				painter.matrix.prependScale(_scaleX, _scaleY, 1);
 				painter.matrix.prependTranslation(drawRect.x, -drawRect.y, 0);
 				painter.matrix.prependTranslation(drawRect.width/2, -drawRect.height/2, 0);
 				painter.matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
 				painter.matrix.prependTranslation(-drawRect.width/2, drawRect.height/2, 0);
 				
-				if(componentType != NONE)
+				if(componentType != NONE && displayComponent.getRenderingResource() != null)
 				{
 					painter.context.setTextureAt(0, displayComponent.getRenderingResource().nativeTexture);
 					triangleData.uvData[0] = displayComponent.getRenderingResource().u;
@@ -271,7 +272,7 @@ package trolling.object
 				}
 				
 				painter.setDrawData(triangleData);
-				if(componentType != NONE)
+				if(componentType != NONE && displayComponent.getRenderingResource() != null)
 					painter.draw();
 				var coll:Collider = _components[ComponentType.COLLIDER];
 				if(coll != null && _colliderRender && coll.id != Collider.ID_NONE)
@@ -280,7 +281,7 @@ package trolling.object
 					var rect:Rectangle;
 					if(coll.id == Collider.ID_RECT)
 						rect = coll.rect.clone();
-					else(coll.id == Collider.ID_CIRCLE)
+					else if(coll.id == Collider.ID_CIRCLE)
 					{
 						var circle:Circle = coll.circle;
 						rect = new Rectangle();
@@ -290,10 +291,10 @@ package trolling.object
 						rect.height = circle.radius*2;
 					}
 					
-					rect.x = (rect.x*2)/painter.viewPort.width;
-					rect.y = (rect.y*2)/painter.viewPort.height;
-					rect.width = (rect.width*2)/painter.viewPort.width;
-					rect.height = (rect.height*2)/painter.viewPort.height;
+					rect.width = drawRect.width*coll.ratioX;
+					rect.height = drawRect.height*coll.ratioY;
+					rect.x = (drawRect.width/2)-(rect.width/2);
+					rect.y = (drawRect.height/2)-(rect.height/2);
 					
 					var bitmapData:BitmapData = new BitmapData(32, 32, false, Color.BLUE);
 					var textureTemp:flash.display3D.textures.Texture = painter.context.createTexture(32, 32, Context3DTextureFormat.BGRA, false);
@@ -310,7 +311,7 @@ package trolling.object
 					triangleTemp.calculVertex();
 					
 					painter.pushState();
-					painter.matrix.prependTranslation((rect.x-drawRect.x), -(rect.y-drawRect.y), 0);
+					painter.matrix.prependTranslation(rect.x, -rect.y, 0);
 					painter.setDrawData(triangleTemp);
 					painter.draw();
 					painter.popState();
@@ -429,6 +430,7 @@ package trolling.object
 		public function getRectangle():Rectangle
 		{
 			var rectangle:Rectangle = new Rectangle(_x, _y, getWidth(), getHeight());
+			//			var rectangle:Rectangle = new Rectangle(_x, _y, _width, _height);
 			return rectangle;
 		}
 		
@@ -672,6 +674,16 @@ package trolling.object
 			if(value != PivotType.CENTER && value != PivotType.TOP_LEFT)
 				return;
 			_pivot = value;
+		}
+		
+		public function get name():String
+		{
+			return _name;
+		}
+		
+		public function set name(value:String):void
+		{
+			_name = value;
 		}
 	}
 }

@@ -26,8 +26,14 @@ package trolling.core
 				return;
 			
 			if(Trolling.current.currentScene != null)
+			{
+				Trolling.current.currentScene.visable = false;
+				Trolling.current.currentScene.dispatchEvent(new Event(Event.DEACTIVATE));
 				_sceneVector.push(_sceneDic[Trolling.current.currentScene.key]);
-			switchScene(key);
+			}
+			Trolling.current.currentScene = _sceneDic[key];
+			Trolling.current.currentScene.dispatchEvent(new Event(Event.ACTIVATE));
+			Trolling.current.currentScene.visable = true;
 		}
 		
 		public static function outScene():void
@@ -54,10 +60,17 @@ package trolling.core
 			{
 				_sceneDic = new Dictionary();
 				Trolling.current.currentScene = scene;
+				_sceneDic[key] = scene;
+				scene.width = Trolling.current.stage.stageWidth;
+				scene.height = Trolling.current.stage.stageHeight;
+				scene.dispatchEvent(new Event(Event.ACTIVATE));
 			}
-			_sceneDic[key] = scene;
-			scene.width = Trolling.current.stage.stageWidth;
-			scene.height = Trolling.current.stage.stageHeight;
+			else
+			{
+				_sceneDic[key] = scene;
+				scene.width = Trolling.current.stage.stageWidth;
+				scene.height = Trolling.current.stage.stageHeight;
+			}
 		}
 		
 		public static function switchScene(key:String):void
@@ -68,6 +81,7 @@ package trolling.core
 			{
 				Trolling.current.currentScene.visable = false;
 				Trolling.current.currentScene.dispatchEvent(new Event(Event.DEACTIVATE));
+				Trolling.current.currentScene.dispose();
 			}
 			Trolling.current.currentScene = _sceneDic[key];
 			Trolling.current.currentScene.dispatchEvent(new Event(Event.ACTIVATE));
