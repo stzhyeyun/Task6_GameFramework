@@ -21,9 +21,8 @@ package trolling.component.physics
 		private var _id:int;
 		private var _rect:Rectangle;
 		private var _circle:Circle;
-		private var _originalWidth:Number;
-		private var _originalHeight:Number;
-		private var _originalRadius:Number;
+		private var _ratioX:Number;
+		private var _ratioY:Number;
 		
 		private var _isVisible:Boolean;
 		
@@ -36,9 +35,8 @@ package trolling.component.physics
 			_id = ID_NONE;
 			_rect = null;
 			_circle = null;
-			_originalWidth = 0;
-			_originalHeight = 0;
-			_originalRadius = 0;
+			_ratioX = 0;
+			_ratioY = 0;
 			
 			_isVisible = false;
 			
@@ -54,13 +52,12 @@ package trolling.component.physics
 			_id = ID_NONE;
 			_rect = null;
 			_circle = null;
-			_originalWidth = 0;
-			_originalHeight = 0;
-			_originalRadius = 0;
+			_ratioX = 0;
+			_ratioY = 0;
 			
 			_isVisible = false;
 			
-			ColliderManager.removeCollider(this);
+			Trolling.current.colliderManager.removeCollider(this);
 			
 			super.dispose();
 		}
@@ -172,6 +169,21 @@ package trolling.component.physics
 			
 			return false;
 		}
+		
+		public function setRect(ratioX:Number, ratioY:Number):void
+		{
+			_id = ID_RECT;
+			_rect = new Rectangle();
+			_ratioX = ratioX;
+			_ratioY = ratioY;
+		}
+		
+		public function setCircle(ratio:Number):void
+		{
+			_id = ID_CIRCLE;
+			_circle = new Circle(new Point(0, 0), 0);
+			_ratioX = ratio;
+		}
 
 		public function get id():int
 		{
@@ -183,24 +195,9 @@ package trolling.component.physics
 			return _rect;
 		}
 		
-		public function set rect(collider:Rectangle):void
-		{
-			_id = ID_RECT;
-			_rect = collider;
-			_originalWidth = _rect.width;
-			_originalHeight = _rect.height;
-		}
-		
 		public function get circle():Circle
 		{
 			return _circle;
-		}
-		
-		public function set circle(collider:Circle):void
-		{
-			_id = ID_CIRCLE;
-			_circle = collider;
-			_originalRadius = _circle.radius;
 		}
 		
 		public function get isVisible():Boolean
@@ -243,14 +240,14 @@ package trolling.component.physics
 			
 			if (_id == ID_RECT)
 			{
-				_rect.width = _originalWidth * _parent.scaleX;
-				_rect.height = _originalHeight * _parent.scaleY;
+				_rect.width = parentWidth * _ratioX;
+				_rect.height = parentHeight * _ratioY;
 				_rect.x = parentGlobalPos.x + (parentWidth / 2 - _rect.width / 2);
 				_rect.y = parentGlobalPos.y + (parentHeight / 2 - _rect.height / 2);
 			}
 			else if (_id == ID_CIRCLE)
 			{
-				_circle.radius = _originalRadius * _parent.scaleX;
+				_circle.radius = parentWidth * _ratioX / 2;
 				_circle.center.x = parentGlobalPos.x + parentWidth / 2;
 				_circle.center.y = parentGlobalPos.y + parentHeight / 2;
 			}
