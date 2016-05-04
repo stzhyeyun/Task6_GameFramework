@@ -1,7 +1,5 @@
 package trolling.component.graphic
 {
-	import flash.display.Bitmap;
-	
 	import trolling.component.ComponentType;
 	import trolling.component.DisplayComponent;
 	import trolling.rendering.Texture;
@@ -12,16 +10,9 @@ package trolling.component.graphic
 		
 		private var _texture:Texture;
 		
-		public function Image(resource:Bitmap)
+		public function Image(texture:Texture = null)
 		{
 			super(ComponentType.IMAGE);
-			
-			var texture:Texture = new Texture(resource);
-			
-			if (!texture)
-			{
-				throw new ArgumentError(TAG + " ctor : Failed to create a Texture.");
-			}
 			
 			_texture = texture;
 		}
@@ -50,6 +41,16 @@ package trolling.component.graphic
 				trace(TAG + " getRenderingResource : No texture.");
 				return null;
 			}
+		}
+
+		public function get texture():Texture
+		{
+			return _texture;
+		}
+
+		public function set texture(value:Texture):void
+		{
+			_texture = value;
 		}
 	}
 }
