@@ -46,7 +46,6 @@ package trolling.component.animation
 			{
 				for (var i:int = 0; i < _animation.length; i++)
 				{
-					_animation[i].dispose();
 					_animation[i] = null;
 				}
 			}
