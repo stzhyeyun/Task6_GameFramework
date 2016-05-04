@@ -84,15 +84,15 @@ package trolling.media
 				return;
 			}
 			
-			if (_channels && _channels[name])
+			var sound:Sound = _sounds[name];
+			
+			if (sound.channelIndex != -1 && _channels && _channels[sound.channelIndex])
 			{
-				var channel:SoundChannel = _channels[name];
+				var channel:SoundChannel = _channels[sound.channelIndex];
 				channel.stop();
-				_channels[name] = null;
-				delete _channels[name];
+				_channels[sound.channelIndex] = null;
 			}
 			
-			var sound:Sound = _sounds[name];
 			sound.dispose();
 			_sounds[name] = null;
 			delete _sounds[name];
@@ -134,7 +134,7 @@ package trolling.media
 			var pushed:Boolean = false;
 			for (var i:int = 0; i < _channels.length; i++)
 			{
-				if (_channels[i] = null)
+				if (_channels[i] == null)
 				{
 					_channels[i] = channel;
 					pushed = true;
@@ -183,7 +183,7 @@ package trolling.media
 			_bgm = null;
 		}
 				
-		public static function setVolume(target:String, volume:Number, name:String = null):void
+		public static function setCurrentSoundVolume(target:String, volume:Number, name:String = null):void
 		{
 			if (!_channels)
 			{
@@ -260,7 +260,12 @@ package trolling.media
 			if (channel)
 			{
 				channel.removeEventListener(Event.SOUND_COMPLETE, onEnd);
-				channel = null;
+				
+				var index:int = _channels.indexOf(channel);
+				if (index != -1)
+				{
+					_channels[index] = null;
+				}
 			}
 		}
 		
