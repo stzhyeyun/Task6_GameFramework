@@ -16,12 +16,6 @@ package trolling.component.graphic
 		{
 			super(ComponentType.IMAGE);
 			
-			if (!resource)
-			{
-				//super.dispose(); // ?
-				throw new ArgumentError(TAG + " ctor : No \'resource\'.");
-			}
-			
 			var texture:Texture = new Texture(resource);
 			
 			if (!texture)
@@ -34,10 +28,6 @@ package trolling.component.graphic
 		
 		public override function dispose():void
 		{
-//			if (_texture)
-//			{
-//				_texture.dispose();
-//			}
 			_texture = null;
 			
 			super.dispose();

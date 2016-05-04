@@ -11,8 +11,6 @@ package trolling.core
 	import flash.ui.Mouse;
 	import flash.utils.Dictionary;
 	
-	import trolling.component.physics.Collider;
-	import trolling.event.TouchManager;
 	import trolling.event.TouchPhase;
 	import trolling.event.TrollingEvent;
 	import trolling.object.GameObject;
@@ -25,10 +23,13 @@ package trolling.core
 	{        
 		private const TAG:String = "[Trolling]";
 		
+		private static var sPainters:Dictionary = new Dictionary(true);
+		private static var _current:Trolling;
+		
 		private var _sceneDic:Dictionary;
 		private var _createQueue:Array = new Array();
 		
-		private var _currentScene:GameObject;
+		private var _currentScene:Scene;
 		private var _viewPort:Rectangle;
 		private var _stage:Stage;
 		
@@ -40,16 +41,12 @@ package trolling.core
 		private var _nativeStage:flash.display.Stage;
 		private var _nativeOverlay:Sprite;
 		
-		private static var sPainters:Dictionary = new Dictionary(true);
-		private static var _current:Trolling;
 		private var _context:Context3D = null;
 		
+		
+		//Management
+		private var _colliderManager:ColliderManager = new ColliderManager();
 		private var _touchManager:TouchManager = new TouchManager();
-		
-		
-		// Collider Management
-		private var _colliders:Vector.<Collider>;
-		private var _colliderActivated = true;
 		//
 		
 		public function Trolling(stage:flash.display.Stage, stage3D:Stage3D = null)
@@ -85,16 +82,35 @@ package trolling.core
 			stage.addEventListener(TouchEvent.TOUCH_OVER, onTouch);
 		}
 		
-		public function get currentScene():GameObject
+		public function get colliderManager():ColliderManager
+		{
+			return _colliderManager;
+		}
+		
+		public function set currentScene(value:Scene):void
+		{
+			_currentScene = value;
+		}
+		
+		public function get createQueue():Array
+		{
+			return _createQueue;
+		}
+		
+		public function set createQueue(value:Array):void
+		{
+			_createQueue = value;
+		}
+		
+		public function get currentScene():Scene
 		{
 			return _currentScene;
 		}
-
+		
 		private function onTouch(event:Event):void
 		{
 			if(_currentScene == null)
 				return;
-			//trace("onTouch");
 			
 			var globalX:Number;
 			var globalY:Number;
@@ -147,8 +163,6 @@ package trolling.core
 				case MouseEvent.MOUSE_DOWN:  phase = TouchPhase.BEGAN; break;
 				case MouseEvent.MOUSE_UP:    phase = TouchPhase.ENDED; break;
 				case TouchEvent.TOUCH_OVER:  phase = TouchPhase.HOVER; break;
-				//case MouseEvent.MOUSE_MOVE: 
-				//phase = (_leftMouseDown ? TouchPhase.MOVED : TouchPhase.HOVER); break;
 			}
 			
 			// move position into viewport bounds
@@ -157,15 +171,13 @@ package trolling.core
 			var point:Point = new Point(globalX, globalY);
 			var hit:GameObject;
 			
-			//trace("globalX = " + globalX + " globalY = " + globalY);
-			
 			if(phase == TouchPhase.BEGAN)
 			{
 				_touchManager.initPoints();
 				_touchManager.pushPoint(point);
 				hit = _currentScene.findClickedGameObject(point);
 				if(hit != null)
-					hit.dispatchEvent(new TrollingEvent(phase, _touchManager.points));
+					hit.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_BEGAN, _touchManager.points));
 				_touchManager.hoverFlag = true;
 				_touchManager.hoverTarget = hit;
 			}
@@ -173,9 +185,8 @@ package trolling.core
 			{
 				_touchManager.pushPoint(point);
 				hit = _currentScene.findClickedGameObject(point);
-				//				if(hit != null)
-				//					hit.dispatchEvent(new TrollingEvent(phase, _touchManager.points));
-				//	_touchManager.pushPoint(point);
+				if(hit != null)
+					hit.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_MOVED, _touchManager.points));
 				if(hit != _touchManager.hoverTarget)
 					_touchManager.hoverTarget = hit;
 			}
@@ -183,7 +194,7 @@ package trolling.core
 			{
 				hit = _currentScene.findClickedGameObject(point);
 				if(hit != null)
-					hit.dispatchEvent(new TrollingEvent(phase, _touchManager.points));
+					hit.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_ENDED, _touchManager.points));
 				_touchManager.hoverFlag = false;
 			}
 		}
@@ -226,11 +237,6 @@ package trolling.core
 			return _current;
 		}
 		
-		public static function set current(value:Trolling):void
-		{
-			_current = value;
-		}
-		
 		public function get stage():Stage
 		{
 			return _stage;
@@ -247,7 +253,6 @@ package trolling.core
 			_initRender = true;
 			_context = context;
 			trace("createContext");
-			//	initializeRoot();
 			createSceneFromQueue();
 			trace("initRoot");
 		}
@@ -258,7 +263,7 @@ package trolling.core
 			while(_createQueue.length != 0)
 			{
 				arrayTemp = _createQueue.shift();
-				addScene(arrayTemp[0], arrayTemp[1]);
+				SceneManager.addScene(arrayTemp[0], arrayTemp[1]);
 			}
 			arrayTemp = null;
 			_createQueue = null;
@@ -267,43 +272,6 @@ package trolling.core
 		private function nextFrame():void
 		{
 			_currentScene.dispatchEvent(new Event(Event.ENTER_FRAME));
-		}
-		
-		public function addScene(sceneClass:Class, key:String):void
-		{
-			if(_sceneDic && _sceneDic[key] != null)
-				return;
-			if(_context == null)
-			{
-				var addArray:Array = new Array();
-				addArray.push(sceneClass);
-				addArray.push(key);
-				_createQueue.push(addArray);
-				return;	
-			}
-			var scene:Scene = new sceneClass() as Scene;
-			if(!_sceneDic)
-			{
-				_sceneDic = new Dictionary();
-				_currentScene = scene;
-			}
-			_sceneDic[key] = scene;
-			if(scene == null)
-				trace("scene is null");
-			if(_stage == null)
-				trace("_stage is null");
-			scene.width = _stage.stageWidth;
-			scene.height = _stage.stageHeight;
-		}
-		
-		public function switchScene(key:String):void
-		{
-			if(_sceneDic == null || _sceneDic[key] == null)
-				return;
-			
-			_currentScene.visable = false;
-			_currentScene = _sceneDic[key];
-			_currentScene.visable = true;
 		}
 		
 		public function start():void
@@ -328,9 +296,10 @@ package trolling.core
 			if(!_started || !_initRender || !_currentScene)
 				return;
 			if(_touchManager.hoverFlag)
-				_touchManager.hoverTarget.dispatchEvent(new TrollingEvent(TouchPhase.HOVER, _touchManager.points));
+				_touchManager.hoverTarget.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_HOVER, _touchManager.points));
 			nextFrame();
-			detectCollision();
+			_colliderManager.detectCollision();
+			Disposer.disposeObjects();
 			render();
 		}
 		
@@ -341,102 +310,8 @@ package trolling.core
 			
 			_painter.context.setRenderToBackBuffer();
 			_painter.context.clear(Color.getRed(_stage.color)/255.0, Color.getGreen(_stage.color)/255.0, Color.getBlue(_stage.color)/255.0);
-			//	_painter.triangleData.initArray();
 			_currentScene.render(_painter);
 			_painter.present();
 		}
-		
-		// ColliderManagement //////////////////////////////////////// 
-		
-		public function addCollider(collider:Collider):void
-		{
-			if (!_colliders)
-			{
-				_colliders = new Vector.<Collider>();
-			}
-			_colliders.push(collider);
-		}
-		
-		public function removeCollider(collider:Collider):void
-		{
-			if (!_colliders || !collider)
-			{
-				return;
-			}
-			
-			for (var i:int = 0; i < _colliders.length; i++)
-			{
-				if (_colliders[i] == collider)
-				{
-					_colliders.removeAt(i);
-					break;
-				}
-			}
-		}
-		
-		public function set colliderActivated(value:Boolean):void
-		{
-			_colliderActivated = value;
-		}
-		
-		private function detectCollision():void
-		{
-			if (!_colliderActivated || !_colliders || _colliders.length <= 1)
-			{
-				return;
-			}
-			
-			var index:int = 0;
-			var collidedIndices:Vector.<int>;
-			var detectionObjects:Vector.<Collider> = new Vector.<Collider>();
-			for (var i:int = 0; i < _colliders.length; i++)
-			{
-				detectionObjects.push(_colliders[i]);	
-			}
-			
-			if (!detectionObjects)
-			{
-				throw new ArgumentError(TAG + " detectCollision : Failed to clone Colliders.");
-			}
-			
-			while (index < detectionObjects.length - 1)
-			{
-				for (var i:int = index + 1; i < detectionObjects.length; i++)
-				{
-					if (detectionObjects[index].isCollision(detectionObjects[i]))
-					{
-						// Dispatch event
-						detectionObjects[index].parent.dispatchEvent(
-							new TrollingEvent(TrollingEvent.COLLIDE, detectionObjects[i].parent));
-						detectionObjects[i].parent.dispatchEvent(
-							new TrollingEvent(TrollingEvent.COLLIDE, detectionObjects[index].parent));
-						
-						// Store collided objects' indices for deletion from detectionObjects
-						if (!collidedIndices)
-						{
-							collidedIndices = new Vector.<int>();
-						}
-						collidedIndices.push(i);
-					}
-				}
-				
-				// Remove collided objects from detectionObjects
-				if (collidedIndices)
-				{
-					for (var j:int = collidedIndices.length - 1; j >= 0; j--)
-					{
-						detectionObjects.removeAt(collidedIndices[j]);
-					}
-				}
-				collidedIndices = null;
-				
-				index++;
-			}
-			
-			collidedIndices = null;
-			detectionObjects = null;
-		}
-		
-		// End of ColliderManagement 
 	}
 }

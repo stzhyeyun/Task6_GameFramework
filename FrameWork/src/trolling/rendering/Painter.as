@@ -79,7 +79,7 @@ package trolling.rendering
 				Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA
 			);
 			_moleCallBack(_context);
-			//	_context.set
+			//_context.set
 		}
 		
 		public function configureBackBuffer(viewPort:Rectangle, antiAlias:Boolean = true):void
@@ -97,7 +97,7 @@ package trolling.rendering
 			
 			trace(viewPort.width + ", " + viewPort.height);
 			_context.configureBackBuffer(viewPort.width, viewPort.height, alias, true);
-			//	_context.setCulling(Context3DTriangleFace.BACK);
+			//_context.setCulling(Context3DTriangleFace.BACK);
 			
 			_backBufferWidth = viewPort.width;
 			_backBufferHeight = viewPort.height;
@@ -108,10 +108,10 @@ package trolling.rendering
 			createVertexBuffer(triangleData);
 			setVertextBuffer();
 			setUVVector(triangleData);
-			//			_matrix.appendRotation(90, Z_AXIS);
-			//				_matrix.appendTranslation(0, -0.5, 0);
+			//_matrix.appendRotation(90, Z_AXIS);
+			//_matrix.appendTranslation(0, -0.5, 0);
 			setMatrix();
-			//			_context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, _matrix, true);
+			//_context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, _matrix, true);
 		}
 		
 		public function present():void
@@ -124,11 +124,6 @@ package trolling.rendering
 			_context.drawTriangles(_indexBuffer);
 		}
 		
-		//		public function appendMatrix(matrix:Matrix3D):void
-		//		{
-		//			_matrix.append(matrix);
-		//		}
-		
 		public function setUVVector(triagleData:TriangleData):void
 		{
 			_context.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 4, triagleData.uvData);
@@ -137,7 +132,6 @@ package trolling.rendering
 		private function createVertexBuffer(triangleData:TriangleData):void
 		{
 			_vertexBuffer = _context.createVertexBuffer(4, 5);
-			//			trace(triangleData.rawVertexData);
 			_vertexBuffer.uploadFromVector(triangleData.rawVertexData, 0, 4);
 		}
 		

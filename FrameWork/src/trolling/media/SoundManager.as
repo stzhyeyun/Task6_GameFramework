@@ -106,12 +106,6 @@ package trolling.media
 				return;
 			}
 			
-//			if (_channels && _channels[name])
-//			{
-//				trace(TAG + " play : " + name + " is playing.");
-//				return;
-//			}
-			
 			if (_channels && _channels.length == MAX_CHANNEL)
 			{
 				trace(TAG + " play : Cannot add channel.");

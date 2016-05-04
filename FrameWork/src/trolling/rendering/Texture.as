@@ -4,7 +4,7 @@ package trolling.rendering
 	import flash.display3D.textures.Texture;
 	
 	import trolling.utils.TextureUtil;
-
+	
 	public class Texture
 	{
 		private var _width:Number;
@@ -35,21 +35,20 @@ package trolling.rendering
 		{
 			return _width;
 		}
-
+		
 		public function get v():Number
 		{
 			return _v;
 		}
-
+		
 		public function get u():Number
 		{
 			return _u;
 		}
-
+		
 		public function get nativeTexture():flash.display3D.textures.Texture
 		{
 			return _nativeTexture;
 		}
-
 	}
 }

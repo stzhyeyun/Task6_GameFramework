@@ -6,15 +6,15 @@ package trolling.component.physics
 	
 	import trolling.component.Component;
 	import trolling.component.ComponentType;
-	import trolling.core.ColliderManager;
+	import trolling.core.Trolling;
 	import trolling.object.GameObject;
 	import trolling.utils.Circle;
 
 	public class Collider extends Component
 	{
-		public const ID_NONE:int = 0;
-		public const ID_RECT:int = 1;
-		public const ID_CIRCLE:int = 2;
+		public static const ID_NONE:int = 0;
+		public static const ID_RECT:int = 1;
+		public static const ID_CIRCLE:int = 2;
 		
 		private const TAG:String = "[Collider]";
 		
@@ -23,8 +23,6 @@ package trolling.component.physics
 		private var _circle:Circle;
 		private var _ratioX:Number;
 		private var _ratioY:Number;
-		
-		private var _isVisible:Boolean;
 		
 		public function Collider()
 		{
@@ -37,8 +35,6 @@ package trolling.component.physics
 			_circle = null;
 			_ratioX = 0;
 			_ratioY = 0;
-			
-			_isVisible = false;
 			
 			addEventListener(Event.ENTER_FRAME, onNextFrame);
 			addEventListener(Event.ACTIVATE, onActivateScene);
@@ -54,8 +50,6 @@ package trolling.component.physics
 			_circle = null;
 			_ratioX = 0;
 			_ratioY = 0;
-			
-			_isVisible = false;
 			
 			Trolling.current.colliderManager.removeCollider(this);
 			
@@ -77,7 +71,7 @@ package trolling.component.physics
 			
 			if (isFirst)
 			{
-				ColliderManager.addCollider(this);
+				Trolling.current.colliderManager.addCollider(this);
 			}
 		}
 		
@@ -91,7 +85,7 @@ package trolling.component.physics
 					addEventListener(Event.ACTIVATE, onActivateScene);
 					addEventListener(Event.DEACTIVATE, onDeactivateScene);
 					
-					ColliderManager.addCollider(this);
+					Trolling.current.colliderManager.addCollider(this);
 				}
 			}
 			else
@@ -102,9 +96,7 @@ package trolling.component.physics
 					removeEventListener(Event.ACTIVATE, onActivateScene);
 					removeEventListener(Event.DEACTIVATE, onDeactivateScene);
 					
-					ColliderManager.removeCollider(this);
-					
-					_isVisible = false;
+					Trolling.current.colliderManager.removeCollider(this);
 				}
 			}
 			
@@ -198,16 +190,6 @@ package trolling.component.physics
 		public function get circle():Circle
 		{
 			return _circle;
-		}
-		
-		public function get isVisible():Boolean
-		{
-			return _isVisible;
-		}
-		
-		public function set isVisible(value:Boolean):void
-		{
-			_isVisible = value;
 		}
 		
 		private function detectCollisionRectToCircle(rect:Rectangle, circle:Circle):Boolean

@@ -7,13 +7,6 @@ package trolling.rendering
 				0, 1, 2,
 				2, 3, 0]);
 		
-		//        private var _rawVertexData:Vector.<Number> = 
-		//            Vector.<Number>([
-		//                1, 1, 0, 1, 0,
-		//                1, -1, 0, 1, 1,
-		//                -1, -1, 0, 0, 1,
-		//                -1, 1, 0, 0, 0]);
-		
 		private var _rawVertexData:Vector.<Number> = new Vector.<Number>();
 		private var _vertexData:Array = new Array();
 		

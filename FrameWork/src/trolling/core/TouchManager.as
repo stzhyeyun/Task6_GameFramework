@@ -1,10 +1,10 @@
-package trolling.event
+package trolling.core
 {
 	import flash.geom.Point;
 	
 	import trolling.object.GameObject;
 	
-	public class TouchManager
+	internal class TouchManager
 	{
 		private const MAX_POINT_LENGT:uint = 10;
 		

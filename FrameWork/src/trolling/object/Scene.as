@@ -1,43 +1,25 @@
 package trolling.object
 {
-
+	
 	public class Scene extends GameObject
 	{
 		private const TAG:String = "[Scene]";
 		
-		private var _isActive:Boolean;
-	
+		private var _key:String;
+		
 		public function Scene()
 		{
 			super();
 		}
 		
-		public override function dispose():void
+		public function get key():String
 		{
-			_isActive = false;
-			
-			super.dispose();
+			return _key;
 		}
 		
-		public function activate():void
+		public function set key(value:String):void
 		{
-			// activate children
-			
-			
-			_isActive = true;
-		}
-		
-		public function deactivate():void
-		{
-			// deactive children
-
-			
-			_isActive = false;
-		}
-
-		public function get isActive():Boolean
-		{
-			return _isActive;
+			_key = value;
 		}
 		
 		public override function set pivot(value:String):void

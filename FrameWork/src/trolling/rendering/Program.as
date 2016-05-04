@@ -17,19 +17,7 @@ package trolling.rendering
 		private var _program:Program3D;
 		
 		public function Program()
-		{
-			_vertexShaderAssemblerTemp = new AGALMiniAssembler();
-			_vertexShaderAssemblerTemp.assemble( Context3DProgramType.VERTEX,
-				"m44 op, va0, vc0\n" + // pos to clipspace
-				"mov v0, va1" // copy UV
-			);
-			
-			_fragmentShaderAssemblerTemp = new AGALMiniAssembler();
-			_fragmentShaderAssemblerTemp.assemble( Context3DProgramType.FRAGMENT,
-				//	"tex ft1, v0, fs0 <2d>\n" +
-				"mov oc, v0"
-			);
-			
+		{	
 			_vertexShaderAssembler = new AGALMiniAssembler();
 			_vertexShaderAssembler.assemble( Context3DProgramType.VERTEX,
 				// Apply draw matrix (object -> clip space)
@@ -45,7 +33,6 @@ package trolling.rendering
 			_fragmentShaderAssembler.assemble( Context3DProgramType.FRAGMENT,
 				"tex oc, v0, fs0 <2d,linear,mipnone,clamp>"
 			);
-			
 		}
 		
 		public function get program():Program3D

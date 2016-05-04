@@ -1,32 +1,101 @@
 package trolling.core
 {
 	import trolling.component.physics.Collider;
-
-	public class ColliderManager
+	import trolling.event.TrollingEvent;
+	
+	internal class ColliderManager
 	{
+		private const TAG:String = "[ColliderManager]";
+		
+		private var _colliders:Vector.<Collider>;
+		
 		public function ColliderManager()
 		{
 			
 		}
 		
-		public static function addCollider(collider:Collider):void
+		public function addCollider(collider:Collider):void
 		{
-			Trolling.current.addCollider(collider);
+			if (!_colliders)
+			{
+				_colliders = new Vector.<Collider>();
+			}
+			_colliders.push(collider);
 		}
 		
-		public static function removeCollider(collider:Collider):void
+		public function removeCollider(collider:Collider):void
 		{
-			Trolling.current.removeCollider(collider);
+			if (!_colliders || !collider)
+			{
+				return;
+			}
+			
+			for (var i:int = 0; i < _colliders.length; i++)
+			{
+				if (_colliders[i] == collider)
+				{
+					_colliders.removeAt(i);
+					break;
+				}
+			}
 		}
 		
-		public static function activate():void
+		public function detectCollision():void
 		{
-			Trolling.current.colliderActivated = true;
-		}
-		
-		public static function deactivate():void
-		{
-			Trolling.current.colliderActivated = false;
+			if (!_colliders || _colliders.length <= 1)
+			{
+				return;
+			}
+			
+			var index:int = 0;
+			var collidedIndices:Vector.<int>;
+			var detectionObjects:Vector.<Collider> = new Vector.<Collider>();
+			for (var i:int = 0; i < _colliders.length; i++)
+			{
+				detectionObjects.push(_colliders[i]);	
+			}
+			
+			if (!detectionObjects)
+			{
+				throw new ArgumentError(TAG + " detectCollision : Failed to clone Colliders.");
+			}
+			
+			while (index < detectionObjects.length - 1)
+			{
+				for (var i:int = index + 1; i < detectionObjects.length; i++)
+				{
+					if (detectionObjects[index].isCollision(detectionObjects[i]))
+					{
+						// Dispatch event
+						detectionObjects[index].parent.dispatchEvent(
+							new TrollingEvent(TrollingEvent.COLLIDE, detectionObjects[i].parent));
+						detectionObjects[i].parent.dispatchEvent(
+							new TrollingEvent(TrollingEvent.COLLIDE, detectionObjects[index].parent));
+						
+						// Store collided objects' indices for deletion from detectionObjects
+						if (!collidedIndices)
+						{
+							collidedIndices = new Vector.<int>();
+						}
+						collidedIndices.push(i);
+					}
+				}
+				
+				// Remove collided objects from detectionObjects
+				if (collidedIndices)
+				{
+					for (var j:int = collidedIndices.length - 1; j >= 0; j--)
+					{
+						detectionObjects.removeAt(collidedIndices[j]);
+					}
+				}
+				collidedIndices = null;
+				
+				index++;
+			}
+			
+			collidedIndices = null;
+			detectionObjects = null;
 		}
 	}
 }

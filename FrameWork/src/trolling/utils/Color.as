@@ -74,8 +74,5 @@ package trolling.utils
 			
 			return argb(alpha, red, green, blue);
 		}
-		
-		/** @private */
-		//	public function Color() { throw new AbstractClassError(); }
 	}
 }

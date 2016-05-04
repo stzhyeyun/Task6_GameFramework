@@ -28,18 +28,14 @@ package trolling.utils
 			var matrix:Matrix = new Matrix();
 			matrix.scale(binaryWidth/bitmap.width, binaryHeight/bitmap.height);
 			
-			//	var _nativeTexture:flash.display3D.textures.Texture;
 			_nativeTexture = Trolling.current.context.createTexture(binaryWidth, binaryHeight, Context3DTextureFormat.BGRA, false);
-			//	_nativeTexture.uploadFromBitmapData(bitmap.bitmapData);
 			
 			var bitmapData:BitmapData = new BitmapData(binaryWidth, binaryHeight, bitmap.transparent);
-//			bitmapData.draw(bitmap, matrix);
 			var rect:Rectangle = new Rectangle();
 			rect.width = bitmap.width;
 			rect.height = bitmap.height;
+			
 			bitmapData.copyPixels(bitmap, rect, new Point());
-//			trace("bitmapData.widthScale =" + (binaryWidth / bitmap.width));
-//			trace("bitmapData.widthScale =" + (binaryHeight / bitmap.height));
 			_nativeTexture.uploadFromBitmapData(bitmapData);
 			
 			textureInfo.push(_nativeTexture);

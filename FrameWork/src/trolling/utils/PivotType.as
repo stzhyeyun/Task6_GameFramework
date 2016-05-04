@@ -18,6 +18,5 @@ package trolling.utils
 		{
 			return _CENTER;
 		}
-		
 	}
 }

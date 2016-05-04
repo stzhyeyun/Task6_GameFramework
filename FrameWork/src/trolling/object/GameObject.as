@@ -1,5 +1,9 @@
 package trolling.object
 {
+	import flash.display.BitmapData;
+	import flash.display.Shape;
+	import flash.display3D.Context3DTextureFormat;
+	import flash.display3D.textures.Texture;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.geom.Point;
@@ -11,9 +15,13 @@ package trolling.object
 	import trolling.component.ComponentType;
 	import trolling.component.DisplayComponent;
 	import trolling.component.animation.Animator;
+	import trolling.component.physics.Collider;
+	import trolling.core.Disposer;
 	import trolling.core.Trolling;
 	import trolling.rendering.Painter;
 	import trolling.rendering.TriangleData;
+	import trolling.utils.Circle;
+	import trolling.utils.Color;
 	import trolling.utils.PivotType;
 	
 	
@@ -39,41 +47,18 @@ package trolling.object
 		private var _rotate:Number;
 		
 		private var _visable:Boolean;
+		private var _colliderRender:Boolean;
 		
 		public function GameObject()
 		{
-			this.addEventListener(Event.ENTER_FRAME, nextFrame);
+			this.addEventListener(Event.ENTER_FRAME, onThrowEvent);
+			this.addEventListener(Event.DEACTIVATE, onThrowEvent);
+			this.addEventListener(Event.ACTIVATE, onThrowEvent);
 			_x = _y = _width = _height = _rotate = 0.0;
 			_pivot = PivotType.TOP_LEFT;
 			_scaleX = _scaleY = 1;
 			_components = new Dictionary();
 			_visable = true;
-		}
-		
-		public function get visable():Boolean
-		{
-			return _visable;
-		}
-		
-		public function set visable(value:Boolean):void
-		{
-			_visable = value;
-			
-			for(var componentType:String in _components)
-			{
-				var component:Component = _components[componentType];
-				component.isActive = value;
-			}
-		}
-		
-		public function get rotate():Number
-		{
-			return _rotate;
-		}
-		
-		public function set rotate(value:Number):void
-		{
-			_rotate = value;
 		}
 		
 		/**
@@ -120,8 +105,6 @@ package trolling.object
 		{
 			if(_components[componentType] == null)
 				return;
-			//			if(!(_components in component))
-			//				return;
 			_components[componentType].parent = null;
 			_components[componentType] = null;
 		}
@@ -179,6 +162,8 @@ package trolling.object
 		 */		
 		public function removeFromParent():void
 		{
+			if(_parent == null)
+				return;
 			_parent.removeChild(this);
 		}
 		
@@ -215,12 +200,10 @@ package trolling.object
 		 */		
 		public function dispose():void
 		{
-			this.removeEventListener(Event.ENTER_FRAME, nextFrame);
-			for(var componentType:String in _components)
-			{
-				var component:Component = _components[componentType];
-				component.dispose();
-			}
+			this.removeEventListener(Event.ENTER_FRAME, onThrowEvent);
+			this.removeEventListener(Event.DEACTIVATE, onThrowEvent);
+			this.removeEventListener(Event.ACTIVATE, onThrowEvent);
+			
 			if(_children)
 			{
 				for(var i:int = 0; i < _children.length; i++)
@@ -228,7 +211,7 @@ package trolling.object
 					_children[i].dispose();
 				}
 			}
-			this.removeFromParent();
+			Disposer.requestDisposal(this);
 		}
 		
 		/**
@@ -242,11 +225,11 @@ package trolling.object
 				return;
 			var numChildren:int = _children.length;
 			var componentType:String = decideRenderingComponent();
+			
 			painter.pushState();
 			if(this == Trolling.current.currentScene)
 				painter.matrix.appendTranslation(-1, 1, 0);
-			painter.pushState();
-			if(this != Trolling.current.currentScene)
+			else
 			{	
 				var displayComponent:DisplayComponent = DisplayComponent(_components[componentType]);
 				var triangleData:TriangleData = new TriangleData();
@@ -268,11 +251,6 @@ package trolling.object
 					drawRect.y -= (drawRect.height/2);
 				}
 				
-				//				triangleData.vertexData.push(Vector.<Number>([drawRect.width/2, drawRect.height/2, 0, 1, 0]));
-				//				triangleData.vertexData.push(Vector.<Number>([drawRect.width/2, -drawRect.height/2, 0, 1, 1]));
-				//				triangleData.vertexData.push(Vector.<Number>([-drawRect.width/2, -drawRect.height/2, 0, 0, 1]));
-				//				triangleData.vertexData.push(Vector.<Number>([-drawRect.width/2, drawRect.height/2, 0, 0, 0]));
-				
 				triangleData.vertexData.push(Vector.<Number>([drawRect.width, 0, 0, 1, 0]));
 				triangleData.vertexData.push(Vector.<Number>([drawRect.width, -drawRect.height, 0, 1, 1]));
 				triangleData.vertexData.push(Vector.<Number>([0, -drawRect.height, 0, 0, 1]));
@@ -292,10 +270,51 @@ package trolling.object
 					triangleData.uvData[1] = displayComponent.getRenderingResource().v;
 				}
 				
-				
 				painter.setDrawData(triangleData);
 				if(componentType != NONE)
 					painter.draw();
+				var coll:Collider = _components[ComponentType.COLLIDER];
+				if(coll != null && _colliderRender && coll.id != Collider.ID_NONE)
+				{	
+					var shape:Shape = new Shape();
+					var rect:Rectangle;
+					if(coll.id == Collider.ID_RECT)
+						rect = coll.rect.clone();
+					else(coll.id == Collider.ID_CIRCLE)
+					{
+						var circle:Circle = coll.circle;
+						rect = new Rectangle();
+						rect.x = circle.center.x - circle.radius;
+						rect.y = circle.center.y - circle.radius;
+						rect.width = circle.radius*2;
+						rect.height = circle.radius*2;
+					}
+					
+					rect.x = (rect.x*2)/painter.viewPort.width;
+					rect.y = (rect.y*2)/painter.viewPort.height;
+					rect.width = (rect.width*2)/painter.viewPort.width;
+					rect.height = (rect.height*2)/painter.viewPort.height;
+					
+					var bitmapData:BitmapData = new BitmapData(32, 32, false, Color.BLUE);
+					var textureTemp:flash.display3D.textures.Texture = painter.context.createTexture(32, 32, Context3DTextureFormat.BGRA, false);
+					textureTemp.uploadFromBitmapData(bitmapData);
+					
+					var triangleTemp:TriangleData = new TriangleData();
+					triangleTemp.vertexData.push(Vector.<Number>([rect.width, 0, 0, 1, 0]));
+					triangleTemp.vertexData.push(Vector.<Number>([rect.width, -rect.height, 0, 1, 0]));
+					triangleTemp.vertexData.push(Vector.<Number>([0, -rect.height, 0, 1, 0]));
+					triangleTemp.vertexData.push(Vector.<Number>([0, 0, 0, 1, 0]));
+					
+					painter.context.setTextureAt(0, textureTemp);
+					
+					triangleTemp.calculVertex();
+					
+					painter.pushState();
+					painter.matrix.prependTranslation((rect.x-drawRect.x), -(rect.y-drawRect.y), 0);
+					painter.setDrawData(triangleTemp);
+					painter.draw();
+					painter.popState();
+				}
 			}
 			
 			for(var i:int = 0; i < numChildren; i++)
@@ -304,7 +323,82 @@ package trolling.object
 				child.render(painter);
 			}
 			painter.popState();
-			painter.popState();
+		}
+		
+		private function decideRenderingComponent():String
+		{
+			// 컴포넌트가 없음
+			if (!_components)
+			{
+				return NONE;
+			}
+				// Image만 있음
+			else if (_components[ComponentType.IMAGE] && !_components[ComponentType.ANIMATOR])
+			{
+				var image:Component = _components[ComponentType.IMAGE];
+				
+				if (image.isActive)
+				{
+					return ComponentType.IMAGE;
+				}
+				else
+				{
+					return NONE;
+				}
+			}
+				// Animator만 있음
+			else if (!_components[ComponentType.IMAGE] && _components[ComponentType.ANIMATOR])
+			{
+				var animator:Component = _components[ComponentType.ANIMATOR];
+				
+				if (animator.isActive)
+				{
+					return ComponentType.ANIMATOR;
+				}
+				else
+				{
+					return NONE;
+				}
+			}
+				// Image와 Animator 둘 다 있음
+			else if (_components[ComponentType.IMAGE] && _components[ComponentType.ANIMATOR])
+			{
+				var image:Component = _components[ComponentType.IMAGE];
+				var animator:Component = _components[ComponentType.ANIMATOR];
+				
+				if (image.isActive && !animator.isActive)
+				{
+					return ComponentType.IMAGE;
+				}
+				else if (!image.isActive && animator.isActive)
+				{
+					return ComponentType.ANIMATOR;
+				}
+				else if (image.isActive && animator.isActive)
+				{
+					return ComponentType.ANIMATOR; // Animator를 우선하여 그림
+				}
+				else
+				{
+					return NONE;
+				}
+			}
+				// 컴포넌트가 없음
+			else
+			{
+				return NONE;
+			}
+		}
+		
+		public function transition(nextStateName:String):void // [혜윤] 애니메이터에게 지정 상태로 전이하도록 합니다.
+		{
+			if (!_components || !_components[ComponentType.ANIMATOR])
+			{
+				return;
+			}
+			
+			var animator:Animator = _components[ComponentType.ANIMATOR];
+			animator.transition(nextStateName);
 		}
 		
 		/**
@@ -339,11 +433,11 @@ package trolling.object
 		}
 		
 		/**
-		 *매프레임마다 EnterFarme이벤트를 모든 자식 객체에게 전해줍니다. 
+		 *프레임워크 전체에 알려줘야하는 이벤트들은 해당 함수를 사용해서 알려줍니다.
 		 * @param event
 		 * 
 		 */		
-		private function nextFrame(event:Event):void
+		private function onThrowEvent(event:Event):void
 		{
 			for(var key:String in _components)
 			{
@@ -380,12 +474,6 @@ package trolling.object
 		public function getGlobalPoint():Point
 		{
 			var globalPoint:Point = getPivotPoint();
-			
-			//			if(_pivot == PivotType.CENTER)
-			//			{
-			//				globalPoint.x -= (getWidth())/2;
-			//				globalPoint.y -= (getHeight())/2;
-			//			}
 			
 			if(_parent != null)
 			{
@@ -437,7 +525,7 @@ package trolling.object
 		 * @return 
 		 * 
 		 */		
-		public function getGlobalRect():Rectangle
+		private function getGlobalRect():Rectangle
 		{
 			var rect:Rectangle = new Rectangle();
 			rect.topLeft = getGlobalPoint();
@@ -452,9 +540,56 @@ package trolling.object
 			return _width * _scaleX;
 		}
 		
-		private function getHeight():Number
+		public function getHeight():Number
 		{
 			return _height * _scaleY;
+		}
+		
+		/**
+		 *true면 콜라이더가 랜더링됩니다. 
+		 */
+		public function get colliderRender():Boolean
+		{
+			return _colliderRender;
+		}
+		
+		/**
+		 * @private
+		 */
+		public function set colliderRender(value:Boolean):void
+		{
+			_colliderRender = value;
+		}
+		
+		public function get components():Dictionary
+		{
+			return _components;
+		}
+		
+		public function get visable():Boolean
+		{
+			return _visable;
+		}
+		
+		public function set visable(value:Boolean):void
+		{
+			_visable = value;
+			
+			for(var componentType:String in _components)
+			{
+				var component:Component = _components[componentType];
+				component.isActive = value;
+			}
+		}
+		
+		public function get rotate():Number
+		{
+			return _rotate;
+		}
+		
+		public function set rotate(value:Number):void
+		{
+			_rotate = value;
 		}
 		
 		public function get parent():GameObject
@@ -537,82 +672,6 @@ package trolling.object
 			if(value != PivotType.CENTER && value != PivotType.TOP_LEFT)
 				return;
 			_pivot = value;
-		}
-		
-		private function decideRenderingComponent():String
-		{
-			// 컴포넌트가 없음
-			if (!_components)
-			{
-				return NONE;
-			}
-				// Image만 있음
-			else if (_components[ComponentType.IMAGE] && !_components[ComponentType.ANIMATOR])
-			{
-				var image:Component = _components[ComponentType.IMAGE];
-				
-				if (image.isActive)
-				{
-					return ComponentType.IMAGE;
-				}
-				else
-				{
-					return NONE;
-				}
-			}
-				// Animator만 있음
-			else if (!_components[ComponentType.IMAGE] && _components[ComponentType.ANIMATOR])
-			{
-				var animator:Component = _components[ComponentType.ANIMATOR];
-				
-				if (animator.isActive)
-				{
-					return ComponentType.ANIMATOR;
-				}
-				else
-				{
-					return NONE;
-				}
-			}
-				// Image와 Animator 둘 다 있음
-			else if (_components[ComponentType.IMAGE] && _components[ComponentType.ANIMATOR])
-			{
-				var image:Component = _components[ComponentType.IMAGE];
-				var animator:Component = _components[ComponentType.ANIMATOR];
-				
-				if (image.isActive && !animator.isActive)
-				{
-					return ComponentType.IMAGE;
-				}
-				else if (!image.isActive && animator.isActive)
-				{
-					return ComponentType.ANIMATOR;
-				}
-				else if (image.isActive && animator.isActive)
-				{
-					return ComponentType.ANIMATOR; // Animator를 우선하여 그림
-				}
-				else
-				{
-					return NONE;
-				}
-			}
-				// 컴포넌트가 없음
-			else
-			{
-				return NONE;
-			}
-		}
-		
-		public function transition(nextStateName:String):void // [혜윤] 애니메이터에게 지정 상태로 전이하도록 합니다.
-		{
-			if (!_components || !_components[ComponentType.ANIMATOR])
-			{
-				return;
-			}
-			
-			var animator:Animator = _components[ComponentType.ANIMATOR];
-			animator.transition(nextStateName);
 		}
 	}
 }
