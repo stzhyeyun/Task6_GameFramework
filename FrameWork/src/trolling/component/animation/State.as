@@ -13,9 +13,16 @@ package trolling.component.animation
 		private var _name:String;
 		private var _animation:Vector.<Texture>;
 		private var _currentIndex:int;
+		
 		private var _interval:uint; // 다음 애니메이션 인덱스로 업데이트 하기까지의 프레임 수
 		private var _frameCounter:uint;
+		
+		private var _isLoop:Boolean;
+		private var _nextState:String;
+		private var _onEnd:Function;
+		
 		private var _isPlaying:Boolean;
+		private var _isFrozen:Boolean;
 		
 		public function State(name:String)
 		{
@@ -23,7 +30,10 @@ package trolling.component.animation
 			_currentIndex = -1;
 			_interval = 0;
 			_frameCounter = 0;
+			_isLoop = false;
+			_nextState = null;
 			_isPlaying = false;
+			_isFrozen = false;
 		}
 		
 		public function dispose():void
@@ -45,6 +55,8 @@ package trolling.component.animation
 			_currentIndex = -1;
 			_interval = 0;
 			_frameCounter = 0;
+			_isLoop = false;
+			_nextState = null;
 		}
 		
 		public function play():void
@@ -73,9 +85,21 @@ package trolling.component.animation
 			if (_isPlaying)
 			{
 				_currentIndex = -1;
+				_frameCounter = 0;
 				_isPlaying = false;
+				_isFrozen = false;
 				removeEventListener(Event.ENTER_FRAME, onNextFrame);
 			}
+		}
+		
+		public function freeze(freeze:Boolean):void
+		{
+			if (!_isPlaying)
+			{
+				return;
+			}
+			
+			_isFrozen = freeze;
 		}
 		
 		public function addFrame(resource:Bitmap):void
@@ -158,6 +182,31 @@ package trolling.component.animation
 			_interval = value;
 		}
 		
+		public function get isLoop():Boolean
+		{
+			return _isLoop;
+		}
+		
+		public function set isLoop(value:Boolean):void
+		{
+			_isLoop = value;
+		}
+		
+		public function get nextState():String
+		{
+			return _nextState;
+		}
+		
+		public function set nextState(value:String):void
+		{
+			_nextState = value;
+		}
+		
+		public function set onEnd(value:Function):void
+		{
+			_onEnd = value;
+		}
+		
 		public function get isPlaying():Boolean
 		{
 			return _isPlaying;	
@@ -165,7 +214,7 @@ package trolling.component.animation
 		
 		private function onNextFrame(event:Event):void
 		{
-			if (!_isPlaying)
+			if (!_isPlaying || _isFrozen)
 			{
 				return;
 			}
@@ -178,7 +227,18 @@ package trolling.component.animation
 				
 				if (_currentIndex >= _animation.length)
 				{
-					_currentIndex = 0;
+					if (_isLoop)
+					{
+						_currentIndex = 0;
+					}
+					else
+					{
+						if (_nextState && _onEnd)
+						{
+							_onEnd(_nextState);
+						}
+						stop();
+					}
 				}
 				
 				_frameCounter = 0;

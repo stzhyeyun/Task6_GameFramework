@@ -145,6 +145,7 @@ package trolling.component.animation
 				state.play();
 			}
 			
+			state.onEnd = transition;
 			_states[state.name] = state;
 		}
 		
