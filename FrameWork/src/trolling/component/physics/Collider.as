@@ -192,6 +192,26 @@ package trolling.component.physics
 			return _circle;
 		}
 		
+		public function get ratioX():Number
+		{
+			return _ratioX;
+		}
+		
+		public function set ratioX(value:Number):void
+		{
+			_ratioX = value;
+		}
+		
+		public function get ratioY():Number
+		{
+			return _ratioY;
+		}
+		
+		public function set ratioY(value:Number):void
+		{
+			_ratioY = value;
+		}
+		
 		private function detectCollisionRectToCircle(rect:Rectangle, circle:Circle):Boolean
 		{
 			var topRight:Point = new Point(rect.x + rect.width, rect.y);
