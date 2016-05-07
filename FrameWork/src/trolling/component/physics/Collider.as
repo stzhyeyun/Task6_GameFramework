@@ -252,8 +252,8 @@ package trolling.component.physics
 			}
 			
 			var parentGlobalPos:Point = _parent.getGlobalPoint();
-			var parentWidth:Number = _parent.width * _parent.scaleX;
-			var parentHeight:Number = _parent.height * _parent.scaleY;
+			var parentWidth:Number = _parent.width * _parent.getScaleXToGlobal();
+			var parentHeight:Number = _parent.height * _parent.getScaleYToGlobal();
 			
 			if (_id == ID_RECT)
 			{
