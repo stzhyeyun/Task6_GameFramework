@@ -1,8 +1,8 @@
 package trolling.component.animation
 {
-	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	
+	import trolling.event.TrollingEvent;
 	import trolling.rendering.Texture;
 	
 	public class State extends EventDispatcher
@@ -78,7 +78,7 @@ package trolling.component.animation
 				}
 				
 				_isPlaying = true;			
-				addEventListener(Event.ENTER_FRAME, onNextFrame);
+				addEventListener(TrollingEvent.ENTER_FRAME, onNextFrame);
 			}
 		}
 		
@@ -94,7 +94,7 @@ package trolling.component.animation
 				_frameCounter = 0;
 				_isPlaying = false;
 				_isFrozen = false;
-				removeEventListener(Event.ENTER_FRAME, onNextFrame);
+				removeEventListener(TrollingEvent.ENTER_FRAME, onNextFrame);
 			}
 		}
 		
@@ -263,10 +263,10 @@ package trolling.component.animation
 		
 		/**
 		 * 프레임 수를 카운트하여 다음 애니메이션 인덱스로 넘어갈지 여부를 결정합니다. 일회성 애니메이션일 경우 마지막 인덱스 재생 후, 자신을 stop하고 nextState로 전이합니다.
-		 * @param event Event.ENTER_FRAME
+		 * @param event TrollingEvent.ENTER_FRAME
 		 * 
 		 */
-		private function onNextFrame(event:Event):void
+		private function onNextFrame(event:TrollingEvent):void
 		{
 			if (!_isPlaying || _isFrozen)
 			{

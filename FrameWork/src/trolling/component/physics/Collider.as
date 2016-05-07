@@ -1,12 +1,12 @@
 package trolling.component.physics
 {
-	import flash.events.Event;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	
 	import trolling.component.Component;
 	import trolling.component.ComponentType;
 	import trolling.core.Trolling;
+	import trolling.event.TrollingEvent;
 	import trolling.object.GameObject;
 	import trolling.utils.Circle;
 
@@ -36,9 +36,9 @@ package trolling.component.physics
 			_ratioX = 0;
 			_ratioY = 0;
 			
-			addEventListener(Event.ENTER_FRAME, onNextFrame);
-			addEventListener(Event.ACTIVATE, onActivateScene);
-			addEventListener(Event.DEACTIVATE, onDeactivateScene);
+			addEventListener(TrollingEvent.ENTER_FRAME, onNextFrame);
+			addEventListener(TrollingEvent.ACTIVATE, onActivateScene);
+			addEventListener(TrollingEvent.DEACTIVATE, onDeactivateScene);
 		}
 		
 		public override function dispose():void
@@ -91,9 +91,9 @@ package trolling.component.physics
 			{
 				if (!_isActive)
 				{
-					addEventListener(Event.ENTER_FRAME, onNextFrame);
-					addEventListener(Event.ACTIVATE, onActivateScene);
-					addEventListener(Event.DEACTIVATE, onDeactivateScene);
+					addEventListener(TrollingEvent.ENTER_FRAME, onNextFrame);
+					addEventListener(TrollingEvent.ACTIVATE, onActivateScene);
+					addEventListener(TrollingEvent.DEACTIVATE, onDeactivateScene);
 					
 					Trolling.current.colliderManager.addCollider(this);
 				}
@@ -102,9 +102,9 @@ package trolling.component.physics
 			{
 				if (_isActive)
 				{
-					removeEventListener(Event.ENTER_FRAME, onNextFrame);
-					removeEventListener(Event.ACTIVATE, onActivateScene);
-					removeEventListener(Event.DEACTIVATE, onDeactivateScene);
+					removeEventListener(TrollingEvent.ENTER_FRAME, onNextFrame);
+					removeEventListener(TrollingEvent.ACTIVATE, onActivateScene);
+					removeEventListener(TrollingEvent.DEACTIVATE, onDeactivateScene);
 					
 					Trolling.current.colliderManager.removeCollider(this);
 				}
@@ -118,7 +118,7 @@ package trolling.component.physics
 		 * @param event
 		 * 
 		 */
-		protected override function onNextFrame(event:Event):void
+		protected override function onNextFrame(event:TrollingEvent):void
 		{
 			if (_isActive)
 			{
@@ -126,12 +126,12 @@ package trolling.component.physics
 			}
 		}
 		
-		protected override function onActivateScene(event:Event):void
+		protected override function onActivateScene(event:TrollingEvent):void
 		{
 			this.isActive = true;
 		}
 		
-		protected override function onDeactivateScene(event:Event):void
+		protected override function onDeactivateScene(event:TrollingEvent):void
 		{
 			this.isActive = false;
 		}

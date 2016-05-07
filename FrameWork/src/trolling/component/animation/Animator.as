@@ -1,10 +1,10 @@
 package trolling.component.animation
 {
-	import flash.events.Event;
 	import flash.utils.Dictionary;
 	
 	import trolling.component.ComponentType;
 	import trolling.component.DisplayComponent;
+	import trolling.event.TrollingEvent;
 	import trolling.rendering.Texture;
 
 	public class Animator extends DisplayComponent
@@ -21,9 +21,9 @@ package trolling.component.animation
 			
 			_currentState = NONE;
 			
-			addEventListener(Event.ENTER_FRAME, onNextFrame);
-			addEventListener(Event.ACTIVATE, onActivateScene);
-			addEventListener(Event.DEACTIVATE, onDeactivateScene);
+			addEventListener(TrollingEvent.ENTER_FRAME, onNextFrame);
+			addEventListener(TrollingEvent.ACTIVATE, onActivateScene);
+			addEventListener(TrollingEvent.DEACTIVATE, onDeactivateScene);
 		}
 				
 		public override function dispose():void
@@ -64,9 +64,9 @@ package trolling.component.animation
 					var state:State = _states[_currentState];
 					state.play();
 					
-					addEventListener(Event.ENTER_FRAME, onNextFrame);
-					addEventListener(Event.ACTIVATE, onActivateScene);
-					addEventListener(Event.DEACTIVATE, onDeactivateScene);
+					addEventListener(TrollingEvent.ENTER_FRAME, onNextFrame);
+					addEventListener(TrollingEvent.ACTIVATE, onActivateScene);
+					addEventListener(TrollingEvent.DEACTIVATE, onDeactivateScene);
 				}
 			}
 			else
@@ -76,9 +76,9 @@ package trolling.component.animation
 					var state:State = _states[_currentState];
 					state.stop();
 					
-					removeEventListener(Event.ENTER_FRAME, onNextFrame);
-					removeEventListener(Event.ACTIVATE, onActivateScene);
-					removeEventListener(Event.DEACTIVATE, onDeactivateScene);
+					removeEventListener(TrollingEvent.ENTER_FRAME, onNextFrame);
+					removeEventListener(TrollingEvent.ACTIVATE, onActivateScene);
+					removeEventListener(TrollingEvent.DEACTIVATE, onDeactivateScene);
 				}
 			}
 
@@ -111,10 +111,10 @@ package trolling.component.animation
 		
 		/**
 		 * Animator가 활성화 상태이며 지정된 현재 State가 있을 경우 해당 State에게 Event.ENTER_FRAME을 dispatch합니다. 
-		 * @param event Event.ENTER_FRAME
+		 * @param event TrollingEvent.ENTER_FRAME
 		 * 
 		 */
-		protected override function onNextFrame(event:Event):void
+		protected override function onNextFrame(event:TrollingEvent):void
 		{
 			if (_isActive && _states && _currentState != NONE)
 			{
@@ -125,20 +125,20 @@ package trolling.component.animation
 		
 		/**
 		 * Animator가 속한 Scene이 활성화될 경우 이벤트를 수신하여 자기 자신을 활성화합니다. 
-		 * @param event Event.ACTIVATE
+		 * @param event TrollingEvent.ACTIVATE
 		 * 
 		 */
-		protected override function onActivateScene(event:Event):void
+		protected override function onActivateScene(event:TrollingEvent):void
 		{
 			this.isActive = true;
 		}
 		
 		/**
 		 * Animator가 속한 Scene이 비활성화될 경우 이벤트를 수신하여 자기 자신을 비활성화합니다.
-		 * @param event event Event.DEACTIVATE
+		 * @param event event TrollingEvent.DEACTIVATE
 		 * 
 		 */
-		protected override function onDeactivateScene(event:Event):void
+		protected override function onDeactivateScene(event:TrollingEvent):void
 		{
 			this.isActive = false;
 		}

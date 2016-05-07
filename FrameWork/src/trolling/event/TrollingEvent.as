@@ -4,7 +4,10 @@ package trolling.event
 	
 	public class TrollingEvent extends Event
 	{
+		public static const ACTIVATE:String = "activate";
 		public static const COLLIDE:String = "collide";
+		public static const DEACTIVATE:String = "deactivate";
+		public static const ENTER_FRAME:String = "enterFrame";
 		public static const TOUCH_BEGAN:String = "touchBegan";
 		public static const TOUCH_HOVER:String = "touchHover";
 		public static const TOUCH_MOVED:String = "touchMoved";
