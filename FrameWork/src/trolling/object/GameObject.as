@@ -55,8 +55,8 @@ package trolling.object
 		public function GameObject()
 		{
 			this.addEventListener(TrollingEvent.ENTER_FRAME, onThrowEvent);
-			this.addEventListener(TrollingEvent.DEACTIVATE, onThrowEvent);
-			this.addEventListener(TrollingEvent.ACTIVATE, onThrowEvent);
+			this.addEventListener(TrollingEvent.END, onThrowEvent);
+			this.addEventListener(TrollingEvent.START, onThrowEvent);
 			_x = _y = _width = _height = _rotate = 0.0;
 			_pivot = PivotType.TOP_LEFT;
 			_scaleX = _scaleY = 1;
@@ -208,8 +208,8 @@ package trolling.object
 		public function dispose():void
 		{
 			this.removeEventListener(TrollingEvent.ENTER_FRAME, onThrowEvent);
-			this.removeEventListener(TrollingEvent.DEACTIVATE, onThrowEvent);
-			this.removeEventListener(TrollingEvent.ACTIVATE, onThrowEvent);
+			this.removeEventListener(TrollingEvent.END, onThrowEvent);
+			this.removeEventListener(TrollingEvent.START, onThrowEvent);
 			
 			Disposer.requestDisposal(this);
 			if(_children)
@@ -317,7 +317,7 @@ package trolling.object
 					rect.x = (drawRect.width/2)-(rect.width/2);
 					rect.y = (drawRect.height/2)-(rect.height/2);
 					
-					var bitmapData:BitmapData = new BitmapData(32, 32, false, Color.BLUE);
+					var bitmapData:BitmapData = new BitmapData(32, 32, false, Color.FUCHSIA);
 					var textureTemp:flash.display3D.textures.Texture = painter.context.createTexture(32, 32, Context3DTextureFormat.BGRA, false);
 					textureTemp.uploadFromBitmapData(bitmapData);
 					

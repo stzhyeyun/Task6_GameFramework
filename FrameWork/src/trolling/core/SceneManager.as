@@ -30,12 +30,12 @@ package trolling.core
 			if(Trolling.current.currentScene != null)
 			{
 				Trolling.current.currentScene.visable = false;
-				Trolling.current.currentScene.dispatchEvent(new TrollingEvent(TrollingEvent.DEACTIVATE));
+				Trolling.current.currentScene.dispatchEvent(new TrollingEvent(TrollingEvent.END));
 				_sceneVector.push(_sceneDic[Trolling.current.currentScene.key]);
 			}
 			
 			Trolling.current.currentScene = _sceneDic[key];
-			Trolling.current.currentScene.dispatchEvent(new TrollingEvent(TrollingEvent.ACTIVATE));
+			Trolling.current.currentScene.dispatchEvent(new TrollingEvent(TrollingEvent.START));
 			Trolling.current.currentScene.visable = true;
 		}
 		
@@ -66,7 +66,7 @@ package trolling.core
 				_sceneDic[key] = scene;
 				scene.width = Trolling.current.stage.stageWidth;
 				scene.height = Trolling.current.stage.stageHeight;
-				scene.dispatchEvent(new TrollingEvent(TrollingEvent.ACTIVATE));
+				scene.dispatchEvent(new TrollingEvent(TrollingEvent.START));
 			}
 			else
 			{
@@ -83,11 +83,11 @@ package trolling.core
 			if(Trolling.current.currentScene != null)
 			{
 				Trolling.current.currentScene.visable = false;
-				Trolling.current.currentScene.dispatchEvent(new TrollingEvent(TrollingEvent.DEACTIVATE));
+				Trolling.current.currentScene.dispatchEvent(new TrollingEvent(TrollingEvent.END));
 				Trolling.current.currentScene.dispose();
 			}
 			Trolling.current.currentScene = _sceneDic[key];
-			Trolling.current.currentScene.dispatchEvent(new TrollingEvent(TrollingEvent.ACTIVATE));
+			Trolling.current.currentScene.dispatchEvent(new TrollingEvent(TrollingEvent.START));
 			Trolling.current.currentScene.visable = true;
 		}
 	}

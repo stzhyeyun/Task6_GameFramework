@@ -1,6 +1,5 @@
 package trolling.component.physics
 {
-	import flash.events.Event;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	
@@ -38,8 +37,8 @@ package trolling.component.physics
 			_ratioY = 0;
 			
 			addEventListener(TrollingEvent.ENTER_FRAME, onNextFrame);
-			addEventListener(TrollingEvent.ACTIVATE, onActivateScene);
-			addEventListener(TrollingEvent.DEACTIVATE, onDeactivateScene);
+			addEventListener(TrollingEvent.START, onStartScene);
+			addEventListener(TrollingEvent.END, onEndScene);
 		}
 		
 		public override function dispose():void
@@ -93,8 +92,8 @@ package trolling.component.physics
 				if (!_isActive)
 				{
 					addEventListener(TrollingEvent.ENTER_FRAME, onNextFrame);
-					addEventListener(TrollingEvent.ACTIVATE, onActivateScene);
-					addEventListener(TrollingEvent.DEACTIVATE, onDeactivateScene);
+					addEventListener(TrollingEvent.START, onStartScene);
+					addEventListener(TrollingEvent.END, onEndScene);
 					
 					Trolling.current.colliderManager.addCollider(this);
 				}
@@ -104,8 +103,8 @@ package trolling.component.physics
 				if (_isActive)
 				{
 					removeEventListener(TrollingEvent.ENTER_FRAME, onNextFrame);
-					removeEventListener(TrollingEvent.ACTIVATE, onActivateScene);
-					removeEventListener(TrollingEvent.DEACTIVATE, onDeactivateScene);
+					removeEventListener(TrollingEvent.START, onStartScene);
+					removeEventListener(TrollingEvent.END, onEndScene);
 					
 					Trolling.current.colliderManager.removeCollider(this);
 				}
@@ -127,12 +126,12 @@ package trolling.component.physics
 			}
 		}
 		
-		protected override function onActivateScene(event:TrollingEvent):void
+		protected override function onStartScene(event:TrollingEvent):void
 		{
 			this.isActive = true;
 		}
 		
-		protected override function onDeactivateScene(event:TrollingEvent):void
+		protected override function onEndScene(event:TrollingEvent):void
 		{
 			this.isActive = false;
 		}

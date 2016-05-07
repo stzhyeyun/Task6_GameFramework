@@ -55,12 +55,12 @@ package trolling.component
 			// Empty
 		}
 		
-		protected virtual function onActivateScene(event:TrollingEvent):void
+		protected virtual function onStartScene(event:TrollingEvent):void
 		{
 			// Empty
 		}
 		
-		protected virtual function onDeactivateScene(event:TrollingEvent):void
+		protected virtual function onEndScene(event:TrollingEvent):void
 		{
 			// Empty
 		}

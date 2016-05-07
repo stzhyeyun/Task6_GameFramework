@@ -1,6 +1,5 @@
 package trolling.component.animation
 {
-	import flash.events.Event;
 	import flash.utils.Dictionary;
 	
 	import trolling.component.ComponentType;
@@ -23,8 +22,8 @@ package trolling.component.animation
 			_currentState = NONE;
 			
 			addEventListener(TrollingEvent.ENTER_FRAME, onNextFrame);
-			addEventListener(TrollingEvent.ACTIVATE, onActivateScene);
-			addEventListener(TrollingEvent.DEACTIVATE, onDeactivateScene);
+			addEventListener(TrollingEvent.START, onStartScene);
+			addEventListener(TrollingEvent.END, onEndScene);
 		}
 				
 		public override function dispose():void
@@ -66,8 +65,8 @@ package trolling.component.animation
 					state.play();
 					
 					addEventListener(TrollingEvent.ENTER_FRAME, onNextFrame);
-					addEventListener(TrollingEvent.ACTIVATE, onActivateScene);
-					addEventListener(TrollingEvent.DEACTIVATE, onDeactivateScene);
+					addEventListener(TrollingEvent.START, onStartScene);
+					addEventListener(TrollingEvent.END, onEndScene);
 				}
 			}
 			else
@@ -78,8 +77,8 @@ package trolling.component.animation
 					state.stop();
 					
 					removeEventListener(TrollingEvent.ENTER_FRAME, onNextFrame);
-					removeEventListener(TrollingEvent.ACTIVATE, onActivateScene);
-					removeEventListener(TrollingEvent.DEACTIVATE, onDeactivateScene);
+					removeEventListener(TrollingEvent.START, onStartScene);
+					removeEventListener(TrollingEvent.END, onEndScene);
 				}
 			}
 
@@ -129,7 +128,7 @@ package trolling.component.animation
 		 * @param event TrollingEvent.ACTIVATE
 		 * 
 		 */
-		protected override function onActivateScene(event:TrollingEvent):void
+		protected override function onStartScene(event:TrollingEvent):void
 		{
 			this.isActive = true;
 		}
@@ -139,7 +138,7 @@ package trolling.component.animation
 		 * @param event event TrollingEvent.DEACTIVATE
 		 * 
 		 */
-		protected override function onDeactivateScene(event:TrollingEvent):void
+		protected override function onEndScene(event:TrollingEvent):void
 		{
 			this.isActive = false;
 		}
