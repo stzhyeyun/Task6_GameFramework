@@ -1,8 +1,10 @@
 package trolling.core
 {
+	//change
 	import flash.events.Event;
 	import flash.utils.Dictionary;
 	
+	import trolling.event.TrollingEvent;
 	import trolling.object.Scene;
 	
 	public class SceneManager
@@ -28,11 +30,12 @@ package trolling.core
 			if(Trolling.current.currentScene != null)
 			{
 				Trolling.current.currentScene.visable = false;
-				Trolling.current.currentScene.dispatchEvent(new Event(Event.DEACTIVATE));
+				Trolling.current.currentScene.dispatchEvent(new TrollingEvent(TrollingEvent.DEACTIVATE));
 				_sceneVector.push(_sceneDic[Trolling.current.currentScene.key]);
 			}
+			
 			Trolling.current.currentScene = _sceneDic[key];
-			Trolling.current.currentScene.dispatchEvent(new Event(Event.ACTIVATE));
+			Trolling.current.currentScene.dispatchEvent(new TrollingEvent(TrollingEvent.ACTIVATE));
 			Trolling.current.currentScene.visable = true;
 		}
 		
@@ -63,7 +66,7 @@ package trolling.core
 				_sceneDic[key] = scene;
 				scene.width = Trolling.current.stage.stageWidth;
 				scene.height = Trolling.current.stage.stageHeight;
-				scene.dispatchEvent(new Event(Event.ACTIVATE));
+				scene.dispatchEvent(new TrollingEvent(TrollingEvent.ACTIVATE));
 			}
 			else
 			{
@@ -80,11 +83,11 @@ package trolling.core
 			if(Trolling.current.currentScene != null)
 			{
 				Trolling.current.currentScene.visable = false;
-				Trolling.current.currentScene.dispatchEvent(new Event(Event.DEACTIVATE));
+				Trolling.current.currentScene.dispatchEvent(new TrollingEvent(TrollingEvent.DEACTIVATE));
 				Trolling.current.currentScene.dispose();
 			}
 			Trolling.current.currentScene = _sceneDic[key];
-			Trolling.current.currentScene.dispatchEvent(new Event(Event.ACTIVATE));
+			Trolling.current.currentScene.dispatchEvent(new TrollingEvent(TrollingEvent.ACTIVATE));
 			Trolling.current.currentScene.visable = true;
 		}
 	}

@@ -459,18 +459,19 @@ package trolling.object
 		 * @param event
 		 * 
 		 */		
-		private function onThrowEvent(event:Event):void
+		private function onThrowEvent(event:TrollingEvent):void
 		{
 			for(var key:String in _components)
 			{
 				if(_components[key] != null)
-					Component(_components[key]).dispatchEvent(event);
+					Component(_components[key]).dispatchEvent(new TrollingEvent(event.type));
 			}
 			
 			if(_children)
 			{
+//				trace(event.type);
 				for(var i:int = 0; i < _children.length; i++)
-					_children[i].dispatchEvent(event);
+					_children[i].dispatchEvent(new TrollingEvent(event.type));
 			}
 		}
 		

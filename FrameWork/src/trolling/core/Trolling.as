@@ -273,7 +273,7 @@ package trolling.core
 		//change
 		private function nextFrame():void
 		{
-			_currentScene.dispatchEvent(new Event(TrollingEvent.ENTER_FRAME));
+			_currentScene.dispatchEvent(new TrollingEvent(TrollingEvent.ENTER_FRAME));
 		}
 		
 		public function start():void

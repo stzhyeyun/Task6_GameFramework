@@ -1,5 +1,6 @@
 package trolling.component.physics
 {
+	import flash.events.Event;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	

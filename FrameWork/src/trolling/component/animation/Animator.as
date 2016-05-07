@@ -1,5 +1,6 @@
 package trolling.component.animation
 {
+	import flash.events.Event;
 	import flash.utils.Dictionary;
 	
 	import trolling.component.ComponentType;
@@ -119,7 +120,7 @@ package trolling.component.animation
 			if (_isActive && _states && _currentState != NONE)
 			{
 				var state:State = _states[_currentState];
-				state.dispatchEvent(event);
+				state.dispatchEvent(new TrollingEvent(event.type));
 			}
 		}
 		

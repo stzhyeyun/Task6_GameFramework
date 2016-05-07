@@ -1,5 +1,6 @@
 package trolling.component
 {
+	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	
 	import trolling.event.TrollingEvent;
