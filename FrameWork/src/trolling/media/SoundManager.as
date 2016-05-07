@@ -55,6 +55,12 @@ package trolling.media
 			_bgm = null;
 		}
 		
+		/**
+		 * Sound를 등록합니다. Volume, Panning, startTime, Loops 값을 미리 지정해야 할 필요가 있습니다.  
+		 * @param name 등록할 Sound의 이름입니다.
+		 * @param sound 등록한 Sound입니다.
+		 * 
+		 */
 		public static function addSound(name:String, sound:Sound):void
 		{
 			if (!sound)
@@ -76,6 +82,11 @@ package trolling.media
 			_sounds[name] = sound;
 		}
 		
+		/**
+		 * 등록된 Sound를 제거합니다. 제거하고자 하는 Sound가 재생 중이라면 재생이 중지됩니다.
+		 * @param name 제거하고자 하는 Sound의 이름입니다.
+		 * 
+		 */
 		public static function removeSound(name:String):void
 		{
 			if (!_sounds || !_sounds[name])
@@ -98,6 +109,12 @@ package trolling.media
 			delete _sounds[name];
 		}
 		
+		/**
+		 * 해당 이름의 Sound을 반환합니다. 
+		 * @param name 반환받고자 하는 Sound의 이름입니다. 
+		 * @return 해당 이름을 가진 Sound입니다. 대상이 없을 경우 null을 반환합니다.
+		 * 
+		 */
 		public static function getSound(name:String):Sound
 		{
 			if (!_sounds)
@@ -115,6 +132,13 @@ package trolling.media
 			
 			return null;
 		}
+		
+		/**
+		 * 해당 이름의 Sound를 교체합니다.
+		 * @param name 교체하고자 하는 Sound의 이름입니다.
+		 * @param editedSound 새롭게 등록할 Sound입니다.
+		 * 
+		 */
 		public static function setSound(name:String, editedSound:Sound):void
 		{
 			if (!_sounds)
@@ -131,6 +155,12 @@ package trolling.media
 				}
 			}
 		}
+		
+		/**
+		 * 지정한 Sound를 재생합니다.
+		 * @param name 재생하고자 하는 Sound의 이름입니다.
+		 * 
+		 */
 		public static function play(name:String):void
 		{
 			if (!_sounds || !_sounds[name])
@@ -193,6 +223,10 @@ package trolling.media
 			}
 		}
 		
+		/**
+		 * 현재 재생 중인 배경음악(무한반복되도록 설정된 Sound)을 정지합니다. 
+		 * 
+		 */
 		public static function stopBgm():void
 		{
 			if (!_bgm || !_channels)
@@ -216,6 +250,13 @@ package trolling.media
 			_bgm = null;
 		}
 				
+		/**
+		 * 현재 재생 중인 Sound의 Volume을 제어합니다. 
+		 * @param target SoundManager.ALL: 현재 재생 중인 전체 Sound / SoundManager:SELECT: 현재 재생 중인 Sound 중 지정한 Sound
+		 * @param volume 0부터 1 사이의 값을 지정합니다.
+		 * @param name Volume을 제어하고자 하는 특정 Sound의 이름입니다.
+		 * 
+		 */
 		public static function setPlayingSoundVolume(target:String, volume:Number, name:String = null):void
 		{
 			if (!_channels)
@@ -240,7 +281,7 @@ package trolling.media
 				{
 					if (!name || !_channels[name])
 					{
-						trace(TAG + " setVolume : No target.");
+						trace(TAG + " setPlayingSoundVolume : No target.");
 						return;
 					}
 					
@@ -251,6 +292,13 @@ package trolling.media
 			}
 		}
 		
+		/**
+		 * 현재 재생 중인 Sound의 Panning을 제어합니다. 
+		 * @param target SoundManager.ALL: 현재 재생 중인 전체 Sound / SoundManager:SELECT: 현재 재생 중인 Sound 중 지정한 Sound
+		 * @param pan -1(왼쪽 최대)부터 1(오른쪽 최대) 사이의 값을 지정합니다.
+		 * @param name Panning을 제어하고자 하는 특정 Sound의 이름입니다.
+		 * 
+		 */
 		public static function setPlayingSoundPanning(target:String, pan:Number, name:String = null):void
 		{
 			if (!_channels)
@@ -286,6 +334,11 @@ package trolling.media
 			}
 		}
 		
+		/**
+		 * Sound의 재생이 끝나면 해당 SoundChannel의 인덱스를 null 처리합니다. 
+		 * @param event Event.SOUND_COMPLETE
+		 * 
+		 */
 		private static function onEnd(event:Event):void
 		{
 			var channel:SoundChannel = event.target as SoundChannel;
@@ -302,6 +355,11 @@ package trolling.media
 			}
 		}
 		
+		/**
+		 * 배경음악(무한반복되도록 설정된 Sound)의 재생이 끝나면 다시 재생을 시작합니다.
+		 * @param event Event.SOUND_COMPLETE
+		 * 
+		 */
 		private static function onEndBgm(event:Event):void
 		{
 			var channel:SoundChannel = event.target as SoundChannel;

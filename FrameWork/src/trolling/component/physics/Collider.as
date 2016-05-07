@@ -114,8 +114,8 @@ package trolling.component.physics
 		}
 		
 		/**
-		 *  
-		 * @param event
+		 * 매프레임마다 update를 호출합니다.
+		 * @param event TrollingEvent.ENTER_FRAME
 		 * 
 		 */
 		protected override function onNextFrame(event:TrollingEvent):void
@@ -136,6 +136,12 @@ package trolling.component.physics
 			this.isActive = false;
 		}
 		
+		/**
+		 * Collider의 타입에 따라 충돌 검사를 합니다.
+		 * @param object 충돌 검사 대상인 Collider입니다.
+		 * @return 충돌 여부를 반환합니다.
+		 * 
+		 */
 		public function isCollision(object:Collider):Boolean
 		{
 			var objectId:int = object.id;
@@ -177,6 +183,12 @@ package trolling.component.physics
 			return false;
 		}
 		
+		/**
+		 * 사각형 충돌체를 설정합니다. parent의 크기를 기준으로 한 비율을 입력합니다. 위치는 parent의 중앙으로 자동 설정됩니다.  
+		 * @param ratioX parent의 width를 기준으로 한 충돌체의 width 비율입니다.
+		 * @param ratioY parent의 height를 기준으로 한 충돌체의 height 비율입니다.
+		 * 
+		 */
 		public function setRect(ratioX:Number, ratioY:Number):void
 		{
 			_id = ID_RECT;
@@ -185,6 +197,11 @@ package trolling.component.physics
 			_ratioY = ratioY;
 		}
 		
+		/**
+		 * 원 충돌체를 설정합니다. parent의 크기를 기준으로 한 비율을 입력합니다. 위치는 parent의 중앙으로 자동 설정됩니다.  
+		 * @param ratio parent를 기준으로 한 충돌체의 지름 비율입니다.
+		 * 
+		 */
 		public function setCircle(ratio:Number):void
 		{
 			_id = ID_CIRCLE;
@@ -227,6 +244,13 @@ package trolling.component.physics
 			_ratioY = value;
 		}
 		
+		/**
+		 * 사각형과 원의 충돌 여부를 검사합니다. 
+		 * @param rect 충돌 검사 대상인 사각형 Collider입니다.
+		 * @param circle 충돌 검사 대상인 원 Collider입니다.
+		 * @return 충돌 여부를 반환합니다.
+		 * 
+		 */
 		private function detectCollisionRectToCircle(rect:Rectangle, circle:Circle):Boolean
 		{
 			var topRight:Point = new Point(rect.x + rect.width, rect.y);
@@ -244,6 +268,10 @@ package trolling.component.physics
 			return rect.intersects(outerRect);
 		}
 		
+		/**
+		 * parent 기준으로 Collider(rect 또는 circle)의 크기과 위치를 업데이트합니다. Collider의 위치는 Global 좌표입니다.
+		 * 
+		 */
 		private function update():void
 		{
 			if (!_parent || _id == ID_NONE)

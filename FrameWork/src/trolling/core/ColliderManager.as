@@ -14,6 +14,11 @@ package trolling.core
 			
 		}
 		
+		/**
+		 * ColliderManager에 Collider를 등록합니다. 
+		 * @param collider 등록하고자 하는 Collider입니다.
+		 * 
+		 */
 		public function addCollider(collider:Collider):void
 		{
 			if (!_colliders)
@@ -23,6 +28,11 @@ package trolling.core
 			_colliders.push(collider);
 		}
 		
+		/**
+		 * ColliderManager에서 Collider를 제거합니다. 
+		 * @param collider 제거하고자 하는 Collider입니다.
+		 * 
+		 */
 		public function removeCollider(collider:Collider):void
 		{
 			if (!_colliders || !collider)
@@ -40,6 +50,10 @@ package trolling.core
 			}
 		}
 		
+		/**
+		 * 등록된 Collider에 대해 충돌 검사를 수행합니다. 충돌한 Collider를 가진 GameObject에게는 충돌 대상(GameObject)에 대한 정보를 포함하는 충돌 이벤트를 dispatch합니다.
+		 * 
+		 */
 		public function detectCollision():void
 		{
 			if (!_colliders || _colliders.length <= 1)
@@ -90,7 +104,7 @@ package trolling.core
 					}
 				}
 				collidedIndices = null;
-				
+
 				index++;
 			}
 			
