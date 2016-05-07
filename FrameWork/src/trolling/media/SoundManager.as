@@ -183,11 +183,11 @@ package trolling.media
 			_bgm = null;
 		}
 				
-		public static function setCurrentSoundVolume(target:String, volume:Number, name:String = null):void
+		public static function setPlayingSoundVolume(target:String, volume:Number, name:String = null):void
 		{
 			if (!_channels)
 			{
-				trace(TAG + " setVolume : No target.");
+				trace(TAG + " setPlayingSoundVolume : No target.");
 				return;
 			}
 			
@@ -218,11 +218,11 @@ package trolling.media
 			}
 		}
 		
-		public static function setPanning(target:String, pan:Number, name:String = null):void
+		public static function setPlayingSoundPanning(target:String, pan:Number, name:String = null):void
 		{
 			if (!_channels)
 			{
-				trace(TAG + " setPan : No target.");
+				trace(TAG + " setPlayingSoundPanning : No target.");
 				return;
 			}
 			
@@ -242,7 +242,7 @@ package trolling.media
 				{
 					if (!name || !_channels[name])
 					{
-						trace(TAG + " setPan : No target.");
+						trace(TAG + " setPlayingSoundPanning : No target.");
 						return;
 					}
 					
