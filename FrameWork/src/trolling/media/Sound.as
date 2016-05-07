@@ -32,8 +32,6 @@ package trolling.media
 			_startTime = 0;
 			_loops = NO_LOOP;
 			_channelIndex = -1;
-			
-			super.close();
 		}
 		
 		/**

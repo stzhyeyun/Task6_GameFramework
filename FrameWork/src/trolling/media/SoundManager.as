@@ -2,6 +2,7 @@ package trolling.media
 {
 	import flash.events.Event;
 	import flash.media.SoundChannel;
+	import flash.media.SoundMixer;
 	import flash.media.SoundTransform;
 	import flash.utils.Dictionary;
 	
@@ -24,35 +25,20 @@ package trolling.media
 		
 		public static function dispose():void
 		{
-			if (_channels)
-			{
-				for (var i:int = 0; i < _channels.length; i++)
-				{
-					if (_channels[i])
-					{
-						_channels[i].stop();
-					}
-					_channels[i] = null;
-				}
-			}
-			_channels = null;
+			stopAll();
 			
 			if (_sounds)
 			{
 				for (var key:String in _sounds)
 				{
 					var sound:Sound = _sounds[key];
+					
+					if (sound.bytesLoaded < sound.bytesTotal)
 					sound.dispose();
 					sound = null;
 				}
 			}
 			_sounds = null;
-			
-			if (_bgm)
-			{
-				_bgm.close();
-			}
-			_bgm = null;
 		}
 		
 		/**
@@ -224,29 +210,26 @@ package trolling.media
 		}
 		
 		/**
-		 * 현재 재생 중인 배경음악(무한반복되도록 설정된 Sound)을 정지합니다. 
+		 * 현재 재생 중인 모든 Sound를 정지합니다. 
 		 * 
 		 */
-		public static function stopBgm():void
+		public static function stopAll():void
 		{
-			if (!_bgm || !_channels)
+			SoundMixer.stopAll();
+			
+			if (_channels)
 			{
-				return;
+				for (var i:int = 0; i < _channels.length; i++)
+				{
+					_channels[i] = null;
+				}
 			}
+			_channels = null;
 			
-			var bgmIndex:int = _bgm.channelIndex;
-			
-			if (bgmIndex < 0 || !_channels[bgmIndex])
+			if (_bgm)
 			{
-				return;
+				_bgm.dispose();
 			}
-			
-			var channel:SoundChannel = _channels[bgmIndex];
-			channel.removeEventListener(Event.SOUND_COMPLETE, onEndBgm);
-			channel.stop();
-			channel = null;
-			
-			_bgm.channelIndex = -1;
 			_bgm = null;
 		}
 				
