@@ -98,6 +98,39 @@ package trolling.media
 			delete _sounds[name];
 		}
 		
+		public static function getSound(name:String):Sound
+		{
+			if (!_sounds)
+			{
+				return null;	
+			}
+			
+			for (var key:String in _sounds)
+			{
+				if (key == name)
+				{
+					return _sounds[key];
+				}
+			}
+			
+			return null;
+		}
+		public static function setSound(name:String, editedSound:Sound):void
+		{
+			if (!_sounds)
+			{
+				return;	
+			}
+			
+			for (var key:String in _sounds)
+			{
+				if (key == name)
+				{
+					_sounds[key] = editedSound;
+					break;
+				}
+			}
+		}
 		public static function play(name:String):void
 		{
 			if (!_sounds || !_sounds[name])
