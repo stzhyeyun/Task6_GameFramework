@@ -532,7 +532,7 @@ package trolling.object
 			//				drawRect.y -= (drawRect.height/2);
 			//			}
 			
-			if(_parent != Trolling.current.currentScene)
+			if(_parent != null)
 				matrix = _parent.getMatrix(matrix);
 			//			trace(matrix.position);
 			

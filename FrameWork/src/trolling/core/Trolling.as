@@ -250,11 +250,12 @@ package trolling.core
 		private function onInitPainter(context:Context3D):void
 		{
 			_painter.configureBackBuffer(_viewPort);
-			_initRender = true;
 			_context = context;
 			trace("createContext");
 			createSceneFromQueue();
+			_initRender = true;
 			trace("initRoot");
+			trace(_currentScene.key);
 		}
 		
 		private function createSceneFromQueue():void
@@ -269,9 +270,10 @@ package trolling.core
 			_createQueue = null;
 		}
 		
+		//change
 		private function nextFrame():void
 		{
-			_currentScene.dispatchEvent(new Event(Event.ENTER_FRAME));
+			_currentScene.dispatchEvent(new Event(TrollingEvent.ENTER_FRAME));
 		}
 		
 		public function start():void
