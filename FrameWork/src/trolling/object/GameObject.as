@@ -258,31 +258,32 @@ package trolling.object
 					drawRect.y -= (drawRect.height/2);
 				}
 				
-				//				triangleData.vertexData.push(Vector.<Number>([drawRect.width, 0, 0, 1, 0]));
-				//				triangleData.vertexData.push(Vector.<Number>([drawRect.width, -drawRect.height, 0, 1, 1]));
-				//				triangleData.vertexData.push(Vector.<Number>([0, -drawRect.height, 0, 0, 1]));
-				//				triangleData.vertexData.push(Vector.<Number>([0, 0, 0, 0, 0]));
-				
-				triangleData.vertexData.push(Vector.<Number>([drawRect.width/2, drawRect.height/2, 0, 1, 0]));
-				triangleData.vertexData.push(Vector.<Number>([drawRect.width/2, -drawRect.height/2, 0, 1, 1]));
-				triangleData.vertexData.push(Vector.<Number>([-drawRect.width/2, -drawRect.height/2, 0, 0, 1]));
-				triangleData.vertexData.push(Vector.<Number>([-drawRect.width/2, drawRect.height/2, 0, 0, 0]));
-				
-				triangleData.calculVertex();
-				
-				//				painter.matrix.prependScale(_scaleX, _scaleY, 1);
-				painter.matrix.prependTranslation((drawRect.x+(drawRect.width/2)), -(drawRect.y+(drawRect.height/2)), 0);
-				//				painter.matrix.prependTranslation(drawRect.width/2, -drawRect.height/2, 0);
-				painter.matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
-				//				if(_pivot != PivotType.TOP_LEFT)
-				//				{
-				//					painter.matrix.prependTranslation(-(drawRect.width/2), (drawRect.height/2), 0);
-				//					painter.matrix.prependScale(_scaleX, _scaleY, 1);
-				//					painter.matrix.prependTranslation((drawRect.width/2), -(drawRect.height/2), 0);
-				//				}
-				//				else
-				painter.matrix.prependScale(_scaleX, _scaleY, 1);
-				//				painter.matrix.prependTranslation(-drawRect.width/2, drawRect.height/2, 0);
+				if(_pivot == PivotType.TOP_LEFT)
+				{
+					triangleData.vertexData.push(Vector.<Number>([drawRect.width, 0, 0, 1, 0]));
+					triangleData.vertexData.push(Vector.<Number>([drawRect.width, -drawRect.height, 0, 1, 1]));
+					triangleData.vertexData.push(Vector.<Number>([0, -drawRect.height, 0, 0, 1]));
+					triangleData.vertexData.push(Vector.<Number>([0, 0, 0, 0, 0]));
+					
+					triangleData.calculVertex();
+					
+					painter.matrix.prependTranslation((drawRect.x), -(drawRect.y), 0);
+					painter.matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
+					painter.matrix.prependScale(_scaleX, _scaleY, 1);
+				}
+				else
+				{
+					triangleData.vertexData.push(Vector.<Number>([drawRect.width/2, drawRect.height/2, 0, 1, 0]));
+					triangleData.vertexData.push(Vector.<Number>([drawRect.width/2, -drawRect.height/2, 0, 1, 1]));
+					triangleData.vertexData.push(Vector.<Number>([-drawRect.width/2, -drawRect.height/2, 0, 0, 1]));
+					triangleData.vertexData.push(Vector.<Number>([-drawRect.width/2, drawRect.height/2, 0, 0, 0]));
+					
+					triangleData.calculVertex();
+					
+					painter.matrix.prependTranslation((drawRect.x+(drawRect.width/2)), -(drawRect.y+(drawRect.height/2)), 0);
+					painter.matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
+					painter.matrix.prependScale(_scaleX, _scaleY, 1);
+				}
 				
 				if(componentType != NONE && displayComponent.getRenderingResource() != null)
 				{
@@ -331,6 +332,8 @@ package trolling.object
 					triangleTemp.calculVertex();
 					
 					painter.pushState();
+					if(_pivot == PivotType.TOP_LEFT)
+						painter.matrix.prependTranslation((rect.x+(rect.width/2)), -(rect.y+(rect.height/2)), 0);
 					painter.setDrawData(triangleTemp);
 					painter.draw();
 					painter.popState();
@@ -497,8 +500,14 @@ package trolling.object
 			var matrix:Matrix3D = getGlobalMatrix();
 			var globalPoint:Point = new Point();
 			
-			globalPoint.x = matrix.position.x - (_width*getScaleXToGlobal()/2);
-			globalPoint.y = matrix.position.y - (_height*getScaleYToGlobal()/2);
+			globalPoint.x = matrix.position.x;
+			globalPoint.y = matrix.position.y;
+			
+			if(_pivot == PivotType.CENTER)
+			{
+				globalPoint.x -= ((_width*getScaleXToGlobal())/2);
+				globalPoint.y -= ((_height*getScaleYToGlobal())/2);
+			}
 			
 			return globalPoint;
 		}
@@ -517,18 +526,32 @@ package trolling.object
 		{
 			var drawRect:Rectangle = getRectangle();
 			
-			if(_pivot == PivotType.CENTER)
-			{
-				drawRect.x -= (drawRect.width/2);
-				drawRect.y -= (drawRect.height/2);
-			}
+			//			if(_pivot == PivotType.CENTER)
+			//			{
+			//				drawRect.x -= (drawRect.width/2);
+			//				drawRect.y -= (drawRect.height/2);
+			//			}
 			
 			if(_parent != Trolling.current.currentScene)
 				matrix = _parent.getMatrix(matrix);
+			//			trace(matrix.position);
 			
-			matrix.prependTranslation((drawRect.x+(drawRect.width/2)), (drawRect.y+(drawRect.height/2)), 0);
-			matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
-			matrix.prependScale(_scaleX, _scaleY, 1);
+			//			if(_pivot == PivotType.TOP_LEFT)
+			{
+				matrix.prependTranslation((drawRect.x), (drawRect.y), 0);
+				matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
+				matrix.prependScale(_scaleX, _scaleY, 1);
+			}
+			//			else
+			//			{
+			//				matrix.prependTranslation((drawRect.x-(drawRect.width/2)), (drawRect.y-(drawRect.height/2)), 0);
+			//				matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
+			//				matrix.prependScale(_scaleX, _scaleY, 1);
+			//			}
+			
+			//			matrix.prependTranslation((drawRect.x+(drawRect.width/2)), (drawRect.y+(drawRect.height/2)), 0);
+			//			matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
+			//			matrix.prependScale(_scaleX, _scaleY, 1);
 			
 			return matrix;
 		}
@@ -573,9 +596,15 @@ package trolling.object
 			{
 				var childBound:Rectangle = _children[i].getBound();
 				if(childBound.topLeft.x < bound.topLeft.x)
+				{
+					bound.width += (bound.x - childBound.x);
 					bound.x = childBound.x;
+				}
 				if(childBound.topLeft.y < bound.topLeft.y)
+				{
+					bound.height += (bound.y - childBound.y);
 					bound.y = childBound.y;
+				}
 				if(childBound.bottomRight.x > bound.bottomRight.x)
 					bound.width += (childBound.bottomRight.x-bound.bottomRight.x);
 				if(childBound.bottomRight.y > bound.bottomRight.y)
