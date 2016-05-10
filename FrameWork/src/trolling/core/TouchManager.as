@@ -6,7 +6,7 @@ package trolling.core
 	
 	internal class TouchManager
 	{
-		private const MAX_POINT_LENGT:uint = 10;
+		private const MAX_POINT_LENGT:uint = 20;
 		
 		private var _hoverFlag:Boolean;
 		private var _hoverTarget:GameObject = null;
@@ -33,7 +33,8 @@ package trolling.core
 		
 		public function get points():Vector.<Point>
 		{
-			return _points;
+			return TouchManager.copyPoints(_points);
+//			return _points;
 		}
 		
 		public function get hoverTarget():GameObject
@@ -54,6 +55,14 @@ package trolling.core
 		public function set hoverFlag(value:Boolean):void
 		{
 			_hoverFlag = value;
+		}
+		
+		public static function copyPoints(source:Vector.<Point>):Vector.<Point>
+		{
+			var result:Vector.<Point> = new Vector.<Point>();
+			for(var i:int = 0; i < source.length; i++)
+				result.push(source[i].clone());
+			return result;
 		}
 	}
 }
