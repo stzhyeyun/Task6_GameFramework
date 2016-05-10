@@ -13,14 +13,14 @@ package trolling.media
 		
 		private static const TAG:String = "[SoundManager]";
 		private static const MAX_CHANNEL:int = 32; 
-
+		
 		private static var _sounds:Dictionary; // key: String(Name), value: Sound
 		private static var _channels:Vector.<SoundChannel>; // 동시에 32개까지 사용 가능
 		private static var _bgm:Sound;
 		
 		public function SoundManager()
 		{
-
+			
 		}
 		
 		public static function dispose():void
@@ -34,7 +34,7 @@ package trolling.media
 					var sound:Sound = _sounds[key];
 					
 					if (sound.bytesLoaded < sound.bytesTotal)
-					sound.dispose();
+						sound.dispose();
 					sound = null;
 				}
 			}
@@ -54,7 +54,7 @@ package trolling.media
 				trace(TAG + " addSound : No sound.");
 				return;
 			}
-		
+			
 			if (_sounds && _sounds[name])
 			{
 				trace(TAG + " addSound : Registered name.");
@@ -217,22 +217,65 @@ package trolling.media
 		{
 			SoundMixer.stopAll();
 			
+			var index:int = -1;
+			if (_bgm)
+			{
+				index = _bgm.channelIndex;
+			}
+			
 			if (_channels)
 			{
 				for (var i:int = 0; i < _channels.length; i++)
 				{
+					// BGM 중단 위치 저장
+					if (i == index)
+					{
+						_bgm.startTime = _channels[i].position;
+					}
 					_channels[i] = null;
 				}
 			}
 			_channels = null;
-			
-			if (_bgm)
-			{
-				_bgm.dispose();
-			}
-			_bgm = null;
 		}
-				
+		
+		public static function wakeBgm():void
+		{
+			if (!_bgm)
+			{
+				trace(TAG + " wakeBgm : No BGM.");
+				return;
+			}
+			
+			var channel:SoundChannel =
+				_bgm.play(_bgm.startTime, 0, new SoundTransform(_bgm.volume, _bgm.panning));
+			
+			// Channel 저장			
+			if (!_channels)
+			{
+				_channels = new Vector.<SoundChannel>();
+			}
+			
+			var pushed:Boolean = false;
+			for (var i:int = 0; i < _channels.length; i++)
+			{
+				if (_channels[i] == null)
+				{
+					_channels[i] = channel;
+					pushed = true;
+					break;
+				}
+			}
+			
+			if (!pushed)
+			{
+				_channels.push(channel);
+			}
+			_bgm.channelIndex = _channels.length - 1;
+			
+			// addEventListener
+			channel.addEventListener(Event.SOUND_COMPLETE, onEndBgm);
+		}
+		
 		/**
 		 * 현재 재생 중인 Sound의 Volume을 제어합니다. 
 		 * @param target SoundManager.ALL: 현재 재생 중인 전체 Sound / SoundManager:SELECT: 현재 재생 중인 Sound 중 지정한 Sound
@@ -268,8 +311,8 @@ package trolling.media
 						return;
 					}
 					
-					var channel:SoundChannel = _channels[name];
-					channel.soundTransform.volume = volume;
+					var selectedChannel:SoundChannel = _channels[name];
+					selectedChannel.soundTransform.volume = volume;
 				}
 					break;
 			}
@@ -310,8 +353,8 @@ package trolling.media
 						return;
 					}
 					
-					var channel:SoundChannel = _channels[name];
-					channel.soundTransform.pan = pan;
+					var selectedChannel:SoundChannel = _channels[name];
+					selectedChannel.soundTransform.pan = pan;
 				}
 					break;
 			}
@@ -351,6 +394,7 @@ package trolling.media
 			{
 				channel.removeEventListener(Event.SOUND_COMPLETE, onEndBgm);
 				
+				_bgm.startTime = 0;
 				channel = _bgm.play(_bgm.startTime, 0, channel.soundTransform);
 				channel.addEventListener(Event.SOUND_COMPLETE, onEndBgm);
 			}

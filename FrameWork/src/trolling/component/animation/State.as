@@ -29,7 +29,7 @@ package trolling.component.animation
 			_currentIndex = -1;
 			_interval = 0;
 			_frameCounter = 0;
-			_isLoop = false;
+			_isLoop = true;
 			_nextState = null;
 			_isPlaying = false;
 			_isFrozen = false;

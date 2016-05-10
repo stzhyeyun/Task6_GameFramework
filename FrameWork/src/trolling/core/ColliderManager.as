@@ -76,14 +76,47 @@ package trolling.core
 			
 			while (index < detectionObjects.length - 1)
 			{
-				for (var i:int = index + 1; i < detectionObjects.length; i++)
+				for (var j:int = index + 1; j < detectionObjects.length; j++)
 				{
-					if (detectionObjects[index].isCollision(detectionObjects[i]))
+					var isTarget:Boolean = true;
+					var ignoreTagsA:Vector.<String> = detectionObjects[index].ignoreTags;
+					var ignoreTagsB:Vector.<String> = detectionObjects[j].ignoreTags;
+					
+					if (ignoreTagsA)
+					{
+						for (var k:int = 0; k < ignoreTagsA.length; k++)
+						{
+							if (ignoreTagsA[k] == detectionObjects[j].parent.tag)
+							{
+								isTarget = false;
+								break;
+							}
+						}
+					}
+					
+					if (isTarget && ignoreTagsB)
+					{
+						for (k = 0; k < ignoreTagsB.length; k++)
+						{
+							if (ignoreTagsB[k] == detectionObjects[index].parent.tag)
+							{
+								isTarget = false;
+								break;
+							}
+						}
+					}
+					
+					if (!isTarget)
+					{
+						continue;
+					}
+					
+					if (detectionObjects[index].isCollision(detectionObjects[j]))
 					{
 						// Dispatch event
 						detectionObjects[index].parent.dispatchEvent(
-							new TrollingEvent(TrollingEvent.COLLIDE, detectionObjects[i].parent));
-						detectionObjects[i].parent.dispatchEvent(
+							new TrollingEvent(TrollingEvent.COLLIDE, detectionObjects[j].parent));
+						detectionObjects[j].parent.dispatchEvent(
 							new TrollingEvent(TrollingEvent.COLLIDE, detectionObjects[index].parent));
 						
 						// Store collided objects' indices for deletion from detectionObjects
@@ -91,20 +124,20 @@ package trolling.core
 						{
 							collidedIndices = new Vector.<int>();
 						}
-						collidedIndices.push(i);
+						collidedIndices.push(j);
 					}
 				}
 				
 				// Remove collided objects from detectionObjects
 				if (collidedIndices)
 				{
-					for (var j:int = collidedIndices.length - 1; j >= 0; j--)
+					for (var l:int = collidedIndices.length - 1; l >= 0; l--)
 					{
-						detectionObjects.removeAt(collidedIndices[j]);
+						detectionObjects.removeAt(collidedIndices[l]);
 					}
 				}
 				collidedIndices = null;
-
+				
 				index++;
 			}
 			
@@ -113,3 +146,4 @@ package trolling.core
 		}
 	}
 }
+

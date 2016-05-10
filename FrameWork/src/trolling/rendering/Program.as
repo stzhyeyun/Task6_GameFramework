@@ -31,7 +31,8 @@ package trolling.rendering
 			
 			_fragmentShaderAssembler = new AGALMiniAssembler();
 			_fragmentShaderAssembler.assemble( Context3DProgramType.FRAGMENT,
-				"tex oc, v0, fs0 <2d,linear,mipnone,clamp>"
+				"tex ft1, v0, fs0 <2d,linear,mipnone,clamp>\n" + 
+				"mul oc, ft1, fc0"
 			);
 		}
 		

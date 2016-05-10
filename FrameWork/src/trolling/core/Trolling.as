@@ -1,6 +1,5 @@
 package trolling.core
 {
-	import flash.display.Sprite;
 	import flash.display.Stage3D;
 	import flash.display3D.Context3D;
 	import flash.events.Event;
@@ -9,15 +8,20 @@ package trolling.core
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.ui.Mouse;
+	import flash.ui.Multitouch;
+	import flash.ui.MultitouchInputMode;
 	import flash.utils.Dictionary;
+	import flash.utils.getTimer;
 	
 	import trolling.event.TouchPhase;
 	import trolling.event.TrollingEvent;
+	import trolling.media.SoundManager;
 	import trolling.object.GameObject;
 	import trolling.object.Scene;
 	import trolling.object.Stage;
 	import trolling.rendering.Painter;
 	import trolling.utils.Color;
+	import flash.errors.IllegalOperationError;
 	
 	public class Trolling
 	{        
@@ -39,14 +43,14 @@ package trolling.core
 		private var _painter:Painter;
 		
 		private var _nativeStage:flash.display.Stage;
-		private var _nativeOverlay:Sprite;
 		
 		private var _context:Context3D = null;
 		
+		private var _vfr:uint;
 		
 		//Management
 		private var _colliderManager:ColliderManager = new ColliderManager();
-		private var _touchManager:TouchManager = new TouchManager();
+		private var _touchs:Dictionary = new Dictionary();
 		//
 		
 		public function Trolling(stage:flash.display.Stage, stage3D:Stage3D = null)
@@ -59,52 +63,48 @@ package trolling.core
 			trace(stage.width, stage.height);
 			_viewPort = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
 			
-			_nativeOverlay = new Sprite();
-			
 			_stage = new Stage(_viewPort.width, _viewPort.height, stage.color);
 			trace("stage init");
 			_nativeStage = stage;
-			_nativeStage.addChild(_nativeOverlay);
 			trace("addNativeOverlay");
 			
 			_painter = createPainter(stage3D);
 			_painter.initPainter(onInitPainter);
 			
-			stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+			stage.addEventListener(Event.ACTIVATE, onActivate);
+			stage.addEventListener(Event.DEACTIVATE, onDeactivate);
 			trace("successed Creater");
 			
-			stage.addEventListener(TouchEvent.TOUCH_BEGIN, onTouch); 
-			stage.addEventListener(TouchEvent.TOUCH_MOVE, onTouch); 
+			stage.addEventListener(TouchEvent.TOUCH_BEGIN, onTouch);
+			stage.addEventListener(TouchEvent.TOUCH_MOVE, onTouch);
 			stage.addEventListener(TouchEvent.TOUCH_END, onTouch);
 			stage.addEventListener(MouseEvent.MOUSE_DOWN, onTouch);
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, onTouch);
 			stage.addEventListener(MouseEvent.MOUSE_UP, onTouch);
 			stage.addEventListener(TouchEvent.TOUCH_OVER, onTouch);
+			calculVFR(stage);
+			
+//			trace("_vfr = " + _vfr);
 		}
 		
-		public function get colliderManager():ColliderManager
+		private function calculVFR(stage:flash.display.Stage):void
 		{
-			return _colliderManager;
-		}
-		
-		public function set currentScene(value:Scene):void
-		{
-			_currentScene = value;
-		}
-		
-		public function get createQueue():Array
-		{
-			return _createQueue;
-		}
-		
-		public function set createQueue(value:Array):void
-		{
-			_createQueue = value;
-		}
-		
-		public function get currentScene():Scene
-		{
-			return _currentScene;
+			_vfr = 0;
+			
+			stage.addEventListener(Event.ENTER_FRAME, onEnteredFrame);
+			var time:Number = getTimer() / 1000.0;
+			
+			function onEnteredFrame():void
+			{
+				_vfr++;
+				
+				var timeTemp:Number = getTimer() / 1000.0;
+				if((timeTemp - time) >= 1.0)
+				{
+					stage.removeEventListener(Event.ENTER_FRAME, onEnteredFrame);
+					trace("_vfr = " + _vfr);
+				}
+			}
 		}
 		
 		private function onTouch(event:Event):void
@@ -154,7 +154,7 @@ package trolling.core
 				}
 			}
 			
-			switch (event.type) 
+			switch (event.type)
 			{
 				case TouchEvent.TOUCH_BEGIN: phase = TouchPhase.BEGAN; break;
 				case TouchEvent.TOUCH_MOVE:  phase = TouchPhase.MOVED; break;
@@ -168,35 +168,77 @@ package trolling.core
 			// move position into viewport bounds
 			globalX = _stage.stageWidth  * (globalX - _viewPort.x) / _viewPort.width;
 			globalY = _stage.stageHeight * (globalY - _viewPort.y) / _viewPort.height;
+			
 			var point:Point = new Point(globalX, globalY);
 			var hit:GameObject;
 			
 			if(phase == TouchPhase.BEGAN)
 			{
-				_touchManager.initPoints();
-				_touchManager.pushPoint(point);
+				if(!_touchs[touchID])
+				{
+					var touchManager:TouchManager = new TouchManager();
+					_touchs[touchID] = touchManager;
+				}
+				_touchs[touchID].pushPoint(point);
 				hit = _currentScene.findClickedGameObject(point);
 				if(hit != null)
-					hit.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_BEGAN, _touchManager.points));
-				_touchManager.hoverFlag = true;
-				_touchManager.hoverTarget = hit;
+					hit.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_BEGAN, _touchs[touchID].points));
+				_touchs[touchID].hoverFlag = true;
+				_touchs[touchID].hoverTarget = hit;
 			}
 			else if(phase == TouchPhase.MOVED)
 			{
-				_touchManager.pushPoint(point);
+				if(!_touchs[touchID])
+				{
+					touchManager = new TouchManager();
+					_touchs[touchID] = touchManager;
+				}
+				_touchs[touchID].pushPoint(point);
 				hit = _currentScene.findClickedGameObject(point);
 				if(hit != null)
-					hit.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_MOVED, _touchManager.points));
-				if(hit != _touchManager.hoverTarget)
-					_touchManager.hoverTarget = hit;
+					hit.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_MOVED, _touchs[touchID].points));
+				if(hit != _touchs[touchID].hoverTarget)
+					_touchs[touchID].hoverTarget = hit;
 			}
 			else if(phase == TouchPhase.ENDED)
 			{
+				if(!_touchs[touchID])
+				{
+					touchManager = new TouchManager();
+					_touchs[touchID] = touchManager;
+				}
 				hit = _currentScene.findClickedGameObject(point);
 				if(hit != null)
-					hit.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_ENDED, _touchManager.points));
-				_touchManager.hoverFlag = false;
+					hit.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_ENDED, _touchs[touchID].points));
+				_touchs[touchID].hoverFlag = false;
+//				_touchs[touchID] = null;
+				delete _touchs[touchID];
 			}
+		}
+		
+		public function get colliderManager():ColliderManager
+		{
+			return _colliderManager;
+		}
+		
+		public function set currentScene(value:Scene):void
+		{
+			_currentScene = value;
+		}
+		
+		public function get createQueue():Array
+		{
+			return _createQueue;
+		}
+		
+		public function set createQueue(value:Array):void
+		{
+			_createQueue = value;
+		}
+		
+		public function get currentScene():Scene
+		{
+			return _currentScene;
 		}
 		
 		public function get painter():Painter
@@ -256,6 +298,7 @@ package trolling.core
 			_initRender = true;
 			trace("initRoot");
 			trace(_currentScene.key);
+			_nativeStage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
 		}
 		
 		private function createSceneFromQueue():void
@@ -295,10 +338,15 @@ package trolling.core
 		
 		private function onEnterFrame(event:Event):void
 		{
-			if(!_started || !_initRender || !_currentScene)
+			if(!_started || !_painter.context)
 				return;
-			if(_touchManager.hoverFlag)
-				_touchManager.hoverTarget.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_HOVER, _touchManager.points));
+			for(var key:String in _touchs)
+			{
+				if(_touchs[key].hoverFlag)
+				{
+					_touchs[key].hoverTarget.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_HOVER, _touchs[key].points));
+				}
+			}
 			nextFrame();
 			_colliderManager.detectCollision();
 			Disposer.disposeObjects();
@@ -306,14 +354,39 @@ package trolling.core
 		}
 		
 		private function render():void
-		{
-			if(_painter.context == null)
-				return;
-			
+		{			
 			_painter.context.setRenderToBackBuffer();
 			_painter.context.clear(Color.getRed(_stage.color)/255.0, Color.getGreen(_stage.color)/255.0, Color.getBlue(_stage.color)/255.0);
 			_currentScene.render(_painter);
 			_painter.present();
+		}
+		
+		private function onActivate(event:Event):void
+		{
+			trace("온엑");
+			_nativeStage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+			SoundManager.wakeBgm();
+		}
+		
+		private function onDeactivate(event:Event):void
+		{
+			trace("디엑");
+			_nativeStage.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
+			SoundManager.stopAll();
+		}
+		
+		public static function get multitouchEnabled():Boolean 
+		{ 
+			return Multitouch.inputMode == MultitouchInputMode.TOUCH_POINT;
+		}
+		
+		public static function set multitouchEnabled(value:Boolean):void
+		{
+			if (_current) throw new IllegalOperationError(
+				"'multitouchEnabled' must be set before Trolling instance is created");
+			else 
+				Multitouch.inputMode = value ? MultitouchInputMode.TOUCH_POINT :
+												MultitouchInputMode.NONE;
 		}
 	}
 }

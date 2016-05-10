@@ -4,7 +4,6 @@ package trolling.object
 	import flash.display.Shape;
 	import flash.display3D.Context3DTextureFormat;
 	import flash.display3D.textures.Texture;
-	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.geom.Matrix3D;
 	import flash.geom.Point;
@@ -33,6 +32,8 @@ package trolling.object
 		private const TAG:String = "[GameObject]";
 		private const NONE:String = "none";
 		
+		private var _tag:String;
+		
 		private var _parent:GameObject = null;
 		private var _depth:Number;
 		
@@ -48,6 +49,11 @@ package trolling.object
 		private var _scaleY:Number;
 		private var _rotate:Number;
 		private var _name:String;
+		private var _alpha:Number;
+		
+		private var _red:Number;
+		private var _green:Number;
+		private var _blue:Number;
 		
 		private var _visable:Boolean;
 		private var _colliderRender:Boolean;
@@ -55,13 +61,14 @@ package trolling.object
 		public function GameObject()
 		{
 			this.addEventListener(TrollingEvent.ENTER_FRAME, onThrowEvent);
-			this.addEventListener(TrollingEvent.END, onThrowEvent);
-			this.addEventListener(TrollingEvent.START, onThrowEvent);
+			this.addEventListener(TrollingEvent.END_SCENE, onThrowEvent);
+			this.addEventListener(TrollingEvent.START_SCENE, onThrowEvent);
 			_x = _y = _width = _height = _rotate = 0.0;
 			_pivot = PivotType.TOP_LEFT;
-			_scaleX = _scaleY = 1;
+			_scaleX = _scaleY = _alpha = _red = _green = _blue = 1;
 			_components = new Dictionary();
 			_visable = true;
+			_tag = null;
 		}
 		
 		/**
@@ -108,11 +115,10 @@ package trolling.object
 		 */		
 		public function removeComponent(componentType:String):void
 		{
-			trace(componentType);
 			if(_components[componentType] == null)
 				return;
 			_components[componentType].parent = null;
-			_components[componentType] = null 
+			_components[componentType] = null;
 			delete _components[componentType];
 		}
 		
@@ -148,6 +154,25 @@ package trolling.object
 				child.parent.removeChild(child);
 			_children.insertAt(index, child);
 			child.parent = this;
+		}
+		
+		public function getChild(index:int):GameObject
+		{
+			if (!_children)
+			{
+				trace(TAG + " getChild : No children."); 
+				return null;
+			}
+			
+			if (index >= 0 && index < _children.length)
+			{
+				return _children[index];
+			}
+			else
+			{
+				trace(TAG + " getChild : Invalid index.");
+				return null;
+			}
 		}
 		
 		/**
@@ -208,8 +233,8 @@ package trolling.object
 		public function dispose():void
 		{
 			this.removeEventListener(TrollingEvent.ENTER_FRAME, onThrowEvent);
-			this.removeEventListener(TrollingEvent.END, onThrowEvent);
-			this.removeEventListener(TrollingEvent.START, onThrowEvent);
+			this.removeEventListener(TrollingEvent.END_SCENE, onThrowEvent);
+			this.removeEventListener(TrollingEvent.START_SCENE, onThrowEvent);
 			
 			Disposer.requestDisposal(this);
 			if(_children)
@@ -235,7 +260,10 @@ package trolling.object
 			
 			painter.pushState();
 			if(this == Trolling.current.currentScene)
+			{
 				painter.matrix.appendTranslation(-1, 1, 0);
+				painter.matrix.prependScale(_scaleX, _scaleY, 1);
+			}
 			else
 			{	
 				var displayComponent:DisplayComponent = DisplayComponent(_components[componentType]);
@@ -251,6 +279,11 @@ package trolling.object
 				
 				drawRect.width = drawRect.width*2 / painter.viewPort.width;
 				drawRect.height = drawRect.height*2 / painter.viewPort.height;
+				
+				painter.alpha *= _alpha;
+				painter.red = _red;
+				painter.green = _green;
+				painter.blue = _blue;
 				
 				if(_pivot == PivotType.CENTER)
 				{
@@ -317,7 +350,7 @@ package trolling.object
 					rect.x = (drawRect.width/2)-(rect.width/2);
 					rect.y = (drawRect.height/2)-(rect.height/2);
 					
-					var bitmapData:BitmapData = new BitmapData(32, 32, false, Color.FUCHSIA);
+					var bitmapData:BitmapData = new BitmapData(32, 32, false, Color.RED);
 					var textureTemp:flash.display3D.textures.Texture = painter.context.createTexture(32, 32, Context3DTextureFormat.BGRA, false);
 					textureTemp.uploadFromBitmapData(bitmapData);
 					
@@ -385,8 +418,8 @@ package trolling.object
 				// Image와 Animator 둘 다 있음
 			else if (_components[ComponentType.IMAGE] && _components[ComponentType.ANIMATOR])
 			{
-				var image:Component = _components[ComponentType.IMAGE];
-				var animator:Component = _components[ComponentType.ANIMATOR];
+				image = _components[ComponentType.IMAGE];
+				animator = _components[ComponentType.ANIMATOR];
 				
 				if (image.isActive && !animator.isActive)
 				{
@@ -469,10 +502,21 @@ package trolling.object
 			
 			if(_children)
 			{
-//				trace(event.type);
 				for(var i:int = 0; i < _children.length; i++)
 					_children[i].dispatchEvent(new TrollingEvent(event.type));
 			}
+			
+			//			for(var key:String in _components)
+			//			{
+			//				if(_components[key] != null)
+			//					Component(_components[key]).dispatchEvent(event);
+			//			}
+			//			
+			//			if(_children)
+			//			{
+			//				for(var i:int = 0; i < _children.length; i++)
+			//					_children[i].dispatchEvent(event);
+			//			}
 		}
 		
 		/**
@@ -482,12 +526,9 @@ package trolling.object
 		 */		
 		private function setBound(compare:Rectangle):void
 		{
-			var nativeBound:Rectangle = getRectangle();
-			nativeBound.width *= _scaleX;
-			nativeBound.height *= _scaleY;
-			if(nativeBound.width < (compare.x+compare.width))
+			if(_width == 0)
 				_width = compare.x+compare.width;
-			if(nativeBound.height < (compare.y+compare.height))
+			if(_height == 0)
 				_height = compare.y+compare.height;
 		}
 		
@@ -527,32 +568,12 @@ package trolling.object
 		{
 			var drawRect:Rectangle = getRectangle();
 			
-			//			if(_pivot == PivotType.CENTER)
-			//			{
-			//				drawRect.x -= (drawRect.width/2);
-			//				drawRect.y -= (drawRect.height/2);
-			//			}
-			
 			if(_parent != null)
 				matrix = _parent.getMatrix(matrix);
-			//			trace(matrix.position);
 			
-			//			if(_pivot == PivotType.TOP_LEFT)
-			{
-				matrix.prependTranslation((drawRect.x), (drawRect.y), 0);
-				matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
-				matrix.prependScale(_scaleX, _scaleY, 1);
-			}
-			//			else
-			//			{
-			//				matrix.prependTranslation((drawRect.x-(drawRect.width/2)), (drawRect.y-(drawRect.height/2)), 0);
-			//				matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
-			//				matrix.prependScale(_scaleX, _scaleY, 1);
-			//			}
-			
-			//			matrix.prependTranslation((drawRect.x+(drawRect.width/2)), (drawRect.y+(drawRect.height/2)), 0);
-			//			matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
-			//			matrix.prependScale(_scaleX, _scaleY, 1);
+			matrix.prependTranslation((drawRect.x), (drawRect.y), 0);
+			matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
+			matrix.prependScale(_scaleX, _scaleY, 1);
 			
 			return matrix;
 		}
@@ -767,5 +788,57 @@ package trolling.object
 		{
 			_name = value;
 		}
+		
+		public function get alpha():Number
+		{
+			return _alpha;
+		}
+		
+		public function set alpha(value:Number):void
+		{
+			_alpha = value;
+		}
+		
+		public function get blue():Number
+		{
+			return _blue;
+		}
+		
+		public function set blue(value:Number):void
+		{
+			_blue = value;
+		}
+		
+		public function get green():Number
+		{
+			return _green;
+		}
+		
+		public function set green(value:Number):void
+		{
+			_green = value;
+		}
+		
+		public function get red():Number
+		{
+			return _red;
+		}
+		
+		public function set red(value:Number):void
+		{
+			_red = value;
+		}
+		
+		public function get tag():String
+		{
+			return _tag;
+		}
+		
+		public function set tag(value:String):void
+		{
+			_tag = value;
+		}
+		
 	}
 }
+

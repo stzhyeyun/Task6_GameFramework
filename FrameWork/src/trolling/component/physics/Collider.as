@@ -9,7 +9,7 @@ package trolling.component.physics
 	import trolling.event.TrollingEvent;
 	import trolling.object.GameObject;
 	import trolling.utils.Circle;
-
+	
 	public class Collider extends Component
 	{
 		public static const ID_NONE:int = 0;
@@ -23,6 +23,7 @@ package trolling.component.physics
 		private var _circle:Circle;
 		private var _ratioX:Number;
 		private var _ratioY:Number;
+		private var _ignoreTags:Vector.<String>;
 		
 		public function Collider()
 		{
@@ -35,10 +36,11 @@ package trolling.component.physics
 			_circle = null;
 			_ratioX = 0;
 			_ratioY = 0;
+			_ignoreTags = null;
 			
 			addEventListener(TrollingEvent.ENTER_FRAME, onNextFrame);
-			addEventListener(TrollingEvent.START, onStartScene);
-			addEventListener(TrollingEvent.END, onEndScene);
+			addEventListener(TrollingEvent.START_SCENE, onStartScene);
+			addEventListener(TrollingEvent.END_SCENE, onEndScene);
 		}
 		
 		public override function dispose():void
@@ -50,6 +52,15 @@ package trolling.component.physics
 			_circle = null;
 			_ratioX = 0;
 			_ratioY = 0;
+			
+			if (_ignoreTags)
+			{
+				for (var i:int = 0; i < _ignoreTags.length; i++)
+				{
+					_ignoreTags[i] = null;
+				}
+			}
+			_ignoreTags = null;
 			
 			Trolling.current.colliderManager.removeCollider(this);
 			
@@ -92,8 +103,8 @@ package trolling.component.physics
 				if (!_isActive)
 				{
 					addEventListener(TrollingEvent.ENTER_FRAME, onNextFrame);
-					addEventListener(TrollingEvent.START, onStartScene);
-					addEventListener(TrollingEvent.END, onEndScene);
+					addEventListener(TrollingEvent.START_SCENE, onStartScene);
+					addEventListener(TrollingEvent.END_SCENE, onEndScene);
 					
 					Trolling.current.colliderManager.addCollider(this);
 				}
@@ -103,8 +114,8 @@ package trolling.component.physics
 				if (_isActive)
 				{
 					removeEventListener(TrollingEvent.ENTER_FRAME, onNextFrame);
-					removeEventListener(TrollingEvent.START, onStartScene);
-					removeEventListener(TrollingEvent.END, onEndScene);
+					removeEventListener(TrollingEvent.START_SCENE, onStartScene);
+					removeEventListener(TrollingEvent.END_SCENE, onEndScene);
 					
 					Trolling.current.colliderManager.removeCollider(this);
 				}
@@ -150,7 +161,7 @@ package trolling.component.physics
 			{
 				return false;
 			}
-
+			
 			switch (_id)
 			{
 				case ID_RECT:
@@ -208,7 +219,39 @@ package trolling.component.physics
 			_circle = new Circle(new Point(0, 0), 0);
 			_ratioX = ratio;
 		}
-
+		
+		public function addignoreTag(tag:String):void
+		{
+			if (!tag)
+			{
+				return;
+			}
+			
+			if (!_ignoreTags)
+			{
+				_ignoreTags = new Vector.<String>();
+			}
+			_ignoreTags.push(tag);
+		}
+		
+		public function removeignoreTag(tag:String):void
+		{
+			if (!tag || !_ignoreTags)
+			{
+				return;
+			}
+			
+			for (var i:int = 0; i < _ignoreTags.length; i++)
+			{
+				if (_ignoreTags[i] == tag)
+				{
+					_ignoreTags[i] = null;
+					_ignoreTags.removeAt(i);
+					break;
+				}
+			}
+		}
+		
 		public function get id():int
 		{
 			return _id;
@@ -242,6 +285,16 @@ package trolling.component.physics
 		public function set ratioY(value:Number):void
 		{
 			_ratioY = value;
+		}
+		
+		public function get ignoreTags():Vector.<String>
+		{
+			return _ignoreTags;
+		}
+		
+		public function set ignoreTags(value:Vector.<String>):void
+		{
+			_ignoreTags = value;
 		}
 		
 		/**

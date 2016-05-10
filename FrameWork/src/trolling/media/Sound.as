@@ -2,7 +2,7 @@ package trolling.media
 {
 	import flash.media.SoundLoaderContext;
 	import flash.net.URLRequest;
-
+	
 	public class Sound extends flash.media.Sound
 	{
 		public static const INFINITE:int = -1;
@@ -24,7 +24,7 @@ package trolling.media
 			_loops = NO_LOOP;
 			_channelIndex = -1;
 		}
-
+		
 		public function dispose():void
 		{
 			_volume = 1;
@@ -43,7 +43,7 @@ package trolling.media
 		{
 			return _volume;
 		}
-
+		
 		/**
 		 * Sound의 음량으로 0부터 1 사이의 값입니다.
 		 * @param value

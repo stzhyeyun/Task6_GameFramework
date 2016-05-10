@@ -1,5 +1,6 @@
 package trolling.component.animation
 {
+	import flash.events.Event;
 	import flash.utils.Dictionary;
 	
 	import trolling.component.ComponentType;
@@ -22,8 +23,8 @@ package trolling.component.animation
 			_currentState = NONE;
 			
 			addEventListener(TrollingEvent.ENTER_FRAME, onNextFrame);
-			addEventListener(TrollingEvent.START, onStartScene);
-			addEventListener(TrollingEvent.END, onEndScene);
+			addEventListener(TrollingEvent.START_SCENE, onStartScene);
+			addEventListener(TrollingEvent.END_SCENE, onEndScene);
 		}
 				
 		public override function dispose():void
@@ -65,20 +66,20 @@ package trolling.component.animation
 					state.play();
 					
 					addEventListener(TrollingEvent.ENTER_FRAME, onNextFrame);
-					addEventListener(TrollingEvent.START, onStartScene);
-					addEventListener(TrollingEvent.END, onEndScene);
+					addEventListener(TrollingEvent.START_SCENE, onStartScene);
+					addEventListener(TrollingEvent.END_SCENE, onEndScene);
 				}
 			}
 			else
 			{
 				if (_isActive)
 				{
-					var state:State = _states[_currentState];
+					state = _states[_currentState];
 					state.stop();
 					
 					removeEventListener(TrollingEvent.ENTER_FRAME, onNextFrame);
-					removeEventListener(TrollingEvent.START, onStartScene);
-					removeEventListener(TrollingEvent.END, onEndScene);
+					removeEventListener(TrollingEvent.START_SCENE, onStartScene);
+					removeEventListener(TrollingEvent.END_SCENE, onEndScene);
 				}
 			}
 
@@ -120,6 +121,7 @@ package trolling.component.animation
 			{
 				var state:State = _states[_currentState];
 				state.dispatchEvent(new TrollingEvent(event.type));
+//				state.dispatchEvent(event);
 			}
 		}
 		

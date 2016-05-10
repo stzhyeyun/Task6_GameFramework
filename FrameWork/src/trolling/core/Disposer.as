@@ -38,6 +38,7 @@ package trolling.core
 					for(var componentType:String in gameObject.components)
 					{
 						var component:Component = gameObject.components[componentType];
+						gameObject.removeComponent(component.type);
 						component.dispose();
 					}
 					gameObject.removeFromParent();
