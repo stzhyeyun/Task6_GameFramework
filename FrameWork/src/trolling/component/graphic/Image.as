@@ -9,7 +9,6 @@ package trolling.component.graphic
 		private const TAG:String = "[Image]";
 		
 		private var _texture:Texture;
-		private var _name:String;
 		
 		public function Image(texture:Texture = null)
 		{
@@ -18,16 +17,6 @@ package trolling.component.graphic
 			_texture = texture;
 		}
 		
-		public function get name():String
-		{
-			return _name;
-		}
-
-		public function set name(value:String):void
-		{
-			_name = value;
-		}
-
 		public override function dispose():void
 		{
 			_texture = null;
@@ -44,7 +33,7 @@ package trolling.component.graphic
 		{
 			if (!_isActive)
 			{
-				trace(TAG + " getRenderingResource : Image is inactive now.");
+//				trace(TAG + " getRenderingResource : Image is inactive now.");
 				return null;
 			}
 			
@@ -54,7 +43,7 @@ package trolling.component.graphic
 			}
 			else
 			{
-				trace(TAG + " getRenderingResource : No texture.");
+//				trace(TAG + " getRenderingResource : No texture.");
 				return null;
 			}
 		}
