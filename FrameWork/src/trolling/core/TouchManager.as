@@ -61,7 +61,10 @@ package trolling.core
 		{
 			var result:Vector.<Point> = new Vector.<Point>();
 			for(var i:int = 0; i < source.length; i++)
-				result.push(source[i].clone());
+			{
+				var point:Point = source[i].clone();
+				result.push(point);
+			}
 			return result;
 		}
 	}

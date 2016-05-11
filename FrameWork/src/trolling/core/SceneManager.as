@@ -65,15 +65,15 @@ package trolling.core
 				_sceneDic = new Dictionary();
 				Trolling.current.currentScene = scene;
 				_sceneDic[key] = scene;
-				scene.width = Trolling.current.stage.stageWidth;
-				scene.height = Trolling.current.stage.stageHeight;
+				scene.width = Trolling.current.viewPort.width;
+				scene.height = Trolling.current.viewPort.height;
 				scene.dispatchEvent(new TrollingEvent(TrollingEvent.START_SCENE));
 			}
 			else
 			{
 				_sceneDic[key] = scene;
-				scene.width = Trolling.current.stage.stageWidth;
-				scene.height = Trolling.current.stage.stageHeight;
+				scene.width = Trolling.current.viewPort.width;
+				scene.height = Trolling.current.viewPort.height;
 			}
 		}
 		

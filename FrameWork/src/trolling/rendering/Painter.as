@@ -13,6 +13,8 @@ package trolling.rendering
 	import flash.geom.Rectangle;
 	import flash.geom.Vector3D;
 	
+	import trolling.core.Trolling;
+	
 	public class Painter
 	{	
 		private static const X_AXIS:Vector3D = Vector3D.X_AXIS;
@@ -94,12 +96,12 @@ package trolling.rendering
 			//_context.set
 		}
 		
-		public function configureBackBuffer(viewPort:Rectangle, antiAlias:Boolean = true):void
+		public function configureBackBuffer(stageRectangle:Rectangle, antiAlias:Boolean = true):void
 		{
-			_stage3D.x = viewPort.x;
-			_stage3D.y = viewPort.y;
+			_stage3D.x = stageRectangle.x;
+			_stage3D.y = stageRectangle.y;
 			
-			_viewPort = viewPort;
+			_viewPort = Trolling.current.viewPort;
 			
 			var alias:int;
 			if(antiAlias)
@@ -107,12 +109,12 @@ package trolling.rendering
 			else
 				alias = 0;
 			
-			trace(viewPort.width + ", " + viewPort.height);
-			_context.configureBackBuffer(viewPort.width, viewPort.height, alias, true);
+			trace(stageRectangle.width + ", " + stageRectangle.height);
+			_context.configureBackBuffer(stageRectangle.width, stageRectangle.height, alias, true);
 			//_context.setCulling(Context3DTriangleFace.BACK);
 			
-			_backBufferWidth = viewPort.width;
-			_backBufferHeight = viewPort.height;
+			_backBufferWidth = stageRectangle.width;
+			_backBufferHeight = stageRectangle.height;
 		}
 		
 		public function setDrawData(triangleData:TriangleData):void
@@ -122,7 +124,6 @@ package trolling.rendering
 			setUVVector(triangleData);
 			//_matrix.appendRotation(90, Z_AXIS);
 			//_matrix.appendTranslation(0, -0.5, 0);
-//			setMatrix();
 			_context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, _matrix, true);
 			_context.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, new <Number>[_red, _green, _blue, _alpha], 1);    // fc0
 		}
@@ -134,6 +135,7 @@ package trolling.rendering
 		
 		public function draw():void
 		{
+			Trolling.current.drawCall++;
 			_context.drawTriangles(_indexBuffer);
 		}
 		
@@ -159,11 +161,6 @@ package trolling.rendering
 			_context.setVertexBufferAt(0, _vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
 			_context.setVertexBufferAt(1, _vertexBuffer, 3, Context3DVertexBufferFormat.FLOAT_2);
 		}
-		
-//		private function setMatrix():void
-//		{
-//			_context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, _matrix, true);
-//		}
 		
 		private function setProgram():void
 		{
