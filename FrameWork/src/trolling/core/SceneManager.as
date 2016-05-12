@@ -4,6 +4,7 @@ package trolling.core
 	import flash.utils.Dictionary;
 	
 	import trolling.event.TrollingEvent;
+	import trolling.media.SoundManager;
 	import trolling.object.Scene;
 	import trolling.utils.Copy;
 	
@@ -29,6 +30,7 @@ package trolling.core
 			
 			if(Trolling.current.currentScene != null)
 			{
+				SoundManager.dispose();
 				Trolling.current.currentScene.visable = false;
 				_sceneVector.push(_sceneDic[Trolling.current.currentScene.key]);
 				Trolling.current.currentScene.dispatchEvent(new TrollingEvent(TrollingEvent.END_SCENE));
@@ -40,10 +42,10 @@ package trolling.core
 			Trolling.current.currentScene.dispatchEvent(new TrollingEvent(TrollingEvent.START_SCENE));
 		}
 		
-		public static function outScene():void
+		public static function outScene(data:Object = null):void
 		{
 			var scene:Scene = _sceneVector.pop();
-			switchScene(scene.key);
+			switchScene(scene.key, data);
 		}
 		
 		public static function addScene(sceneClass:Class, key:String):void
@@ -56,7 +58,7 @@ package trolling.core
 				addArray.push(sceneClass);
 				addArray.push(key);
 				Trolling.current.createQueue.push(addArray);
-				return;	
+				return;
 			}
 			var scene:Scene = new sceneClass() as Scene;
 			scene.key = key;
@@ -77,12 +79,22 @@ package trolling.core
 			}
 		}
 		
+		public static function deleteScene(key:String):void
+		{
+			if(_sceneDic == null || _sceneDic[key] == null)
+				return;
+			
+			_sceneDic[key] = null
+			delete _sceneDic[key];
+		}
+		
 		public static function switchScene(key:String, data:Object = null):void
 		{
 			if(_sceneDic == null || _sceneDic[key] == null)
 				return;
 			if(Trolling.current.currentScene != null)
 			{
+				SoundManager.dispose();
 				Trolling.current.currentScene.visable = false;
 				Trolling.current.currentScene.dispose();
 				Trolling.current.currentScene.dispatchEvent(new TrollingEvent(TrollingEvent.END_SCENE));

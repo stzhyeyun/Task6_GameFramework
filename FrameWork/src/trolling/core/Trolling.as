@@ -217,7 +217,7 @@ package trolling.core
 				if(hit != _touchs[touchID].hoverTarget)
 				{
 					if(_touchs[touchID].hoverTarget != null)
-						_touchs[touchID].hoverTarget.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_ENDED, _touchs[touchID].points));
+						_touchs[touchID].hoverTarget.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_OUT, _touchs[touchID].points));
 					_touchs[touchID].hoverTarget = hit;
 //					hit.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_BEGAN, _touchs[touchID].points));
 				}
