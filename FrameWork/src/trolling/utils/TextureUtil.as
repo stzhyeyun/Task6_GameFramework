@@ -30,7 +30,7 @@ package trolling.utils
 			
 			_nativeTexture = Trolling.current.context.createTexture(binaryWidth, binaryHeight, Context3DTextureFormat.BGRA, false);
 			
-			var bitmapData:BitmapData = new BitmapData(binaryWidth, binaryHeight, bitmap.transparent);
+			var bitmapData:BitmapData = new BitmapData(binaryWidth, binaryHeight, true, 0x0);
 			var rect:Rectangle = new Rectangle();
 			rect.width = bitmap.width;
 			rect.height = bitmap.height;
