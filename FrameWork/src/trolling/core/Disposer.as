@@ -5,46 +5,63 @@ package trolling.core
 	
 	public class Disposer
 	{	
-		private static var _deathNote:Vector.<GameObject>;
+		private static var _gameObjects:Vector.<GameObject>;
+		private static var _components:Vector.<Component>;
 		
 		public function Disposer()
 		{
 			
 		}
 		
-		public static function requestDisposal(target:GameObject):void
+		public static function requestDisposal(target:Object):void
 		{
 			if (!target)
 			{
 				return;
 			}
 			
-			if (!_deathNote)
+			if (target is GameObject)
 			{
-				_deathNote = new Vector.<GameObject>();
+				if (!_gameObjects)
+				{
+					_gameObjects = new Vector.<GameObject>();
+				}
+				_gameObjects.push(target);
 			}
-			_deathNote.push(target);
+			else if (target is Component)
+			{
+				if (!_components)
+				{
+					_components = new Vector.<Component>();
+				}
+				_components.push(target);
+			}
 		}
 		
 		public static function disposeObjects():void
 		{
-			if (_deathNote)
+			if (_gameObjects)
 			{
-				var gameObject:GameObject;
-				for (var i:int = 0; i < _deathNote.length; i++)
+				for (var i:int = 0; i < _gameObjects.length; i++)
 				{
-					gameObject = _deathNote[i];
-					
-					for(var componentType:String in gameObject.components)
-					{
-						var component:Component = gameObject.components[componentType];
-						gameObject.removeComponent(component.type);
-						component.dispose();
-					}
-					gameObject.removeFromParent();
+					_gameObjects[i].removeFromParent();
 				}
+				_gameObjects.splice(0, _gameObjects.length);
 			}
-			_deathNote = null;
+			_gameObjects = null;
+			
+			if (_components)
+			{
+				for (i = 0; i < _components.length; i++)
+				{
+					if (_components[i])
+					{
+						_components[i].parent = null;
+					}
+				}
+				_components.splice(0, _components.length);
+			}
+			_components = null;
 		}
 	}
 }

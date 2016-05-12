@@ -1,8 +1,8 @@
 package trolling.component
 {
-	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	
+	import trolling.core.Disposer;
 	import trolling.event.TrollingEvent;
 	import trolling.object.GameObject;
 	
@@ -21,8 +21,9 @@ package trolling.component
 		public function dispose():void
 		{
 			_type = null;
-			_parent = null;
 			_isActive = false;
+			
+			Disposer.requestDisposal(this);
 		}
 		
 		public function get type():String

@@ -117,8 +117,10 @@ package trolling.object
 		{
 			if(_components[componentType] == null)
 				return;
-			_components[componentType].parent = null;
-			_components[componentType] = null;
+			
+			var component:Component = _components[componentType];
+			component.dispose();
+			
 			delete _components[componentType];
 		}
 		
@@ -237,11 +239,21 @@ package trolling.object
 			this.removeEventListener(TrollingEvent.START_SCENE, onThrowEvent);
 			
 			Disposer.requestDisposal(this);
+			
 			if(_children)
 			{
 				for(var i:int = 0; i < _children.length; i++)
 				{
 					_children[i].dispose();
+				}
+			}
+			
+			if (_components)
+			{
+				for (var key:String in _components)
+				{
+					var component:Component = _components[key];
+					component.dispose();
 				}
 			}
 		}
