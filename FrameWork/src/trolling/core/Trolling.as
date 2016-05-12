@@ -4,6 +4,7 @@ package trolling.core
 	import flash.display3D.Context3D;
 	import flash.errors.IllegalOperationError;
 	import flash.events.Event;
+	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.events.TouchEvent;
 	import flash.geom.Point;
@@ -78,7 +79,6 @@ package trolling.core
 			stage.addEventListener(Event.DEACTIVATE, onDeactivate);
 			trace("successed Creater");
 			
-			
 			stage.addEventListener(TouchEvent.TOUCH_BEGIN, onTouch);
 			stage.addEventListener(TouchEvent.TOUCH_MOVE, onTouch);
 			stage.addEventListener(TouchEvent.TOUCH_END, onTouch);
@@ -90,11 +90,16 @@ package trolling.core
 				stage.addEventListener(MouseEvent.MOUSE_MOVE, onTouch);
 				stage.addEventListener(MouseEvent.MOUSE_UP, onTouch);
 			}
+			
+			//change
+//			stage.addEventListener(KeyboardEvent.KEY_DOWN, onKey, false, 0, true);
+//			stage.addEventListener(KeyboardEvent.KEY_UP, onKey, false, 0, true);
+//			stage.addEventListener(Event.RESIZE, onResize, false, 0, true);
 			calculVFR(stage);
 			
-			//			trace("_vfr = " + _vfr);
+//			trace("_vfr = " + _vfr);
 		}
-		
+
 		private function calculVFR(stage:flash.display.Stage):void
 		{
 			_vfr = 0;
@@ -174,16 +179,18 @@ package trolling.core
 			}
 			
 			// move position into viewport bounds
-			//			globalX = _stage.stageWidth  * (globalX - _viewPort.x) / _viewPort.width;
-			//			globalY = _stage.stageHeight * (globalY - _viewPort.y) / _viewPort.height;
+//			globalX = _stage.stageWidth  * (globalX - _viewPort.x) / _viewPort.width;
+//			globalY = _stage.stageHeight * (globalY - _viewPort.y) / _viewPort.height;
 			globalX = (globalX - _viewPort.x) * (_viewPort.width / _stage.stageWidth);
-			globalY = (globalY - _viewPort.y) * _viewPort.height / _stage.stageHeight;
+			globalY = (globalY - _viewPort.y) * (_viewPort.height / _stage.stageHeight);
+			
 			
 			var point:Point = new Point(globalX, globalY);
 			var hit:GameObject;
 			
 			if(phase == TouchPhase.BEGAN)
 			{
+				trace("began");
 				if(!_touchs[touchID])
 				{
 					var touchManager:TouchManager = new TouchManager();
@@ -212,7 +219,7 @@ package trolling.core
 					if(_touchs[touchID].hoverTarget != null)
 						_touchs[touchID].hoverTarget.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_OUT, _touchs[touchID].points));
 					_touchs[touchID].hoverTarget = hit;
-//                    hit.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_BEGAN, _touchs[touchID].points));
+//					hit.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_BEGAN, _touchs[touchID].points));
 				}
 			}
 			else if(phase == TouchPhase.ENDED)
@@ -226,7 +233,7 @@ package trolling.core
 				if(hit != null && _touchs[touchID].points.length != 0)
 					hit.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_ENDED, _touchs[touchID].points));
 				_touchs[touchID].hoverFlag = false;
-				//				_touchs[touchID] = null;
+//				_touchs[touchID] = null;
 				delete _touchs[touchID];
 			}
 		}
@@ -375,7 +382,7 @@ package trolling.core
 			_painter.context.clear(Color.getRed(_stage.color)/255.0, Color.getGreen(_stage.color)/255.0, Color.getBlue(_stage.color)/255.0);
 			_currentScene.render(_painter);
 			_painter.present();
-			//			trace(_drawCall);
+//			trace(_drawCall);
 		}
 		
 		private function onActivate(event:Event):void
@@ -412,7 +419,7 @@ package trolling.core
 			_viewPort = value;
 		}
 		
-		public static function get multitouchEnabled():Boolean 
+		public static function get multitouchEnabled():Boolean
 		{ 
 			return Multitouch.inputMode == MultitouchInputMode.TOUCH_POINT;
 		}
@@ -423,7 +430,7 @@ package trolling.core
 				"'multitouchEnabled' must be set before Trolling instance is created");
 			else 
 				Multitouch.inputMode = value ? MultitouchInputMode.TOUCH_POINT :
-					MultitouchInputMode.NONE;
+												MultitouchInputMode.NONE;
 		}
 	}
 }

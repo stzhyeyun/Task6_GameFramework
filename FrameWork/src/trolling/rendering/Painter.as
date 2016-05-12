@@ -124,7 +124,6 @@ package trolling.rendering
 			setUVVector(triangleData);
 			//_matrix.appendRotation(90, Z_AXIS);
 			//_matrix.appendTranslation(0, -0.5, 0);
-//			setMatrix();
 			_context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, _matrix, true);
 			_context.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, new <Number>[_red, _green, _blue, _alpha], 1);    // fc0
 		}
@@ -136,6 +135,7 @@ package trolling.rendering
 		
 		public function draw():void
 		{
+			Trolling.current.drawCall++;
 			_context.drawTriangles(_indexBuffer);
 		}
 		
@@ -161,11 +161,6 @@ package trolling.rendering
 			_context.setVertexBufferAt(0, _vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
 			_context.setVertexBufferAt(1, _vertexBuffer, 3, Context3DVertexBufferFormat.FLOAT_2);
 		}
-		
-//		private function setMatrix():void
-//		{
-//			_context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, _matrix, true);
-//		}
 		
 		private function setProgram():void
 		{

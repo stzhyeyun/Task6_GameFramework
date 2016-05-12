@@ -1,7 +1,7 @@
 package trolling.object
-{    
+{	
 	public class Stage
-	{    
+	{	
 		private var _width:Number;
 		private var _height:Number;
 		private var _color:uint;
