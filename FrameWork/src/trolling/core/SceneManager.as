@@ -29,13 +29,13 @@ package trolling.core
 			
 			if(Trolling.current.currentScene != null)
 			{
-				Trolling.current.currentScene.visable = false;
+				Trolling.current.currentScene.visible = false;
 				_sceneVector.push(_sceneDic[Trolling.current.currentScene.key]);
 				Trolling.current.currentScene.dispatchEvent(new TrollingEvent(TrollingEvent.END_SCENE));
 			}
 			
 			Trolling.current.currentScene = _sceneDic[key];
-			Trolling.current.currentScene.visable = true;
+			Trolling.current.currentScene.visible = true;
 			Trolling.current.currentScene.data = Copy.clone(data);
 			Trolling.current.currentScene.dispatchEvent(new TrollingEvent(TrollingEvent.START_SCENE));
 		}
@@ -56,7 +56,7 @@ package trolling.core
 				addArray.push(sceneClass);
 				addArray.push(key);
 				Trolling.current.createQueue.push(addArray);
-				return;	
+				return;    
 			}
 			var scene:Scene = new sceneClass() as Scene;
 			scene.key = key;
@@ -65,15 +65,15 @@ package trolling.core
 				_sceneDic = new Dictionary();
 				Trolling.current.currentScene = scene;
 				_sceneDic[key] = scene;
-				scene.width = Trolling.current.stage.stageWidth;
-				scene.height = Trolling.current.stage.stageHeight;
+				scene.width = Trolling.current.viewPort.width;
+				scene.height = Trolling.current.viewPort.height;
 				scene.dispatchEvent(new TrollingEvent(TrollingEvent.START_SCENE));
 			}
 			else
 			{
 				_sceneDic[key] = scene;
-				scene.width = Trolling.current.stage.stageWidth;
-				scene.height = Trolling.current.stage.stageHeight;
+				scene.width = Trolling.current.viewPort.width;
+				scene.height = Trolling.current.viewPort.height;
 			}
 		}
 		
@@ -83,12 +83,12 @@ package trolling.core
 				return;
 			if(Trolling.current.currentScene != null)
 			{
-				Trolling.current.currentScene.visable = false;
+				Trolling.current.currentScene.visible = false;
 				Trolling.current.currentScene.dispose();
 				Trolling.current.currentScene.dispatchEvent(new TrollingEvent(TrollingEvent.END_SCENE));
 			}
 			Trolling.current.currentScene = _sceneDic[key];
-			Trolling.current.currentScene.visable = true;
+			Trolling.current.currentScene.visible = true;
 			Trolling.current.currentScene.data = Copy.clone(data);
 			Trolling.current.currentScene.dispatchEvent(new TrollingEvent(TrollingEvent.START_SCENE));
 		}

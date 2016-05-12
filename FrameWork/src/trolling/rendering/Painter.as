@@ -13,6 +13,8 @@ package trolling.rendering
 	import flash.geom.Rectangle;
 	import flash.geom.Vector3D;
 	
+	import trolling.core.Trolling;
+	
 	public class Painter
 	{	
 		private static const X_AXIS:Vector3D = Vector3D.X_AXIS;
@@ -94,12 +96,12 @@ package trolling.rendering
 			//_context.set
 		}
 		
-		public function configureBackBuffer(viewPort:Rectangle, antiAlias:Boolean = true):void
+		public function configureBackBuffer(stageRectangle:Rectangle, antiAlias:Boolean = true):void
 		{
-			_stage3D.x = viewPort.x;
-			_stage3D.y = viewPort.y;
+			_stage3D.x = stageRectangle.x;
+			_stage3D.y = stageRectangle.y;
 			
-			_viewPort = viewPort;
+			_viewPort = Trolling.current.viewPort;
 			
 			var alias:int;
 			if(antiAlias)
@@ -107,12 +109,12 @@ package trolling.rendering
 			else
 				alias = 0;
 			
-			trace(viewPort.width + ", " + viewPort.height);
-			_context.configureBackBuffer(viewPort.width, viewPort.height, alias, true);
+			trace(stageRectangle.width + ", " + stageRectangle.height);
+			_context.configureBackBuffer(stageRectangle.width, stageRectangle.height, alias, true);
 			//_context.setCulling(Context3DTriangleFace.BACK);
 			
-			_backBufferWidth = viewPort.width;
-			_backBufferHeight = viewPort.height;
+			_backBufferWidth = stageRectangle.width;
+			_backBufferHeight = stageRectangle.height;
 		}
 		
 		public function setDrawData(triangleData:TriangleData):void

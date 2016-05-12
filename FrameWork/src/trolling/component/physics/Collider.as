@@ -220,7 +220,7 @@ package trolling.component.physics
 			_ratioX = ratio;
 		}
 		
-		public function addignoreTag(tag:String):void
+		public function addIgnoreTag(tag:String):void
 		{
 			if (!tag)
 			{
@@ -234,7 +234,7 @@ package trolling.component.physics
 			_ignoreTags.push(tag);
 		}
 		
-		public function removeignoreTag(tag:String):void
+		public function removeIgnoreTag(tag:String):void
 		{
 			if (!tag || !_ignoreTags)
 			{

@@ -373,10 +373,13 @@ package trolling.media
 			{
 				channel.removeEventListener(Event.SOUND_COMPLETE, onEnd);
 				
-				var index:int = _channels.indexOf(channel);
-				if (index != -1)
+				if (_channels)
 				{
-					_channels[index] = null;
+					var index:int = _channels.indexOf(channel);
+					if (index != -1)
+					{
+						_channels[index] = null;
+					}
 				}
 			}
 		}

@@ -55,7 +55,7 @@ package trolling.object
 		private var _green:Number;
 		private var _blue:Number;
 		
-		private var _visable:Boolean;
+		private var _visible:Boolean;
 		private var _colliderRender:Boolean;
 		
 		public function GameObject()
@@ -67,7 +67,7 @@ package trolling.object
 			_pivot = PivotType.TOP_LEFT;
 			_scaleX = _scaleY = _alpha = _red = _green = _blue = 1;
 			_components = new Dictionary();
-			_visable = true;
+			_visible = true;
 			_tag = null;
 		}
 		
@@ -253,7 +253,7 @@ package trolling.object
 		 */		
 		public function render(painter:Painter):void
 		{	
-			if(!_visable)
+			if(!_visible)
 				return;
 			var numChildren:int = _children.length;
 			var componentType:String = decideRenderingComponent();
@@ -504,7 +504,7 @@ package trolling.object
 			{
 				for(var i:int = 0; i < _children.length; i++)
 					_children[i].dispatchEvent(new TrollingEvent(event.type));
-			}
+			} 
 			
 			//			for(var key:String in _components)
 			//			{
@@ -671,14 +671,14 @@ package trolling.object
 			return _components;
 		}
 		
-		public function get visable():Boolean
+		public function get visible():Boolean
 		{
-			return _visable;
+			return _visible;
 		}
 		
-		public function set visable(value:Boolean):void
+		public function set visible(value:Boolean):void
 		{
-			_visable = value;
+			_visible = value;
 			
 			for(var componentType:String in _components)
 			{
