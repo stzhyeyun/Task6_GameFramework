@@ -17,10 +17,12 @@ package trolling.media
 		private static var _sounds:Dictionary; // key: String(Name), value: Sound
 		private static var _channels:Vector.<SoundChannel>; // 동시에 32개까지 사용 가능
 		private static var _bgm:Sound;
+		private static var _isBgmActive:Boolean = true;
+		private static var _isSoundEffectActive:Boolean = true;
 		
 		public function SoundManager()
 		{
-			
+			 
 		}
 		
 		public static function dispose():void
@@ -169,6 +171,12 @@ package trolling.media
 			{
 				loops = 0;
 				isInfinite = true;
+				
+				if (!isBgmActive) return;
+			}
+			else
+			{
+				if (!isSoundEffectActive) return;
 			}
 			
 			var channel:SoundChannel =
@@ -195,7 +203,7 @@ package trolling.media
 			{
 				_channels.push(channel);
 			}
-			sound.channelIndex = _channels.length - 1;
+			sound.channelIndex = _channels.indexOf(channel);
 			
 			// addEventListener
 			if (!isInfinite)
@@ -227,15 +235,63 @@ package trolling.media
 			{
 				for (var i:int = 0; i < _channels.length; i++)
 				{
-					// BGM 중단 위치 저장
-					if (i == index)
+					if (_channels[i])
 					{
-						_bgm.startTime = _channels[i].position;
-					}
+						// BGM 중단 위치 저장
+						if (i == index)
+						{
+							//_bgm.startTime = _channels[i].position;
+							_channels[i].removeEventListener(Event.SOUND_COMPLETE, onEndBgm);
+						}
+						else
+						{
+							_channels[i].removeEventListener(Event.SOUND_COMPLETE, onEnd);
+						}
+					} 
 					_channels[i] = null;
 				}
 			}
 			_channels = null;
+		}
+		
+		public static function stopSoundEffect():void
+		{
+			var index:int = -1;
+			if (_bgm)
+			{
+				index = _bgm.channelIndex;
+			}
+			
+			if (_channels)
+			{
+				for (var i:int = 0; i < _channels.length; i++)
+				{
+					if (_channels[i] && i != index)
+					{
+						_channels[i].removeEventListener(Event.SOUND_COMPLETE, onEnd);
+						_channels[i].stop();
+						_channels[i] = null;
+					}
+				}
+			}
+		}
+		
+		public static function stopBgm():void
+		{
+			var index:int = -1;
+			if (_bgm)
+			{
+				index = _bgm.channelIndex;
+			}
+			
+			if (_channels && _channels[index])
+			{
+				//_bgm.startTime = _channels[index].position;
+				
+				_channels[index].removeEventListener(Event.SOUND_COMPLETE, onEndBgm);
+				_channels[index].stop();
+				_channels[index] = null;
+			}
 		}
 		
 		public static function wakeBgm():void
@@ -270,7 +326,7 @@ package trolling.media
 			{
 				_channels.push(channel);
 			}
-			_bgm.channelIndex = _channels.length - 1;
+			_bgm.channelIndex = _channels.indexOf(channel);
 			
 			// addEventListener
 			channel.addEventListener(Event.SOUND_COMPLETE, onEndBgm);
@@ -401,6 +457,26 @@ package trolling.media
 				channel = _bgm.play(_bgm.startTime, 0, channel.soundTransform);
 				channel.addEventListener(Event.SOUND_COMPLETE, onEndBgm);
 			}
+		}
+		
+		public static function get isBgmActive():Boolean
+		{
+			return _isBgmActive;
+		}
+		
+		public static function set isBgmActive(value:Boolean):void
+		{
+			_isBgmActive = value; 
+		}
+		
+		public static function get isSoundEffectActive():Boolean
+		{
+			return _isSoundEffectActive;
+		}
+
+		public static function set isSoundEffectActive(value:Boolean):void
+		{
+			_isSoundEffectActive = value;
 		}
 	}
 }
