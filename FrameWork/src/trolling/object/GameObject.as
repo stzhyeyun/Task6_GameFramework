@@ -55,6 +55,7 @@ package trolling.object
 		private var _green:Number;
 		private var _blue:Number;
 		
+		private var _active:Boolean;
 		private var _visible:Boolean;
 		private var _colliderRender:Boolean;
 		
@@ -67,6 +68,7 @@ package trolling.object
 			_pivot = PivotType.TOP_LEFT;
 			_scaleX = _scaleY = _alpha = _red = _green = _blue = 1;
 			_components = new Dictionary();
+			_active = true;
 			_visible = true;
 			_tag = null;
 		}
@@ -476,14 +478,18 @@ package trolling.object
 		 */		
 		public function findClickedGameObject(point:Point):GameObject
 		{			
-			var target:GameObject = this;
+			var target:GameObject = null;
 			for(var i:int = _children.length-1; i >= 0; i--)
 			{
-				if(_children[i].getBound().containsPoint(point))
+				if(_children[i].getBound().containsPoint(point) && _children[i].visible)
 				{
 					target = _children[i].findClickedGameObject(point);
 					break;
 				}
+			}
+			if(target == null && getGlobalRect().containsPoint(point))
+			{
+				target = this;
 			}
 			return target;
 		}
@@ -506,6 +512,11 @@ package trolling.object
 		 */		
 		private function onThrowEvent(event:TrollingEvent):void
 		{
+			if (!_active)
+			{
+				return;	
+			}
+			
 			for(var key:String in _components)
 			{
 				if(_components[key] != null)
@@ -850,6 +861,17 @@ package trolling.object
 		{
 			_tag = value;
 		}
+
+		public function get active():Boolean
+		{
+			return _active;
+		}
+
+		public function set active(value:Boolean):void
+		{
+			_active = value;
+		}
+
 		
 	}
 }
