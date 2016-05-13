@@ -362,9 +362,10 @@ package trolling.core
 		{
 			if(!_started || !_painter.context)
 				return;
+			
 			for(var key:String in _touchs)
 			{
-				if(_touchs[key].hoverFlag)
+				if(_touchs[key] && _touchs[key].hoverFlag && (_touchs[key].hoverTarget != null))
 				{
 					_touchs[key].hoverTarget.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_HOVER, _touchs[key].points));
 				}

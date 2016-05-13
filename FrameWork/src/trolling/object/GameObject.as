@@ -475,15 +475,19 @@ package trolling.object
 		 * 
 		 */		
 		public function findClickedGameObject(point:Point):GameObject
-		{			
-			var target:GameObject = this;
+		{            
+			var target:GameObject = null;
 			for(var i:int = _children.length-1; i >= 0; i--)
 			{
-				if(_children[i].getBound().containsPoint(point))
+				if(_children[i].getBound().containsPoint(point) && _children[i].visible)
 				{
 					target = _children[i].findClickedGameObject(point);
 					break;
 				}
+			}
+			if(target == null && getGlobalRect().containsPoint(point))
+			{
+				target = this;
 			}
 			return target;
 		}
