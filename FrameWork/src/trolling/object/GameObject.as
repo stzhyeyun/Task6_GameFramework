@@ -674,6 +674,20 @@ package trolling.object
 		}
 		
 		/**
+		 * 
+		 * @param red
+		 * @param green
+		 * @param blue
+		 * 게임오브젝트에 색상을 블렌딩 합니다. 
+		 */
+		public function blendColor(red:int, green:int, blue:int):void
+		{
+			_red = red;
+			_green = green;
+			_blue = blue;
+		}
+		
+		/**
 		 *true면 콜라이더가 랜더링됩니다. 
 		 */
 		public function get colliderRender():Boolean
