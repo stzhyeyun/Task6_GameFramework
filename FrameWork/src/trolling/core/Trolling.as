@@ -370,8 +370,8 @@ package trolling.core
 					_touchs[key].hoverTarget.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_HOVER, _touchs[key].points));
 				}
 			}
-			nextFrame();
 			_colliderManager.detectCollision();
+			nextFrame();
 			Disposer.disposeObjects();
 			render();
 		}
