@@ -104,5 +104,15 @@ package trolling.core
 			Trolling.current.currentScene.data = Copy.clone(data);
 			Trolling.current.currentScene.dispatchEvent(new TrollingEvent(TrollingEvent.START_SCENE));
 		}
+		
+		public static function restartScene(sceneClass:Class, key:String, data:Object = null):void
+		{
+			if (!sceneClass || !key)
+				return;
+			
+			deleteScene(key);
+			addScene(sceneClass, key);
+			switchScene(key, data);
+		}
 	}
 }
