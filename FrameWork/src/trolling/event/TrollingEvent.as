@@ -13,6 +13,7 @@ package trolling.event
 		public static const TOUCH_MOVED:String = "touchMoved";
 		public static const TOUCH_ENDED:String = "touchEnded";
 		public static const TOUCH_OUT:String = "touchOut";
+		public static const TOUCH_IN:String = "touchIn";
 		
 		private var _data:Object;
 		

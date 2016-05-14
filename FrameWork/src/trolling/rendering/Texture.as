@@ -2,8 +2,10 @@ package trolling.rendering
 {
 	import flash.display.Bitmap;
 	import flash.display3D.textures.Texture;
+	import flash.geom.Rectangle;
 	
 	import trolling.utils.TextureUtil;
+	
 	
 	public class Texture
 	{
@@ -11,10 +13,27 @@ package trolling.rendering
 		private var _height:Number;
 		private var _u:Number;
 		private var _v:Number;
+		private var _ux:Number;
+		private var _vy:Number;
 		
 		private var _nativeTexture:flash.display3D.textures.Texture;
 		
-		public function Texture(bitmap:Bitmap)
+		public function Texture(bitmap:Bitmap = null)
+		{
+			if(bitmap != null)
+			{
+				_width = bitmap.width;
+				_height = bitmap.height;
+				
+				var textureInfo:Array = TextureUtil.fromBitmapData(bitmap.bitmapData);
+				
+				_nativeTexture = textureInfo[0];
+				_u = textureInfo[1];
+				_v = textureInfo[2];
+			}
+		}
+		
+		public function setFromBitmap(bitmap:Bitmap):void
 		{
 			_width = bitmap.width;
 			_height = bitmap.height;
@@ -24,6 +43,17 @@ package trolling.rendering
 			_nativeTexture = textureInfo[0];
 			_u = textureInfo[1];
 			_v = textureInfo[2];
+		}
+		
+		public function setFromTexture(parentTexture:trolling.rendering.Texture, position:Rectangle):void
+		{
+			if(parentTexture.nativeTexture == null)
+				return;
+			_nativeTexture = parentTexture.nativeTexture;
+			_width = position.width;
+			_height = position.height;
+			
+			
 		}
 		
 		public function get height():Number

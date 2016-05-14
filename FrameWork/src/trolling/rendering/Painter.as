@@ -130,13 +130,14 @@ package trolling.rendering
 		
 		public function present():void
 		{
-			_context.present();	
+			_context.present();
 		}
 		
 		public function draw():void
 		{
 			Trolling.current.drawCall++;
 			_context.drawTriangles(_indexBuffer);
+			clearVertextBuffer();
 		}
 		
 		public function setUVVector(triagleData:TriangleData):void
@@ -160,6 +161,12 @@ package trolling.rendering
 		{
 			_context.setVertexBufferAt(0, _vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
 			_context.setVertexBufferAt(1, _vertexBuffer, 3, Context3DVertexBufferFormat.FLOAT_2);
+		}
+		
+		private function clearVertextBuffer():void
+		{
+			_context.setVertexBufferAt(0, null);
+			_context.setVertexBufferAt(1, null);
 		}
 		
 		private function setProgram():void

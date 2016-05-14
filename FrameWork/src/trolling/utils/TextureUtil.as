@@ -20,7 +20,7 @@ package trolling.utils
 		{
 			var textureInfo:Array = new Array();
 			
-			var _nativeTexture:Texture;
+			var _nativeTexture:flash.display3D.textures.Texture;
 			
 			var binaryWidth:Number = nextPowerOfTwo(bitmap.width);
 			var binaryHeight:Number = nextPowerOfTwo(bitmap.height);

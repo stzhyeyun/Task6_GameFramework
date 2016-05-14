@@ -190,7 +190,6 @@ package trolling.core
 			
 			if(phase == TouchPhase.BEGAN)
 			{
-				trace("began");
 				if(!_touchs[touchID])
 				{
 					var touchManager:TouchManager = new TouchManager();
@@ -219,7 +218,8 @@ package trolling.core
 					if(_touchs[touchID].hoverTarget != null)
 						_touchs[touchID].hoverTarget.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_OUT, _touchs[touchID].points));
 					_touchs[touchID].hoverTarget = hit;
-//					hit.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_BEGAN, _touchs[touchID].points));
+					if(hit != null)
+						hit.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_IN, _touchs[touchID].points));
 				}
 			}
 			else if(phase == TouchPhase.ENDED)
@@ -370,8 +370,8 @@ package trolling.core
 					_touchs[key].hoverTarget.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_HOVER, _touchs[key].points));
 				}
 			}
-			_colliderManager.detectCollision();
 			nextFrame();
+			_colliderManager.detectCollision();
 			Disposer.disposeObjects();
 			render();
 		}
