@@ -8,6 +8,7 @@ package trolling.rendering
 	import flash.display3D.Context3DVertexBufferFormat;
 	import flash.display3D.IndexBuffer3D;
 	import flash.display3D.VertexBuffer3D;
+	import flash.display3D.textures.Texture;
 	import flash.events.Event;
 	import flash.geom.Matrix3D;
 	import flash.geom.Rectangle;
@@ -31,6 +32,8 @@ package trolling.rendering
 		
 		private var _backBufferWidth:Number;
 		private var _backBufferHeight:Number;
+		
+		private var _previousTexture:flash.display3D.textures.Texture;
 		
 		private var _culling:String;
 		private var _alpha:Number = 1.0;
@@ -272,6 +275,16 @@ package trolling.rendering
 		public function set red(value:Number):void
 		{
 			_red = value;
+		}
+		
+		public function get previousTexture():flash.display3D.textures.Texture
+		{
+			return _previousTexture;
+		}
+		
+		public function set previousTexture(value:flash.display3D.textures.Texture):void
+		{
+			_previousTexture = value;
 		}
 	}
 }
