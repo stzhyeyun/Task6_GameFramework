@@ -22,17 +22,20 @@ package trolling.rendering
 		{
 			if(bitmap != null)
 			{
-				_width = bitmap.width;
-				_height = bitmap.height;
-				
-				var textureInfo:Array = TextureUtil.fromBitmapData(bitmap.bitmapData);
-				
-				_nativeTexture = textureInfo[0];
-				_u = textureInfo[1];
-				_v = textureInfo[2];
+//				_width = bitmap.width;
+//				_height = bitmap.height;
+//				
+//				var textureInfo:Array = TextureUtil.fromBitmapData(bitmap.bitmapData);
+//				
+//				_nativeTexture = textureInfo[0];
+//				_u = textureInfo[1];
+//				_v = textureInfo[2];
+//				_ux = 1;
+//				_vy = 1;
+				setFromBitmap(bitmap);
 			}
 		}
-		
+
 		public function setFromBitmap(bitmap:Bitmap):void
 		{
 			_width = bitmap.width;
@@ -42,7 +45,13 @@ package trolling.rendering
 			
 			_nativeTexture = textureInfo[0];
 			_u = textureInfo[1];
+//			trace("_u = " + _u);
 			_v = textureInfo[2];
+//			trace("_v = " + _v);
+//			_ux = 1;
+//			_vy = 1;
+			_ux = 1;
+			_vy = 1;
 		}
 		
 		public function setFromTexture(parentTexture:trolling.rendering.Texture, position:Rectangle):void
@@ -53,7 +62,8 @@ package trolling.rendering
 			_width = position.width;
 			_height = position.height;
 			
-			
+			_u = position.width / parentTexture.width;
+			_v = position.height / parentTexture.height;
 		}
 		
 		public function get height():Number
@@ -74,6 +84,26 @@ package trolling.rendering
 		public function get u():Number
 		{
 			return _u;
+		}
+		
+		public function get vy():Number
+		{
+			return _vy;
+		}
+		
+		public function set vy(value:Number):void
+		{
+			_vy = value;
+		}
+		
+		public function get ux():Number
+		{
+			return _ux;
+		}
+		
+		public function set ux(value:Number):void
+		{
+			_ux = value;
 		}
 		
 		public function get nativeTexture():flash.display3D.textures.Texture

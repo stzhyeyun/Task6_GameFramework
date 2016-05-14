@@ -25,8 +25,8 @@ package trolling.utils
 			var binaryWidth:Number = nextPowerOfTwo(bitmap.width);
 			var binaryHeight:Number = nextPowerOfTwo(bitmap.height);
 			
-			var matrix:Matrix = new Matrix();
-			matrix.scale(binaryWidth/bitmap.width, binaryHeight/bitmap.height);
+//			var matrix:Matrix = new Matrix();
+//			matrix.scale(binaryWidth/bitmap.width, binaryHeight/bitmap.height);
 			
 			_nativeTexture = Trolling.current.context.createTexture(binaryWidth, binaryHeight, Context3DTextureFormat.BGRA, false);
 			
@@ -39,8 +39,10 @@ package trolling.utils
 			_nativeTexture.uploadFromBitmapData(bitmapData);
 			
 			textureInfo.push(_nativeTexture);
-			textureInfo.push((binaryWidth / bitmap.width));
-			textureInfo.push((binaryHeight / bitmap.height));
+//			textureInfo.push((binaryWidth / bitmap.width));
+//			textureInfo.push((binaryHeight / bitmap.height));
+			textureInfo.push((bitmap.width / binaryWidth));
+			textureInfo.push((bitmap.height / binaryHeight));
 			
 			return textureInfo;
 		}

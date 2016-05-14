@@ -307,10 +307,20 @@ package trolling.object
 				
 				if(_pivot == PivotType.TOP_LEFT)
 				{
-					triangleData.vertexData.push(Vector.<Number>([drawRect.width, 0, 0, 1, 0]));
-					triangleData.vertexData.push(Vector.<Number>([drawRect.width, -drawRect.height, 0, 1, 1]));
-					triangleData.vertexData.push(Vector.<Number>([0, -drawRect.height, 0, 0, 1]));
-					triangleData.vertexData.push(Vector.<Number>([0, 0, 0, 0, 0]));
+					if(componentType != NONE && displayComponent.getRenderingResource() == null)
+					{
+						triangleData.vertexData.push(Vector.<Number>([drawRect.width, 0, 0, 1, 0]));
+						triangleData.vertexData.push(Vector.<Number>([drawRect.width, -drawRect.height, 0, 1, 1]));
+						triangleData.vertexData.push(Vector.<Number>([0, -drawRect.height, 0, 0, 1]));
+						triangleData.vertexData.push(Vector.<Number>([0, 0, 0, 0, 0]));
+					}
+					else
+					{
+						triangleData.vertexData.push(Vector.<Number>([drawRect.width, 0, 0, displayComponent.getRenderingResource().u, 0]));
+						triangleData.vertexData.push(Vector.<Number>([drawRect.width, -drawRect.height, 0, displayComponent.getRenderingResource().u, displayComponent.getRenderingResource().v]));
+						triangleData.vertexData.push(Vector.<Number>([0, -drawRect.height, 0, 0, displayComponent.getRenderingResource().v]));
+						triangleData.vertexData.push(Vector.<Number>([0, 0, 0, 0, 0]));
+					}
 					
 					triangleData.calculVertex();
 					
@@ -320,10 +330,20 @@ package trolling.object
 				}
 				else
 				{
-					triangleData.vertexData.push(Vector.<Number>([drawRect.width/2, drawRect.height/2, 0, 1, 0]));
-					triangleData.vertexData.push(Vector.<Number>([drawRect.width/2, -drawRect.height/2, 0, 1, 1]));
-					triangleData.vertexData.push(Vector.<Number>([-drawRect.width/2, -drawRect.height/2, 0, 0, 1]));
-					triangleData.vertexData.push(Vector.<Number>([-drawRect.width/2, drawRect.height/2, 0, 0, 0]));
+					if(componentType != NONE && displayComponent.getRenderingResource() == null)
+					{
+						triangleData.vertexData.push(Vector.<Number>([drawRect.width/2, drawRect.height/2, 0, 1, 0]));
+						triangleData.vertexData.push(Vector.<Number>([drawRect.width/2, -drawRect.height/2, 0, 1, 1]));
+						triangleData.vertexData.push(Vector.<Number>([-drawRect.width/2, -drawRect.height/2, 0, 0, 1]));
+						triangleData.vertexData.push(Vector.<Number>([-drawRect.width/2, drawRect.height/2, 0, 0, 0]));
+					}
+					else
+					{
+						triangleData.vertexData.push(Vector.<Number>([drawRect.width/2, drawRect.height/2, 0, displayComponent.getRenderingResource().u, 0]));
+						triangleData.vertexData.push(Vector.<Number>([drawRect.width/2, -drawRect.height/2, 0, displayComponent.getRenderingResource().u, displayComponent.getRenderingResource().v]));
+						triangleData.vertexData.push(Vector.<Number>([-drawRect.width/2, -drawRect.height/2, 0, 0, displayComponent.getRenderingResource().v]));
+						triangleData.vertexData.push(Vector.<Number>([-drawRect.width/2, drawRect.height/2, 0, 0, 0]));
+					}
 					
 					triangleData.calculVertex();
 					
@@ -335,8 +355,22 @@ package trolling.object
 				if(componentType != NONE && displayComponent.getRenderingResource() != null)
 				{
 					painter.context.setTextureAt(0, displayComponent.getRenderingResource().nativeTexture);
-					triangleData.uvData[0] = displayComponent.getRenderingResource().u;
-					triangleData.uvData[1] = displayComponent.getRenderingResource().v;
+//					triangleData.uvData[0] = displayComponent.getRenderingResource().u;
+//					triangleData.uvData[1] = displayComponent.getRenderingResource().v;
+//					triangleData.uvData[2] = displayComponent.getRenderingResource().ux;
+//					triangleData.uvData[3] = displayComponent.getRenderingResource().vy;
+					
+					triangleData.uvData[0] = 1;
+					triangleData.uvData[1] = 1;
+					triangleData.uvData[2] = 1;
+					triangleData.uvData[3] = 1;
+					
+//					triangleData.vertexData[0][3] = triangleData.uvData[0];
+//					
+//					triangleData.vertexData[1][3] = triangleData.uvData[0];
+//					triangleData.vertexData[1][4] = triangleData.uvData[1];
+//					
+//					triangleData.vertexData[2][4] = triangleData.uvData[1];
 				}
 				
 				painter.setDrawData(triangleData);
