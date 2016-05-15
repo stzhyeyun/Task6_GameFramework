@@ -304,15 +304,6 @@ package trolling.object
 				painter.green = _green;
 				painter.blue = _blue;
 				
-				if(componentType != NONE && displayComponent.getRenderingResource() != null)
-				{
-					textureRect.x = displayComponent.getRenderingResource().ux;
-					textureRect.y = displayComponent.getRenderingResource().vy;
-					textureRect.width = displayComponent.getRenderingResource().u;
-					textureRect.height = displayComponent.getRenderingResource().v;
-//					trace(textureRect);
-				}
-				
 				if(_pivot == PivotType.CENTER)
 				{
 					drawRect.x -= (drawRect.width/2);
@@ -321,17 +312,22 @@ package trolling.object
 				
 				if(_pivot == PivotType.TOP_LEFT)
 				{
-					triangleData.vertexData.push(Vector.<Number>([drawRect.width, 0, 0, textureRect.x+textureRect.width, textureRect.y]));
-					triangleData.vertexData.push(Vector.<Number>([drawRect.width, -drawRect.height, 0, textureRect.x+textureRect.width, textureRect.y+textureRect.height]));
-					triangleData.vertexData.push(Vector.<Number>([0, -drawRect.height, 0, textureRect.x, textureRect.y+textureRect.height]));
-					triangleData.vertexData.push(Vector.<Number>([0, 0, 0, textureRect.x, textureRect.y]));
+//					triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([drawRect.width, 0, 0, textureRect.x+textureRect.width, textureRect.y]));
+//					triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([drawRect.width, -drawRect.height, 0, textureRect.x+textureRect.width, textureRect.y+textureRect.height]));
+//					triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([0, -drawRect.height, 0, textureRect.x, textureRect.y+textureRect.height]));
+//					triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([0, 0, 0, textureRect.x, textureRect.y]));
+					
+//					triangleData.vertexData.push(Vector.<Number>([drawRect.width, 0, 0, textureRect.x+textureRect.width, textureRect.y]));
+//					triangleData.vertexData.push(Vector.<Number>([drawRect.width, -drawRect.height, 0, textureRect.x+textureRect.width, textureRect.y+textureRect.height]));
+//					triangleData.vertexData.push(Vector.<Number>([0, -drawRect.height, 0, textureRect.x, textureRect.y+textureRect.height]));
+//					triangleData.vertexData.push(Vector.<Number>([0, 0, 0, textureRect.x, textureRect.y]));
 					
 //					triangleData.vertexData.push(Vector.<Number>([drawRect.width, 0, 0, textureRect.width, 0]));
 //					triangleData.vertexData.push(Vector.<Number>([drawRect.width, -drawRect.height, 0, textureRect.width, textureRect.height]));
 //					triangleData.vertexData.push(Vector.<Number>([0, -drawRect.height, 0, 0, textureRect.height]));
 //					triangleData.vertexData.push(Vector.<Number>([0, 0, 0, 0, 0]));
 					
-					triangleData.calculVertex();
+//					triangleData.calculVertex();
 					
 					painter.matrix.prependTranslation((drawRect.x), -(drawRect.y), 0);
 					painter.matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
@@ -339,17 +335,22 @@ package trolling.object
 				}
 				else
 				{
-					triangleData.vertexData.push(Vector.<Number>([drawRect.width/2, drawRect.height/2, 0, textureRect.x+textureRect.width, textureRect.y]));
-					triangleData.vertexData.push(Vector.<Number>([drawRect.width/2, -drawRect.height/2, 0, textureRect.x+textureRect.width, textureRect.y+textureRect.height]));
-					triangleData.vertexData.push(Vector.<Number>([-drawRect.width/2, -drawRect.height/2, 0, textureRect.x, textureRect.y+textureRect.height]));
-					triangleData.vertexData.push(Vector.<Number>([-drawRect.width/2, drawRect.height/2, 0, textureRect.x, textureRect.y]));
+//					triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([drawRect.width/2, drawRect.height/2, 0, textureRect.x+textureRect.width, textureRect.y]));
+//					triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([drawRect.width/2, -drawRect.height/2, 0, textureRect.x+textureRect.width, textureRect.y+textureRect.height]));
+//					triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([-drawRect.width/2, -drawRect.height/2, 0, textureRect.x, textureRect.y+textureRect.height]));
+//					triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([-drawRect.width/2, drawRect.height/2, 0, textureRect.x, textureRect.y]));
+					
+//					triangleData.vertexData.push(Vector.<Number>([drawRect.width/2, drawRect.height/2, 0, textureRect.x+textureRect.width, textureRect.y]));
+//					triangleData.vertexData.push(Vector.<Number>([drawRect.width/2, -drawRect.height/2, 0, textureRect.x+textureRect.width, textureRect.y+textureRect.height]));
+//					triangleData.vertexData.push(Vector.<Number>([-drawRect.width/2, -drawRect.height/2, 0, textureRect.x, textureRect.y+textureRect.height]));
+//					triangleData.vertexData.push(Vector.<Number>([-drawRect.width/2, drawRect.height/2, 0, textureRect.x, textureRect.y]));
 					
 //					triangleData.vertexData.push(Vector.<Number>([drawRect.width/2, drawRect.height/2, 0, textureRect.width, 0]));
 //					triangleData.vertexData.push(Vector.<Number>([drawRect.width/2, -drawRect.height/2, 0, textureRect.width, textureRect.height]));
 //					triangleData.vertexData.push(Vector.<Number>([-drawRect.width/2, -drawRect.height/2, 0, 0, textureRect.height]));
 //					triangleData.vertexData.push(Vector.<Number>([-drawRect.width/2, drawRect.height/2, 0, 0, 0]));
 					
-					triangleData.calculVertex();
+//					triangleData.calculVertex();
 					
 					painter.matrix.prependTranslation((drawRect.x+(drawRect.width/2)), -(drawRect.y+(drawRect.height/2)), 0);
 					painter.matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
@@ -358,36 +359,39 @@ package trolling.object
 				
 				if(componentType != NONE && displayComponent.getRenderingResource() != null)
 				{
+					textureRect.x = displayComponent.getRenderingResource().ux;
+					textureRect.y = displayComponent.getRenderingResource().vy;
+					textureRect.width = displayComponent.getRenderingResource().u;
+					textureRect.height = displayComponent.getRenderingResource().v;
+					
+					if(_pivot == PivotType.TOP_LEFT)
+					{
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([drawRect.width, 0, 0, textureRect.x+textureRect.width, textureRect.y]));
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([drawRect.width, -drawRect.height, 0, textureRect.x+textureRect.width, textureRect.y+textureRect.height]));
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([0, -drawRect.height, 0, textureRect.x, textureRect.y+textureRect.height]));
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([0, 0, 0, textureRect.x, textureRect.y]));
+					}
+					else
+					{
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([drawRect.width/2, drawRect.height/2, 0, textureRect.x+textureRect.width, textureRect.y]));
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([drawRect.width/2, -drawRect.height/2, 0, textureRect.x+textureRect.width, textureRect.y+textureRect.height]));
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([-drawRect.width/2, -drawRect.height/2, 0, textureRect.x, textureRect.y+textureRect.height]));
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([-drawRect.width/2, drawRect.height/2, 0, textureRect.x, textureRect.y]));
+					}
+					
 					if(painter.previousTexture != displayComponent.getRenderingResource().nativeTexture)
 					{
 						painter.context.setTextureAt(0, displayComponent.getRenderingResource().nativeTexture);
 						painter.previousTexture = displayComponent.getRenderingResource().nativeTexture;
 					}
-//					triangleData.uvData[0] = displayComponent.getRenderingResource().u;
-//					triangleData.uvData[1] = displayComponent.getRenderingResource().v;
-//					triangleData.uvData[2] = displayComponent.getRenderingResource().ux;
-//					triangleData.uvData[3] = displayComponent.getRenderingResource().vy;
 					
-					triangleData.uvData[0] = 1;
-					triangleData.uvData[1] = 1;
-					triangleData.uvData[2] = 1;
-					triangleData.uvData[3] = 1;
-					
-//					triangleData.vertexData[0][3] = triangleData.uvData[0];
-//					
-//					triangleData.vertexData[1][3] = triangleData.uvData[0];
-//					triangleData.vertexData[1][4] = triangleData.uvData[1];
-//					
-//					triangleData.vertexData[2][4] = triangleData.uvData[1];
-				}
-				
-				painter.setDrawData(triangleData);
-				if(componentType != NONE && displayComponent.getRenderingResource() != null)
+					painter.setDrawData(triangleData);
 					painter.draw();
+				}
+					
 				var coll:Collider = _components[ComponentType.COLLIDER];
 				if(coll != null && _colliderRender && coll.id != Collider.ID_NONE)
 				{	
-					var shape:Shape = new Shape();
 					var rect:Rectangle;
 					if(coll.id == Collider.ID_RECT)
 						rect = coll.rect.clone();
@@ -411,14 +415,19 @@ package trolling.object
 					textureTemp.uploadFromBitmapData(bitmapData);
 					
 					var triangleTemp:TriangleData = new TriangleData();
-					triangleTemp.vertexData.push(Vector.<Number>([rect.width/2, rect.height/2, 0, 1, 0]));
-					triangleTemp.vertexData.push(Vector.<Number>([rect.width/2, -rect.height/2, 0, 1, 0]));
-					triangleTemp.vertexData.push(Vector.<Number>([-rect.width/2, -rect.height/2, 0, 1, 0]));
-					triangleTemp.vertexData.push(Vector.<Number>([-rect.width/2, rect.height/2, 0, 1, 0]));
+					triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([rect.width/2, rect.height/2, 0, 1, 0]));
+					triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([rect.width/2, -rect.height/2, 0, 1, 1]));
+					triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([-rect.width/2, -rect.height/2, 0, 0, 1]));
+					triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([-rect.width/2, rect.height/2, 0, 0, 0]));
+					
+//					triangleTemp.vertexData.push(Vector.<Number>([rect.width/2, rect.height/2, 0, 1, 0]));
+//					triangleTemp.vertexData.push(Vector.<Number>([rect.width/2, -rect.height/2, 0, 1, 1]));
+//					triangleTemp.vertexData.push(Vector.<Number>([-rect.width/2, -rect.height/2, 0, 0, 1]));
+//					triangleTemp.vertexData.push(Vector.<Number>([-rect.width/2, rect.height/2, 0, 0, 0]));
 					
 					painter.context.setTextureAt(0, textureTemp);
 					
-					triangleTemp.calculVertex();
+//					triangleTemp.calculVertex();
 					
 					painter.pushState();
 					if(_pivot == PivotType.TOP_LEFT)

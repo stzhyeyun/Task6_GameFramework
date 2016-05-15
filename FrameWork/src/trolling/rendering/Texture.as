@@ -11,10 +11,10 @@ package trolling.rendering
 	{
 		private var _width:Number;
 		private var _height:Number;
-		private var _ux:Number = 0;
-		private var _vy:Number = 0;
-		private var _u:Number = 1;
-		private var _v:Number = 1;
+		private var _ux:Number;
+		private var _vy:Number;
+		private var _u:Number;
+		private var _v:Number;
 		
 		private var _nativeTexture:flash.display3D.textures.Texture;
 		
@@ -48,8 +48,8 @@ package trolling.rendering
 //			trace("_u = " + _u);
 			_v = textureInfo[2];
 //			trace("_v = " + _v);
-//			_ux = 1;
-//			_vy = 1;
+			_ux = 0;
+			_vy = 0;
 		}
 		
 		public function setFromTexture(parentTexture:trolling.rendering.Texture, position:Rectangle):void
@@ -62,6 +62,8 @@ package trolling.rendering
 			
 			_u = position.width / parentTexture.width;
 			_v = position.height / parentTexture.height;
+			_ux = position.x / parentTexture.width;
+			_vy = position.y / parentTexture.height;
 		}
 		
 		public function get height():Number

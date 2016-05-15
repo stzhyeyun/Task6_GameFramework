@@ -26,6 +26,7 @@
     <classEntry path="trolling.media.Sound"/>
     <classEntry path="trolling.core.Disposer"/>
     <classEntry path="trolling.utils.Copy"/>
+    <classEntry path="trolling.rendering.BatchData"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

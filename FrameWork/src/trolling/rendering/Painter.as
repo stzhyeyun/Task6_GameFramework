@@ -5,6 +5,7 @@ package trolling.rendering
 	import flash.display3D.Context3DBlendFactor;
 	import flash.display3D.Context3DCompareMode;
 	import flash.display3D.Context3DProgramType;
+	import flash.display3D.Context3DTriangleFace;
 	import flash.display3D.Context3DVertexBufferFormat;
 	import flash.display3D.IndexBuffer3D;
 	import flash.display3D.VertexBuffer3D;
@@ -89,8 +90,9 @@ package trolling.rendering
 			_context = _stage3D.context3D;	
 			_program.initProgram(_context);
 			setProgram();
-			createIndexBuffer();
+//			_indexBuffer = _context.createIndexBuffer(1024);
 			_context.setDepthTest(true, Context3DCompareMode.ALWAYS);
+			_context.setCulling(Context3DTriangleFace.BACK);
 			_context.setBlendFactors(
 				Context3DBlendFactor.SOURCE_ALPHA,
 				Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA
@@ -123,6 +125,7 @@ package trolling.rendering
 		public function setDrawData(triangleData:TriangleData):void
 		{
 			createVertexBuffer(triangleData);
+			createIndexBuffer(triangleData);
 			setVertextBuffer();
 			setUVVector(triangleData);
 			//_matrix.appendRotation(90, Z_AXIS);
@@ -141,23 +144,24 @@ package trolling.rendering
 			Trolling.current.drawCall++;
 			_context.drawTriangles(_indexBuffer);
 			clearVertextBuffer();
+			clearIndexBuffer();
 		}
 		
 		public function setUVVector(triagleData:TriangleData):void
 		{
-			_context.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 4, triagleData.uvData);
+			_context.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 4, new <Number>[1, 1, 1, 1]);
 		}
 		
 		private function createVertexBuffer(triangleData:TriangleData):void
 		{
-			_vertexBuffer = _context.createVertexBuffer(4, 5);
-			_vertexBuffer.uploadFromVector(triangleData.rawVertexData, 0, 4);
+			_vertexBuffer = _context.createVertexBuffer(triangleData.rawVertexData.length/5, 5);
+			_vertexBuffer.uploadFromVector(triangleData.rawVertexData, 0, triangleData.rawVertexData.length/5);
 		}
 		
-		private function createIndexBuffer():void
+		private function createIndexBuffer(triangleData:TriangleData):void
 		{
-			_indexBuffer = _context.createIndexBuffer(TriangleData.rawIndexData.length);
-			_indexBuffer.uploadFromVector(TriangleData.rawIndexData, 0, TriangleData.rawIndexData.length);
+			_indexBuffer = _context.createIndexBuffer(triangleData.rawIndexData.length);
+			_indexBuffer.uploadFromVector(triangleData.rawIndexData, 0, triangleData.rawIndexData.length);
 		}
 		
 		private function setVertextBuffer():void
@@ -170,6 +174,14 @@ package trolling.rendering
 		{
 			_context.setVertexBufferAt(0, null);
 			_context.setVertexBufferAt(1, null);
+			_vertexBuffer.dispose();
+			_vertexBuffer = null
+		}
+		
+		private function clearIndexBuffer():void
+		{
+			_indexBuffer.dispose();
+			_indexBuffer = null;
 		}
 		
 		private function setProgram():void
