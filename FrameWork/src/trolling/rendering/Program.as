@@ -12,7 +12,9 @@ package trolling.rendering
 		private var _fragmentShaderAssembler : AGALMiniAssembler;
 		
 		private var _vertexShaderAssemblerTemp : AGALMiniAssembler;
-		private var _fragmentShaderAssemblerTemp : AGALMiniAssembler;
+		
+		private var _fragmentShaderAssembler1 : AGALMiniAssembler;
+		private var _fragmentShaderAssembler3 : AGALMiniAssembler;
 		
 		private var _program:Program3D;
 		
@@ -32,8 +34,48 @@ package trolling.rendering
 			_fragmentShaderAssembler = new AGALMiniAssembler();
 			_fragmentShaderAssembler.assemble( Context3DProgramType.FRAGMENT,
 				"tex ft1, v0, fs0 <2d,linear,mipnone,clamp>\n" + 
-				"mul oc, ft1, fc0"
+				"mul oc, ft1, fc0\n"
 			);
+			
+			_vertexShaderAssemblerTemp = new AGALMiniAssembler();
+			_vertexShaderAssemblerTemp.assemble
+				( 
+					Context3DProgramType.VERTEX,
+					// 4x4 matrix multiply to get camera angle	
+					"m44 op, va0, vc0\n" +
+					// tell fragment shader about XYZ
+					"mov v0, va0\n" +
+					// tell fragment shader about UV
+					"mov v1, va1\n" +
+					// tell fragment shader about RGBA
+					"mov v2, va2\n"
+				);
+			
+			_fragmentShaderAssembler1 = new AGALMiniAssembler();
+			_fragmentShaderAssembler1.assemble
+				( 
+					Context3DProgramType.FRAGMENT,	
+					// grab the texture color from texture 0 
+					// and uv coordinates from varying register 1
+					// and store the interpolated value in ft0
+					"tex ft0, v1, fs0 <2d,repeat,miplinear>\n" +	
+					// move this value to the output color
+					"mov oc, ft0\n"
+				);
+			
+			// textured using UV coordinates AND colored by vertex RGB
+			_fragmentShaderAssembler3 = new AGALMiniAssembler();
+			_fragmentShaderAssembler3.assemble
+				( 
+					Context3DProgramType.FRAGMENT,	
+					// grab the texture color from texture 0 
+					// and uv coordinates from varying register 1
+					"tex ft0, v1, fs0 <2d,repeat,miplinear>\n" +
+					// multiply by the value stored in v2 (the vertex rgb)
+					"mul ft1, v2, ft0\n" +
+					// move this value to the output color
+					"mov oc, ft1\n"
+				);
 		}
 		
 		public function get program():Program3D
@@ -45,6 +87,7 @@ package trolling.rendering
 		{
 			_program = context.createProgram();
 			
+//			_program.upload( _vertexShaderAssemblerTemp.agalcode, _fragmentShaderAssembler1.agalcode);
 			_program.upload( _vertexShaderAssembler.agalcode, _fragmentShaderAssembler.agalcode);
 		}
 	}

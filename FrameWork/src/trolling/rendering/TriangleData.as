@@ -24,7 +24,7 @@ package trolling.rendering
 //			while(_vertexData.length != 0)
 //				_rawVertexData = _rawVertexData.concat(_vertexData.shift());
 //		}
-		
+
 		public function get rawVertexData():Vector.<Number>
 		{
 			return _rawVertexData;

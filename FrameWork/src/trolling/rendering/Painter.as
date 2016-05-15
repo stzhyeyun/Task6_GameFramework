@@ -34,14 +34,15 @@ package trolling.rendering
 		private var _backBufferWidth:Number;
 		private var _backBufferHeight:Number;
 		
-		private var _previousTexture:flash.display3D.textures.Texture;
+		private var _batchDatas:Vector.<BatchData>;
+		private var _currentBatchData:BatchData;
 		
 		private var _culling:String;
 		private var _alpha:Number = 1.0;
 		private var _red:Number = 1.0;
 		private var _green:Number = 1.0;
 		private var _blue:Number = 1.0;
-		private var _matrix:Matrix3D = new Matrix3D();
+		private var _currentMatrix:Matrix3D = new Matrix3D();
 		private var _textureFlag:Boolean;
 		private var _program:Program;
 		
@@ -53,14 +54,14 @@ package trolling.rendering
 		{
 			_stage3D = stage3D;
 			_program = new Program();
-			_matrix.identity();
+			_currentMatrix.identity();
 			trace("Painter Creater");
 		}
 		
 		public function pushState():void
 		{
 			var state:RenderState = new RenderState();
-			state.matrix = _matrix.clone();
+			state.matrix = _currentMatrix.clone();
 			state.alpha = _alpha;
 			state.red = _red;
 			state.green = _green;
@@ -71,7 +72,7 @@ package trolling.rendering
 		public function popState():void
 		{
 			var state:RenderState = _stateStack.pop();
-			_matrix = state.matrix.clone();
+			_currentMatrix = state.matrix.clone();
 			_alpha = state.alpha;
 			_red = state.red;
 			_green = state.green;
@@ -91,6 +92,7 @@ package trolling.rendering
 			_program.initProgram(_context);
 			setProgram();
 //			_indexBuffer = _context.createIndexBuffer(1024);
+			_batchDatas = new Vector.<BatchData>();
 			_context.setDepthTest(true, Context3DCompareMode.ALWAYS);
 			_context.setCulling(Context3DTriangleFace.BACK);
 			_context.setBlendFactors(
@@ -122,21 +124,108 @@ package trolling.rendering
 			_backBufferHeight = stageRectangle.height;
 		}
 		
-		public function setDrawData(triangleData:TriangleData):void
+//		public function setDrawData(triangleData:TriangleData):void
+//		{
+//			createVertexBuffer(triangleData);
+//			createIndexBuffer(triangleData);
+//			setVertextBuffer();
+//			setUVVector(triangleData);
+//			//_matrix.appendRotation(90, Z_AXIS);
+//			//_matrix.appendTranslation(0, -0.5, 0);
+////			_context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, _matrix, true);
+//			
+//			var matrix:Matrix3D = new Matrix3D();
+//			matrix.identity();
+//			_context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, matrix, true);
+//			
+//			_context.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, new <Number>[_red, _green, _blue, _alpha], 1);    // fc0
+//		}
+		
+//		private function createVertexBuffer(triangleData:TriangleData):void
+//		{
+//			_vertexBuffer = _context.createVertexBuffer(triangleData.rawVertexData.length/5, 5);
+//			_vertexBuffer.uploadFromVector(triangleData.rawVertexData, 0, triangleData.rawVertexData.length/5);
+//		}
+//		
+//		private function createIndexBuffer(triangleData:TriangleData):void
+//		{
+//			_indexBuffer = _context.createIndexBuffer(triangleData.rawIndexData.length);
+//			_indexBuffer.uploadFromVector(triangleData.rawIndexData, 0, triangleData.rawIndexData.length);
+//		}
+//		
+//		private function setVertextBuffer():void
+//		{
+//			_context.setVertexBufferAt(0, _vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
+//			_context.setVertexBufferAt(1, _vertexBuffer, 3, Context3DVertexBufferFormat.FLOAT_2);
+//		}
+//		
+//		public function setUVVector(triagleData:TriangleData):void
+//		{
+//			_context.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 4, new <Number>[1, 1, 1, 1]);
+//		}
+		
+		public function setDrawData(batchData:BatchData):void
 		{
-			createVertexBuffer(triangleData);
-			createIndexBuffer(triangleData);
+			createVertexBuffer(batchData);
+			createIndexBuffer(batchData);
 			setVertextBuffer();
-			setUVVector(triangleData);
+			_context.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 4, new <Number>[1, 1, 1, 1]);
+//			setUVVector(batchData);
 			//_matrix.appendRotation(90, Z_AXIS);
 			//_matrix.appendTranslation(0, -0.5, 0);
-			_context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, _matrix, true);
-			_context.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, new <Number>[_red, _green, _blue, _alpha], 1);    // fc0
+			//			_context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, _matrix, true);
+			
+			var matrix:Matrix3D = new Matrix3D();
+			matrix.identity();
+			_context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, matrix, true);
+			
+//			_context.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, new <Number>[_red, _green, _blue, _alpha], 1);    // fc0
+			_context.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, new <Number>[1, 1, 1, 1], 1);
+		}
+		
+		private function createVertexBuffer(batchData:BatchData):void
+		{
+			_vertexBuffer = _context.createVertexBuffer(batchData.batchVertex.length/5, 5);
+			_vertexBuffer.uploadFromVector(batchData.batchVertex, 0, batchData.batchVertex.length/5);
+		}
+		
+		private function createIndexBuffer(batchData:BatchData):void
+		{
+			_indexBuffer = _context.createIndexBuffer(batchData.batchIndex.length);
+			_indexBuffer.uploadFromVector(batchData.batchIndex, 0, batchData.batchIndex.length);
+		}
+		
+		private function setVertextBuffer():void
+		{
+			_context.setVertexBufferAt(0, _vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
+			_context.setVertexBufferAt(1, _vertexBuffer, 3, Context3DVertexBufferFormat.FLOAT_2);
 		}
 		
 		public function present():void
 		{
+			batchDraw();
 			_context.present();
+			initBatchDatas();
+		}
+		
+		public function initBatchDatas():void
+		{
+			_batchDatas = new Vector.<BatchData>();
+			_currentBatchData = null;
+		}
+		
+		public function batchDraw():void
+		{
+			var batchData:BatchData;
+			while(_batchDatas.length != 0)
+			{
+				batchData = _batchDatas.shift();
+				
+				_context.setTextureAt(0, batchData.batchTexture);
+				batchData.calculVecrtex();
+				setDrawData(batchData);
+				draw();
+			}
 		}
 		
 		public function draw():void
@@ -145,29 +234,6 @@ package trolling.rendering
 			_context.drawTriangles(_indexBuffer);
 			clearVertextBuffer();
 			clearIndexBuffer();
-		}
-		
-		public function setUVVector(triagleData:TriangleData):void
-		{
-			_context.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 4, new <Number>[1, 1, 1, 1]);
-		}
-		
-		private function createVertexBuffer(triangleData:TriangleData):void
-		{
-			_vertexBuffer = _context.createVertexBuffer(triangleData.rawVertexData.length/5, 5);
-			_vertexBuffer.uploadFromVector(triangleData.rawVertexData, 0, triangleData.rawVertexData.length/5);
-		}
-		
-		private function createIndexBuffer(triangleData:TriangleData):void
-		{
-			_indexBuffer = _context.createIndexBuffer(triangleData.rawIndexData.length);
-			_indexBuffer.uploadFromVector(triangleData.rawIndexData, 0, triangleData.rawIndexData.length);
-		}
-		
-		private function setVertextBuffer():void
-		{
-			_context.setVertexBufferAt(0, _vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
-			_context.setVertexBufferAt(1, _vertexBuffer, 3, Context3DVertexBufferFormat.FLOAT_2);
 		}
 		
 		private function clearVertextBuffer():void
@@ -211,12 +277,12 @@ package trolling.rendering
 		
 		public function get matrix():Matrix3D
 		{
-			return _matrix;
+			return _currentMatrix;
 		}
 		
 		public function set matrix(value:Matrix3D):void
 		{
-			_matrix = value;
+			_currentMatrix = value;
 		}
 		
 		public function get culling():String
@@ -289,14 +355,24 @@ package trolling.rendering
 			_red = value;
 		}
 		
-		public function get previousTexture():flash.display3D.textures.Texture
+		public function get currentBatchData():BatchData
 		{
-			return _previousTexture;
+			return _currentBatchData;
 		}
 		
-		public function set previousTexture(value:flash.display3D.textures.Texture):void
+		public function set currentBatchData(value:BatchData):void
 		{
-			_previousTexture = value;
+			_currentBatchData = value;
+		}
+		
+		public function get batchDatas():Vector.<BatchData>
+		{
+			return _batchDatas;
+		}
+		
+		public function set batchDatas(value:Vector.<BatchData>):void
+		{
+			_batchDatas = value;
 		}
 	}
 }

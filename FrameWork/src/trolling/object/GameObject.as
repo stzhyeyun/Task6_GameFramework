@@ -19,6 +19,7 @@ package trolling.object
 	import trolling.core.Disposer;
 	import trolling.core.Trolling;
 	import trolling.event.TrollingEvent;
+	import trolling.rendering.BatchData;
 	import trolling.rendering.Painter;
 	import trolling.rendering.TriangleData;
 	import trolling.utils.Circle;
@@ -265,7 +266,7 @@ package trolling.object
 		 * @param painter
 		 * 
 		 */		
-		public function render(painter:Painter, atalasData:TriangleData = null):void
+		public function setRenderData(painter:Painter, atalasData:TriangleData = null):void
 		{	
 			if(!_visible)
 				return;
@@ -364,83 +365,117 @@ package trolling.object
 					textureRect.width = displayComponent.getRenderingResource().u;
 					textureRect.height = displayComponent.getRenderingResource().v;
 					
+					var matrixTemp:Matrix3D = painter.matrix.clone();
+					
 					if(_pivot == PivotType.TOP_LEFT)
 					{
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([drawRect.width, 0, 0, textureRect.x+textureRect.width, textureRect.y]));
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([drawRect.width, -drawRect.height, 0, textureRect.x+textureRect.width, textureRect.y+textureRect.height]));
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([0, -drawRect.height, 0, textureRect.x, textureRect.y+textureRect.height]));
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([0, 0, 0, textureRect.x, textureRect.y]));
+						matrixTemp.prependTranslation(drawRect.width, 0, 0);
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrixTemp.position.x, matrixTemp.position.y, 0, textureRect.x+textureRect.width, textureRect.y]));
+						matrixTemp.prependTranslation(-drawRect.width, 0, 0);
+						
+						matrixTemp.prependTranslation(drawRect.width, -drawRect.height, 0);
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrixTemp.position.x, matrixTemp.position.y, 0, textureRect.x+textureRect.width, textureRect.y+textureRect.height]));
+						matrixTemp.prependTranslation(-drawRect.width, drawRect.height, 0);
+						
+						matrixTemp.prependTranslation(0, -drawRect.height, 0);
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrixTemp.position.x, matrixTemp.position.y, 0, textureRect.x, textureRect.y+textureRect.height]));
+						matrixTemp.prependTranslation(0, drawRect.height, 0);
+						
+						matrixTemp.prependTranslation(0, 0, 0);
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrixTemp.position.x, matrixTemp.position.y, 0, textureRect.x, textureRect.y]));
+						matrixTemp.prependTranslation(0, 0, 0);
+						
+//						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([drawRect.width, 0, 0, textureRect.x+textureRect.width, textureRect.y]));
+//						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([drawRect.width, -drawRect.height, 0, textureRect.x+textureRect.width, textureRect.y+textureRect.height]));
+//						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([0, -drawRect.height, 0, textureRect.x, textureRect.y+textureRect.height]));
+//						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([0, 0, 0, textureRect.x, textureRect.y]));
 					}
 					else
 					{
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([drawRect.width/2, drawRect.height/2, 0, textureRect.x+textureRect.width, textureRect.y]));
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([drawRect.width/2, -drawRect.height/2, 0, textureRect.x+textureRect.width, textureRect.y+textureRect.height]));
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([-drawRect.width/2, -drawRect.height/2, 0, textureRect.x, textureRect.y+textureRect.height]));
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([-drawRect.width/2, drawRect.height/2, 0, textureRect.x, textureRect.y]));
+						matrixTemp.prependTranslation((drawRect.width/2), (drawRect.height/2), 0);
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrixTemp.position.x, matrixTemp.position.y, 0, textureRect.x+textureRect.width, textureRect.y]));
+						matrixTemp.prependTranslation(-(drawRect.width/2), -(drawRect.height/2), 0);
+						
+						matrixTemp.prependTranslation((drawRect.width/2), -(drawRect.height/2), 0);
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrixTemp.position.x, matrixTemp.position.y, 0, textureRect.x+textureRect.width, textureRect.y+textureRect.height]));
+						matrixTemp.prependTranslation(-(drawRect.width/2), (drawRect.height/2), 0);
+						
+						matrixTemp.prependTranslation(-(drawRect.width/2), -(drawRect.height/2), 0);
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrixTemp.position.x, matrixTemp.position.y, 0, textureRect.x, textureRect.y+textureRect.height]));
+						matrixTemp.prependTranslation((drawRect.width/2), (drawRect.height/2), 0);
+						
+						matrixTemp.prependTranslation(-(drawRect.width/2), (drawRect.height/2), 0);
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrixTemp.position.x, matrixTemp.position.y, 0, textureRect.x, textureRect.y]));
+						matrixTemp.prependTranslation((drawRect.width/2), -(drawRect.height/2), 0);
+						
+//						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([(drawRect.width/2), (drawRect.height/2), 0, textureRect.x+textureRect.width, textureRect.y]));
+//						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([(drawRect.width/2), -(drawRect.height/2), 0, textureRect.x+textureRect.width, textureRect.y+textureRect.height]));
+//						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([-(drawRect.width/2), -(drawRect.height/2), 0, textureRect.x, textureRect.y+textureRect.height]));
+//						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([-(drawRect.width/2), (drawRect.height/2), 0, textureRect.x, textureRect.y]));
 					}
 					
-					if(painter.previousTexture != displayComponent.getRenderingResource().nativeTexture)
+					if(painter.currentBatchData == null || painter.currentBatchData.batchTexture != displayComponent.getRenderingResource().nativeTexture)
 					{
-						painter.context.setTextureAt(0, displayComponent.getRenderingResource().nativeTexture);
-						painter.previousTexture = displayComponent.getRenderingResource().nativeTexture;
+						var batchData:BatchData = new BatchData();
+						batchData.batchTexture = displayComponent.getRenderingResource().nativeTexture;
+						painter.currentBatchData = batchData;
+						painter.batchDatas.push(batchData);
 					}
+//					else
+//					{
+						painter.currentBatchData.batchTriangles.push(triangleData);
+//					}
 					
-					painter.setDrawData(triangleData);
-					painter.draw();
+//					painter.context.setTextureAt(0, displayComponent.getRenderingResource().nativeTexture);
+//					painter.setDrawData(triangleData);
+//					painter.draw();
 				}
-					
-				var coll:Collider = _components[ComponentType.COLLIDER];
-				if(coll != null && _colliderRender && coll.id != Collider.ID_NONE)
-				{	
-					var rect:Rectangle;
-					if(coll.id == Collider.ID_RECT)
-						rect = coll.rect.clone();
-					else if(coll.id == Collider.ID_CIRCLE)
-					{
-						var circle:Circle = coll.circle;
-						rect = new Rectangle();
-						rect.x = circle.center.x - circle.radius;
-						rect.y = circle.center.y - circle.radius;
-						rect.width = circle.radius*2;
-						rect.height = circle.radius*2;
-					}
-					
-					rect.width = drawRect.width*coll.ratioX;
-					rect.height = drawRect.height*coll.ratioY;
-					rect.x = (drawRect.width/2)-(rect.width/2);
-					rect.y = (drawRect.height/2)-(rect.height/2);
-					
-					var bitmapData:BitmapData = new BitmapData(32, 32, false, Color.RED);
-					var textureTemp:flash.display3D.textures.Texture = painter.context.createTexture(32, 32, Context3DTextureFormat.BGRA, false);
-					textureTemp.uploadFromBitmapData(bitmapData);
-					
-					var triangleTemp:TriangleData = new TriangleData();
-					triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([rect.width/2, rect.height/2, 0, 1, 0]));
-					triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([rect.width/2, -rect.height/2, 0, 1, 1]));
-					triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([-rect.width/2, -rect.height/2, 0, 0, 1]));
-					triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([-rect.width/2, rect.height/2, 0, 0, 0]));
-					
-//					triangleTemp.vertexData.push(Vector.<Number>([rect.width/2, rect.height/2, 0, 1, 0]));
-//					triangleTemp.vertexData.push(Vector.<Number>([rect.width/2, -rect.height/2, 0, 1, 1]));
-//					triangleTemp.vertexData.push(Vector.<Number>([-rect.width/2, -rect.height/2, 0, 0, 1]));
-//					triangleTemp.vertexData.push(Vector.<Number>([-rect.width/2, rect.height/2, 0, 0, 0]));
-					
-					painter.context.setTextureAt(0, textureTemp);
-					
-//					triangleTemp.calculVertex();
-					
-					painter.pushState();
-					if(_pivot == PivotType.TOP_LEFT)
-						painter.matrix.prependTranslation((rect.x+(rect.width/2)), -(rect.y+(rect.height/2)), 0);
-					painter.setDrawData(triangleTemp);
-					painter.draw();
-					painter.popState();
-				}
+				
+//				var coll:Collider = _components[ComponentType.COLLIDER];
+//				if(coll != null && _colliderRender && coll.id != Collider.ID_NONE)
+//				{	
+//					var rect:Rectangle;
+//					if(coll.id == Collider.ID_RECT)
+//						rect = coll.rect.clone();
+//					else if(coll.id == Collider.ID_CIRCLE)
+//					{
+//						var circle:Circle = coll.circle;
+//						rect = new Rectangle();
+//						rect.x = circle.center.x - circle.radius;
+//						rect.y = circle.center.y - circle.radius;
+//						rect.width = circle.radius*2;
+//						rect.height = circle.radius*2;
+//					}
+//					
+//					rect.width = drawRect.width*coll.ratioX;
+//					rect.height = drawRect.height*coll.ratioY;
+//					rect.x = (drawRect.width/2)-(rect.width/2);
+//					rect.y = (drawRect.height/2)-(rect.height/2);
+//					
+//					var bitmapData:BitmapData = new BitmapData(32, 32, false, Color.RED);
+//					var textureTemp:flash.display3D.textures.Texture = painter.context.createTexture(32, 32, Context3DTextureFormat.BGRA, false);
+//					textureTemp.uploadFromBitmapData(bitmapData);
+//					
+//					var triangleTemp:TriangleData = new TriangleData();
+//					triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([rect.width/2, rect.height/2, 0, 1, 0]));
+//					triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([rect.width/2, -rect.height/2, 0, 1, 1]));
+//					triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([-rect.width/2, -rect.height/2, 0, 0, 1]));
+//					triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([-rect.width/2, rect.height/2, 0, 0, 0]));
+//					
+//					painter.context.setTextureAt(0, textureTemp);
+//					
+//					painter.pushState();
+//					if(_pivot == PivotType.TOP_LEFT)
+//						painter.matrix.prependTranslation((rect.x+(rect.width/2)), -(rect.y+(rect.height/2)), 0);
+//					painter.setDrawData(triangleTemp);
+//					painter.draw();
+//					painter.popState();
+//				}
 			}
 			for(var i:int = 0; i < numChildren; i++)
 			{
 				var child:GameObject = _children[i];
-				child.render(painter);
+				child.setRenderData(painter);
 			}
 			painter.popState();
 		}

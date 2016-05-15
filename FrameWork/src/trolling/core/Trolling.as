@@ -381,9 +381,9 @@ package trolling.core
 			_drawCall = 0;
 			_painter.context.setRenderToBackBuffer();
 			_painter.context.clear(Color.getRed(_stage.color)/255.0, Color.getGreen(_stage.color)/255.0, Color.getBlue(_stage.color)/255.0);
-			_currentScene.render(_painter);
+			_currentScene.setRenderData(_painter);
 			_painter.present();
-//			trace(_drawCall);
+			trace(_drawCall);
 		}
 		
 		private function onActivate(event:Event):void

@@ -13,11 +13,28 @@ package trolling.rendering
 		
 		public function BatchData()
 		{
+			_batchTriangles = new Vector.<TriangleData>();
 		}
 		
 		public function calculVecrtex():void
 		{
+			_batchVertex = new Vector.<Number>();
+			_batchIndex = new Vector.<uint>();
 			
+			var triangleData:TriangleData;
+			var triangleCount:uint = 0;
+			while(_batchTriangles.length != 0)
+			{
+				triangleData = _batchTriangles.shift();
+				
+				for(var i:int = 0; i < triangleData.rawIndexData.length; i++)
+					triangleData.rawIndexData[i] += triangleCount;
+				
+				_batchVertex = _batchVertex.concat(triangleData.rawVertexData);
+				_batchIndex = _batchIndex.concat(triangleData.rawIndexData);
+				
+				triangleCount += 4;
+			}
 		}
 		
 		public function get batchTexture():flash.display3D.textures.Texture
