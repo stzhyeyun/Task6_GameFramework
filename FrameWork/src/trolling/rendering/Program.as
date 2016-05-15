@@ -41,14 +41,10 @@ package trolling.rendering
 			_vertexShaderAssemblerTemp.assemble
 				( 
 					Context3DProgramType.VERTEX,
-					// 4x4 matrix multiply to get camera angle	
-					"m44 op, va0, vc0\n" +
-					// tell fragment shader about XYZ
-					"mov v0, va0\n" +
-					// tell fragment shader about UV
-					"mov v1, va1\n" +
-					// tell fragment shader about RGBA
-					"mov v2, va2\n"
+					"m44 op, va0, vc0 \n" + 
+					"mov v0, va0 \n" + // tell fragment shader about XYZ
+					"mov v1, va1 \n" + // tell fragment shader about UV
+					"mov v2, va2\n"   // tell fragment shader about RGBA
 				);
 			
 			_fragmentShaderAssembler1 = new AGALMiniAssembler();
@@ -68,13 +64,10 @@ package trolling.rendering
 			_fragmentShaderAssembler3.assemble
 				( 
 					Context3DProgramType.FRAGMENT,	
-					// grab the texture color from texture 0 
-					// and uv coordinates from varying register 1
-					"tex ft0, v1, fs0 <2d,repeat,miplinear>\n" +
-					// multiply by the value stored in v2 (the vertex rgb)
+					"tex ft0, v1, fs0 <2d,clamp,linear> \n" + 
+//					"mul ft0.a, ft0.a, fc0.x\n" + // manage alpha value that is set as program constant
 					"mul ft1, v2, ft0\n" +
-					// move this value to the output color
-					"mov oc, ft1\n"
+					"mov oc, ft1 \n" // move this value to the output color
 				);
 		}
 		
@@ -87,8 +80,8 @@ package trolling.rendering
 		{
 			_program = context.createProgram();
 			
-//			_program.upload( _vertexShaderAssemblerTemp.agalcode, _fragmentShaderAssembler1.agalcode);
-			_program.upload( _vertexShaderAssembler.agalcode, _fragmentShaderAssembler.agalcode);
+			_program.upload( _vertexShaderAssemblerTemp.agalcode, _fragmentShaderAssembler3.agalcode);
+//			_program.upload( _vertexShaderAssembler.agalcode, _fragmentShaderAssembler.agalcode);
 		}
 	}
 }

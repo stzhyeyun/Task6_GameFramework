@@ -39,9 +39,6 @@ package trolling.rendering
 		
 		private var _culling:String;
 		private var _alpha:Number = 1.0;
-		private var _red:Number = 1.0;
-		private var _green:Number = 1.0;
-		private var _blue:Number = 1.0;
 		private var _currentMatrix:Matrix3D = new Matrix3D();
 		private var _textureFlag:Boolean;
 		private var _program:Program;
@@ -63,9 +60,6 @@ package trolling.rendering
 			var state:RenderState = new RenderState();
 			state.matrix = _currentMatrix.clone();
 			state.alpha = _alpha;
-			state.red = _red;
-			state.green = _green;
-			state.blue = _blue;
 			_stateStack.push(state);
 		}
 		
@@ -74,9 +68,6 @@ package trolling.rendering
 			var state:RenderState = _stateStack.pop();
 			_currentMatrix = state.matrix.clone();
 			_alpha = state.alpha;
-			_red = state.red;
-			_green = state.green;
-			_blue = state.blue;
 		}
 		
 		public function initPainter(resultFunc:Function):void
@@ -118,51 +109,11 @@ package trolling.rendering
 			
 			trace(stageRectangle.width + ", " + stageRectangle.height);
 			_context.configureBackBuffer(stageRectangle.width, stageRectangle.height, alias, true);
-			//_context.setCulling(Context3DTriangleFace.BACK);
+			_context.setCulling(Context3DTriangleFace.BACK);
 			
 			_backBufferWidth = stageRectangle.width;
 			_backBufferHeight = stageRectangle.height;
 		}
-		
-//		public function setDrawData(triangleData:TriangleData):void
-//		{
-//			createVertexBuffer(triangleData);
-//			createIndexBuffer(triangleData);
-//			setVertextBuffer();
-//			setUVVector(triangleData);
-//			//_matrix.appendRotation(90, Z_AXIS);
-//			//_matrix.appendTranslation(0, -0.5, 0);
-////			_context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, _matrix, true);
-//			
-//			var matrix:Matrix3D = new Matrix3D();
-//			matrix.identity();
-//			_context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, matrix, true);
-//			
-//			_context.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, new <Number>[_red, _green, _blue, _alpha], 1);    // fc0
-//		}
-		
-//		private function createVertexBuffer(triangleData:TriangleData):void
-//		{
-//			_vertexBuffer = _context.createVertexBuffer(triangleData.rawVertexData.length/5, 5);
-//			_vertexBuffer.uploadFromVector(triangleData.rawVertexData, 0, triangleData.rawVertexData.length/5);
-//		}
-//		
-//		private function createIndexBuffer(triangleData:TriangleData):void
-//		{
-//			_indexBuffer = _context.createIndexBuffer(triangleData.rawIndexData.length);
-//			_indexBuffer.uploadFromVector(triangleData.rawIndexData, 0, triangleData.rawIndexData.length);
-//		}
-//		
-//		private function setVertextBuffer():void
-//		{
-//			_context.setVertexBufferAt(0, _vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
-//			_context.setVertexBufferAt(1, _vertexBuffer, 3, Context3DVertexBufferFormat.FLOAT_2);
-//		}
-//		
-//		public function setUVVector(triagleData:TriangleData):void
-//		{
-//			_context.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 4, new <Number>[1, 1, 1, 1]);
-//		}
 		
 		public function setDrawData(batchData:BatchData):void
 		{
@@ -179,14 +130,13 @@ package trolling.rendering
 			matrix.identity();
 			_context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, matrix, true);
 			
-//			_context.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, new <Number>[_red, _green, _blue, _alpha], 1);    // fc0
 			_context.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, new <Number>[1, 1, 1, 1], 1);
 		}
 		
 		private function createVertexBuffer(batchData:BatchData):void
 		{
-			_vertexBuffer = _context.createVertexBuffer(batchData.batchVertex.length/5, 5);
-			_vertexBuffer.uploadFromVector(batchData.batchVertex, 0, batchData.batchVertex.length/5);
+			_vertexBuffer = _context.createVertexBuffer(batchData.batchVertex.length/9, 9);
+			_vertexBuffer.uploadFromVector(batchData.batchVertex, 0, batchData.batchVertex.length/9);
 		}
 		
 		private function createIndexBuffer(batchData:BatchData):void
@@ -199,6 +149,7 @@ package trolling.rendering
 		{
 			_context.setVertexBufferAt(0, _vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
 			_context.setVertexBufferAt(1, _vertexBuffer, 3, Context3DVertexBufferFormat.FLOAT_2);
+			_context.setVertexBufferAt(2, _vertexBuffer, 5, Context3DVertexBufferFormat.FLOAT_4);
 		}
 		
 		public function present():void
@@ -323,36 +274,6 @@ package trolling.rendering
 		public function set alpha(value:Number):void
 		{
 			_alpha = value;
-		}
-		
-		public function get blue():Number
-		{
-			return _blue;
-		}
-		
-		public function set blue(value:Number):void
-		{
-			_blue = value;
-		}
-		
-		public function get green():Number
-		{
-			return _green;
-		}
-		
-		public function set green(value:Number):void
-		{
-			_green = value;
-		}
-		
-		public function get red():Number
-		{
-			return _red;
-		}
-		
-		public function set red(value:Number):void
-		{
-			_red = value;
 		}
 		
 		public function get currentBatchData():BatchData
