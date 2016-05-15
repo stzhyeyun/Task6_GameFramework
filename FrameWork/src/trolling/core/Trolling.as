@@ -383,7 +383,7 @@ package trolling.core
 			_painter.context.clear(Color.getRed(_stage.color)/255.0, Color.getGreen(_stage.color)/255.0, Color.getBlue(_stage.color)/255.0);
 			_currentScene.setRenderData(_painter);
 			_painter.present();
-			trace(_drawCall);
+//			trace(_drawCall);
 		}
 		
 		private function onActivate(event:Event):void
