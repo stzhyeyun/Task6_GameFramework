@@ -10,9 +10,11 @@ package trolling.rendering
 	import flash.display3D.IndexBuffer3D;
 	import flash.display3D.VertexBuffer3D;
 	import flash.events.Event;
+	import flash.geom.Matrix;
 	import flash.geom.Matrix3D;
 	import flash.geom.Rectangle;
 	import flash.geom.Vector3D;
+	import flash.utils.getTimer;
 	
 	import trolling.core.Trolling;
 	
@@ -44,31 +46,82 @@ package trolling.rendering
 		private var _textureFlag:Boolean;
 		private var _program:Program;
 		
+		private var _capacity:uint;
+		
 		private var _stateStack:Vector.<RenderState> = new Vector.<RenderState>();
 
+		public function get matrix():Matrix
+		{
+			return _matrix;
+		}
+
+		public function set matrix(value:Matrix):void
+		{
+			_matrix = value;
+		}
+
+		public function get bufferCreateTime():Number
+		{
+			return _bufferCreateTime;
+		}
+
+		public function set bufferCreateTime(value:Number):void
+		{
+			_bufferCreateTime = value;
+		}
+
+		public function get positionCalTime():Number
+		{
+			return _positionCalTime;
+		}
+
+		public function set positionCalTime(value:Number):void
+		{
+			_positionCalTime = value;
+		}
+
+		public function get matrixCalTime():Number
+		{
+			return _matrixCalTime;
+		}
+
+		public function set matrixCalTime(value:Number):void
+		{
+			_matrixCalTime = value;
+		}
+
 		private var _moleCallBack:Function;
+		
+		private var _matrixCalTime:Number;
+		private var _positionCalTime:Number;
+		private var _bufferCreateTime:Number;
+		
+		private var _matrix:Matrix = new Matrix();
 		
 		public function Painter(stage3D:Stage3D)
 		{
 			_stage3D = stage3D;
 			_program = new Program();
 			_currentMatrix.identity();
+			_matrix.identity();
 			trace("Painter Creater");
 		}
 		
 		public function pushState():void
 		{
 			var state:RenderState = new RenderState();
-			state.matrix = _currentMatrix.clone();
+			state.matrix3d = _currentMatrix.clone();
 			state.alpha = _alpha;
+			state.matrix = _matrix.clone();
 			_stateStack.push(state);
 		}
 		
 		public function popState():void
 		{
 			var state:RenderState = _stateStack.pop();
-			_currentMatrix = state.matrix.clone();
+			_currentMatrix = state.matrix3d.clone();
 			_alpha = state.alpha;
+			_matrix = state.matrix.clone();
 		}
 		
 		public function initPainter(resultFunc:Function):void
@@ -117,7 +170,7 @@ package trolling.rendering
 		}
 		
 		public function setDrawData(batchData:BatchData):void
-		{
+		{	
 			createVertexBuffer(batchData);
 			createIndexBuffer(batchData);
 			setVertextBuffer();
@@ -136,14 +189,35 @@ package trolling.rendering
 		
 		private function createVertexBuffer(batchData:BatchData):void
 		{
+			var prevTime:Number;
+			var currentTime:Number;
+			
+			prevTime = getTimer();
+			
 			_vertexBuffer = _context.createVertexBuffer(batchData.batchVertex.length/9, 9);
 			_vertexBuffer.uploadFromVector(batchData.batchVertex, 0, batchData.batchVertex.length/9);
+			
+			currentTime = getTimer();
+			_bufferCreateTime += (currentTime - prevTime);
 		}
 		
 		private function createIndexBuffer(batchData:BatchData):void
 		{
+			var prevTime:Number;
+			var currentTime:Number;
+			
+			prevTime = getTimer();
+			
 			_indexBuffer = _context.createIndexBuffer(batchData.batchIndex.length);
 			_indexBuffer.uploadFromVector(batchData.batchIndex, 0, batchData.batchIndex.length);
+			
+			currentTime = getTimer();
+			_bufferCreateTime += (currentTime - prevTime);
+		}
+		
+		private function createBuffer():void
+		{
+			
 		}
 		
 		private function setVertextBuffer():void
@@ -186,8 +260,17 @@ package trolling.rendering
 		{
 			Trolling.current.drawCall++;
 			_context.drawTriangles(_indexBuffer);
-			clearVertextBuffer();
-			clearIndexBuffer();
+//			clearVertextBuffer();
+//			clearIndexBuffer();
+			clearBuffer();
+		}
+		
+		private function clearBuffer():void
+		{
+			if(_vertexBuffer)
+				clearVertextBuffer();
+			if(_indexBuffer)
+				clearIndexBuffer();
 		}
 		
 		private function clearVertextBuffer():void
@@ -196,7 +279,7 @@ package trolling.rendering
 			_context.setVertexBufferAt(1, null);
 			_context.setVertexBufferAt(2, null);
 			_vertexBuffer.dispose();
-			_vertexBuffer = null
+			_vertexBuffer = null;
 		}
 		
 		private function clearIndexBuffer():void
@@ -230,12 +313,12 @@ package trolling.rendering
 			_textureFlag = value;
 		}
 		
-		public function get matrix():Matrix3D
+		public function get matrix3d():Matrix3D
 		{
 			return _currentMatrix;
 		}
 		
-		public function set matrix(value:Matrix3D):void
+		public function set matrix3d(value:Matrix3D):void
 		{
 			_currentMatrix = value;
 		}

@@ -1,26 +1,38 @@
 package trolling.rendering
 {
+	import flash.geom.Matrix;
 	import flash.geom.Matrix3D;
 	
 	public class RenderState
 	{
 		private var _alpha:Number;
 		private var _culling:String;
-		private var _matrix:Matrix3D;
+		private var _matrix3d:Matrix3D;
+		private var _matrix:Matrix;
 		
 		public function RenderState()
 		{
 			
 		}
 
-		public function get matrix():Matrix3D
+		public function get matrix():Matrix
 		{
 			return _matrix;
 		}
-		
-		public function set matrix(value:Matrix3D):void
+
+		public function set matrix(value:Matrix):void
 		{
 			_matrix = value;
+		}
+
+		public function get matrix3d():Matrix3D
+		{
+			return _matrix3d;
+		}
+		
+		public function set matrix3d(value:Matrix3D):void
+		{
+			_matrix3d = value;
 		}
 		
 		public function get culling():String
