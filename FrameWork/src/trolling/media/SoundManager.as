@@ -169,10 +169,11 @@ package trolling.media
 			var isInfinite:Boolean = false;
 			if (loops == Sound.INFINITE)
 			{
+				if (!isBgmActive) return;
+				
 				loops = 0;
 				isInfinite = true;
-				
-				if (!isBgmActive) return;
+				stopBgm();				
 			}
 			else
 			{
@@ -296,9 +297,10 @@ package trolling.media
 		
 		public static function wakeBgm():void
 		{
-			if (!_bgm)
+			if (!_bgm || !_isBgmActive)
 			{
-				trace(TAG + " wakeBgm : No BGM.");
+				if (!_bgm) trace(TAG + " wakeBgm : No BGM.");
+				if (!_isBgmActive) trace(TAG + " wakeBgm : BGM is inactive.");
 				return;
 			}
 			

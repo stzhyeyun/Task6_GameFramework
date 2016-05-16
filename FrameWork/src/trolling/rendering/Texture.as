@@ -3,8 +3,8 @@ package trolling.rendering
 	import flash.display.Bitmap;
 	import flash.display3D.textures.Texture;
 	import flash.geom.Rectangle;
-	
 	import trolling.utils.TextureUtil;
+	
 	
 	
 	public class Texture

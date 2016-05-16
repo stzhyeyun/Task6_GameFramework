@@ -27,6 +27,7 @@
     <classEntry path="trolling.core.Disposer"/>
     <classEntry path="trolling.utils.Copy"/>
     <classEntry path="trolling.rendering.BatchData"/>
+    <classEntry path="trolling.rendering.ColliderRenderData"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

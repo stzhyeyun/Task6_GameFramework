@@ -5,11 +5,13 @@ package trolling.object
 	import flash.display3D.Context3DTextureFormat;
 	import flash.display3D.textures.Texture;
 	import flash.events.EventDispatcher;
+	import flash.geom.Matrix;
 	import flash.geom.Matrix3D;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.geom.Vector3D;
 	import flash.utils.Dictionary;
+	import flash.utils.getTimer;
 	
 	import trolling.component.Component;
 	import trolling.component.ComponentType;
@@ -23,7 +25,6 @@ package trolling.object
 	import trolling.rendering.Painter;
 	import trolling.rendering.TriangleData;
 	import trolling.utils.Circle;
-	import trolling.utils.Color;
 	import trolling.utils.PivotType;
 	
 	
@@ -268,6 +269,9 @@ package trolling.object
 		 */		
 		public function setRenderData(painter:Painter, atalasData:TriangleData = null):void
 		{	
+			var prevTime:Number;
+			var currentTime:Number;
+			
 			if(!_visible)
 				return;
 			var numChildren:int = _children.length;
@@ -278,11 +282,15 @@ package trolling.object
 			painter.pushState();
 			if(this == Trolling.current.currentScene)
 			{
-				painter.matrix.appendTranslation(-1, 1, 0);
-				painter.matrix.prependScale(_scaleX, _scaleY, 1);
+				painter.matrix3d.appendTranslation(-1, 1, 0);
+				painter.matrix3d.prependScale(_scaleX, _scaleY, 1);
+				
+//				painter.matrix.scale(_scaleX, _scaleY);
+//				painter.matrix.translate(-1, 1);
 			}
 			else
-			{	
+			{
+				prevTime = getTimer();
 				var displayComponent:DisplayComponent = DisplayComponent(_components[componentType]);
 				if(atalasData == null)
 					triangleData = new TriangleData();
@@ -308,16 +316,28 @@ package trolling.object
 				
 				if(_pivot == PivotType.TOP_LEFT)
 				{
-					painter.matrix.prependTranslation((drawRect.x), -(drawRect.y), 0);
-					painter.matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
-					painter.matrix.prependScale(_scaleX, _scaleY, 1);
+					painter.matrix3d.prependTranslation((drawRect.x), -(drawRect.y), 0);
+					painter.matrix3d.prependRotation(_rotate, Vector3D.Z_AXIS);
+					painter.matrix3d.prependScale(_scaleX, _scaleY, 1);
+					
+//					painter.matrix.translate((drawRect.x), -(drawRect.y));
+//					painter.matrix.rotate(_rotate);
+//					painter.matrix.scale(_scaleX, _scaleY);
 				}
 				else
 				{
-					painter.matrix.prependTranslation((drawRect.x+(drawRect.width/2)), -(drawRect.y+(drawRect.height/2)), 0);
-					painter.matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
-					painter.matrix.prependScale(_scaleX, _scaleY, 1);
+					painter.matrix3d.prependTranslation((drawRect.x+(drawRect.width/2)), -(drawRect.y+(drawRect.height/2)), 0);
+					painter.matrix3d.prependRotation(_rotate, Vector3D.Z_AXIS);
+					painter.matrix3d.prependScale(_scaleX, _scaleY, 1);
+					
+//					painter.matrix.translate((drawRect.x+(drawRect.width/2)), -(drawRect.y+(drawRect.height/2)));
+//					painter.matrix.rotate(_rotate);
+//					painter.matrix.scale(_scaleX, _scaleY);
 				}
+				currentTime = getTimer();
+//				trace("matrix계산 =" + (currentTime - prevTime));
+				painter.matrixCalTime += (currentTime - prevTime);
+				prevTime = currentTime;
 				
 				if(componentType != NONE && displayComponent.getRenderingResource() != null)
 				{
@@ -326,43 +346,67 @@ package trolling.object
 					textureRect.width = displayComponent.getRenderingResource().u;
 					textureRect.height = displayComponent.getRenderingResource().v;
 					
-					var matrixTemp:Matrix3D = painter.matrix.clone();
+					var matrix3dTemp:Matrix3D = painter.matrix3d.clone();
+//					var matrixTemp:Matrix = painter.matrix.clone();
+					
+//					var leftTop:Point;
+//					var rightTop:Point;
+//					var rightBottom:Point;
+//					var leftBottom:Point;
 					
 					if(_pivot == PivotType.TOP_LEFT)
 					{
-						matrixTemp.prependTranslation(drawRect.width, 0, 0);
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrixTemp.position.x, matrixTemp.position.y, 0, textureRect.x+textureRect.width, textureRect.y, _red, _green, _blue, _alpha*painter.alpha]));
-						matrixTemp.prependTranslation(-drawRect.width, 0, 0);
+//						leftTop = matrixTemp.transformPoint(new Point(0, 0));
+//						trace("leftTop = " + leftTop);
+//						rightTop = matrixTemp.transformPoint(new Point(drawRect.width, 0));
+//						trace("rightTop = " + rightTop);
+//						rightBottom = matrixTemp.transformPoint(new Point(drawRect.width, -drawRect.height));
+//						trace("rightBottom = " + rightBottom);
+//						leftBottom = matrixTemp.transformPoint(new Point(0, -drawRect.height));
+//						trace("leftBottom = " + leftBottom);
 						
-						matrixTemp.prependTranslation(drawRect.width, -drawRect.height, 0);
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrixTemp.position.x, matrixTemp.position.y, 0, textureRect.x+textureRect.width, textureRect.y+textureRect.height,_red, _green, _blue, _alpha*painter.alpha]));
-						matrixTemp.prependTranslation(-drawRect.width, drawRect.height, 0);
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0, textureRect.x, textureRect.y, _red, _green, _blue, _alpha*painter.alpha]));
 						
-						matrixTemp.prependTranslation(0, -drawRect.height, 0);
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrixTemp.position.x, matrixTemp.position.y, 0, textureRect.x, textureRect.y+textureRect.height, _red, _green, _blue, _alpha*painter.alpha]));
-						matrixTemp.prependTranslation(0, drawRect.height, 0);
+//						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([leftTop.x, leftTop.y, 0, textureRect.x, textureRect.y, _red, _green, _blue, _alpha*painter.alpha]));
 						
-						matrixTemp.prependTranslation(0, 0, 0);
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrixTemp.position.x, matrixTemp.position.y, 0, textureRect.x, textureRect.y, _red, _green, _blue, _alpha*painter.alpha]));
-						matrixTemp.prependTranslation(0, 0, 0);						
+						matrix3dTemp.prependTranslation(drawRect.width, 0, 0);
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0, textureRect.x+textureRect.width, textureRect.y,_red, _green, _blue, _alpha*painter.alpha]));
+//						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([rightTop.x, rightTop.y, 0, textureRect.x+textureRect.width, textureRect.y,_red, _green, _blue, _alpha*painter.alpha]));
+						
+						matrix3dTemp.prependTranslation(0, -drawRect.height, 0);
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0, textureRect.x+textureRect.width, textureRect.y+textureRect.height, _red, _green, _blue, _alpha*painter.alpha]));
+//						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([rightBottom.x, rightBottom.y, 0, textureRect.x+textureRect.width, textureRect.y+textureRect.height, _red, _green, _blue, _alpha*painter.alpha]));
+						
+						matrix3dTemp.prependTranslation(-drawRect.width, 0, 0);
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0, textureRect.x, textureRect.y+textureRect.height, _red, _green, _blue, _alpha*painter.alpha]));		
+//						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([leftBottom.x, leftBottom.y, 0, textureRect.x, textureRect.y+textureRect.height, _red, _green, _blue, _alpha*painter.alpha]));		
 					}
 					else
 					{
-						matrixTemp.prependTranslation((drawRect.width/2), (drawRect.height/2), 0);
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrixTemp.position.x, matrixTemp.position.y, 0, textureRect.x+textureRect.width, textureRect.y, _red, _green, _blue, _alpha*painter.alpha]));
-						matrixTemp.prependTranslation(-(drawRect.width/2), -(drawRect.height/2), 0);
+//						leftTop = matrixTemp.transformPoint(new Point(-(drawRect.width/2), (drawRect.height/2)));
+//						trace("leftTop = " + leftTop);
+//						rightTop = matrixTemp.transformPoint(new Point((drawRect.width/2), (drawRect.height/2)));
+//						trace("rightTop = " + rightTop);
+//						rightBottom = matrixTemp.transformPoint(new Point((drawRect.width/2), -(drawRect.height/2)));
+//						trace("rightBottom = " + rightBottom);
+//						leftBottom = matrixTemp.transformPoint(new Point(-(drawRect.width/2), -(drawRect.height/2)));
+//						trace("leftBottom = " + leftBottom);
 						
-						matrixTemp.prependTranslation((drawRect.width/2), -(drawRect.height/2), 0);
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrixTemp.position.x, matrixTemp.position.y, 0, textureRect.x+textureRect.width, textureRect.y+textureRect.height, _red, _green, _blue, _alpha*painter.alpha]));
-						matrixTemp.prependTranslation(-(drawRect.width/2), (drawRect.height/2), 0);
+						matrix3dTemp.prependTranslation((drawRect.width/2), (drawRect.height/2), 0);
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0, textureRect.x+textureRect.width, textureRect.y, _red, _green, _blue, _alpha*painter.alpha]));
+//						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([rightTop.x, rightTop.y, 0, textureRect.x+textureRect.width, textureRect.y, _red, _green, _blue, _alpha*painter.alpha]));
 						
-						matrixTemp.prependTranslation(-(drawRect.width/2), -(drawRect.height/2), 0);
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrixTemp.position.x, matrixTemp.position.y, 0, textureRect.x, textureRect.y+textureRect.height, _red, _green, _blue, _alpha*painter.alpha]));
-						matrixTemp.prependTranslation((drawRect.width/2), (drawRect.height/2), 0);
+						matrix3dTemp.prependTranslation(0, -drawRect.height, 0);
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0, textureRect.x+textureRect.width, textureRect.y+textureRect.height, _red, _green, _blue, _alpha*painter.alpha]));
+//						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([rightBottom.x, rightBottom.y, 0, textureRect.x+textureRect.width, textureRect.y+textureRect.height, _red, _green, _blue, _alpha*painter.alpha]));
 						
-						matrixTemp.prependTranslation(-(drawRect.width/2), (drawRect.height/2), 0);
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrixTemp.position.x, matrixTemp.position.y, 0, textureRect.x, textureRect.y, _red, _green, _blue, _alpha*painter.alpha]));
-						matrixTemp.prependTranslation((drawRect.width/2), -(drawRect.height/2), 0);
+						matrix3dTemp.prependTranslation(-drawRect.width, 0, 0);
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0, textureRect.x, textureRect.y+textureRect.height, _red, _green, _blue, _alpha*painter.alpha]));
+//						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([leftBottom.x, leftBottom.y, 0, textureRect.x, textureRect.y+textureRect.height, _red, _green, _blue, _alpha*painter.alpha]));
+						
+						matrix3dTemp.prependTranslation(0, drawRect.height, 0);
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0, textureRect.x, textureRect.y, _red, _green, _blue, _alpha*painter.alpha]));
+//						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([leftTop.x, leftTop.y, 0, textureRect.x, textureRect.y, _red, _green, _blue, _alpha*painter.alpha]));
 					}
 					
 					if(painter.currentBatchData == null || painter.currentBatchData.batchTexture != displayComponent.getRenderingResource().nativeTexture)
@@ -373,50 +417,59 @@ package trolling.object
 						painter.batchDatas.push(batchData);
 					}
 					painter.currentBatchData.batchTriangles.push(triangleData);
+					
+					var coll:Collider = _components[ComponentType.COLLIDER];
+					if(coll != null && _colliderRender && coll.id != Collider.ID_NONE)
+					{	
+						painter.pushState();
+						var rect:Rectangle;
+						if(coll.id == Collider.ID_RECT)
+							rect = coll.rect.clone();
+						else if(coll.id == Collider.ID_CIRCLE)
+						{
+							var circle:Circle = coll.circle;
+							rect = new Rectangle();
+							rect.x = circle.center.x - circle.radius;
+							rect.y = circle.center.y - circle.radius;
+							rect.width = circle.radius*2;
+							rect.height = circle.radius*2;
+						}
+						
+						rect.width = drawRect.width*coll.ratioX;
+						rect.height = drawRect.height*coll.ratioY;
+						rect.x = (drawRect.width/2)-(rect.width/2);
+						rect.y = (drawRect.height/2)-(rect.height/2);
+						
+						
+						if(_pivot == PivotType.TOP_LEFT)
+							painter.matrix3d.prependTranslation((rect.x+(rect.width/2)), -(rect.y+(rect.height/2)), 0);
+						
+						matrix3dTemp = painter.matrix3d.clone();
+						
+						var triangleTemp:TriangleData = new TriangleData();
+						
+						matrix3dTemp.prependTranslation(rect.width/2, rect.height/2, 0);
+						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0,  1, 0,  1, 1, 1, 1]));
+						
+						matrix3dTemp.prependTranslation(0, -rect.height, 0);
+						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0,  1, 1,  1, 1, 1, 1]));
+						
+						matrix3dTemp.prependTranslation(-rect.width, 0, 0);
+						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0,  0, 1,  1, 1, 1, 1]));
+						
+						matrix3dTemp.prependTranslation(0, rect.height, 0);
+						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0,  0, 0,  1, 1, 1, 1]));
+						
+						painter.colliderRenderData.batchTriangles.push(triangleTemp);
+						
+						painter.popState();
+					}
 				}
+				currentTime = getTimer();
+				painter.positionCalTime += (currentTime - prevTime);
+				prevTime = currentTime;
 				
 				painter.alpha *= _alpha;
-				
-//				var coll:Collider = _components[ComponentType.COLLIDER];
-//				if(coll != null && _colliderRender && coll.id != Collider.ID_NONE)
-//				{	
-//					var rect:Rectangle;
-//					if(coll.id == Collider.ID_RECT)
-//						rect = coll.rect.clone();
-//					else if(coll.id == Collider.ID_CIRCLE)
-//					{
-//						var circle:Circle = coll.circle;
-//						rect = new Rectangle();
-//						rect.x = circle.center.x - circle.radius;
-//						rect.y = circle.center.y - circle.radius;
-//						rect.width = circle.radius*2;
-//						rect.height = circle.radius*2;
-//					}
-//					
-//					rect.width = drawRect.width*coll.ratioX;
-//					rect.height = drawRect.height*coll.ratioY;
-//					rect.x = (drawRect.width/2)-(rect.width/2);
-//					rect.y = (drawRect.height/2)-(rect.height/2);
-//					
-//					var bitmapData:BitmapData = new BitmapData(32, 32, false, Color.RED);
-//					var textureTemp:flash.display3D.textures.Texture = painter.context.createTexture(32, 32, Context3DTextureFormat.BGRA, false);
-//					textureTemp.uploadFromBitmapData(bitmapData);
-//					
-//					var triangleTemp:TriangleData = new TriangleData();
-//					triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([rect.width/2, rect.height/2, 0, 1, 0]));
-//					triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([rect.width/2, -rect.height/2, 0, 1, 1]));
-//					triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([-rect.width/2, -rect.height/2, 0, 0, 1]));
-//					triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([-rect.width/2, rect.height/2, 0, 0, 0]));
-//					
-//					painter.context.setTextureAt(0, textureTemp);
-//					
-//					painter.pushState();
-//					if(_pivot == PivotType.TOP_LEFT)
-//						painter.matrix.prependTranslation((rect.x+(rect.width/2)), -(rect.y+(rect.height/2)), 0);
-//					painter.setDrawData(triangleTemp);
-//					painter.draw();
-//					painter.popState();
-//				}
 			}
 			for(var i:int = 0; i < numChildren; i++)
 			{
@@ -916,6 +969,12 @@ package trolling.object
 		public function set active(value:Boolean):void
 		{
 			_active = value;
+			
+			for(var componentType:String in _components)
+			{
+				var component:Component = _components[componentType];
+				component.isActive = value;
+			}
 		}
 
 		

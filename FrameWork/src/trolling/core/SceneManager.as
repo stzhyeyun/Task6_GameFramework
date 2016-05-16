@@ -45,7 +45,9 @@ package trolling.core
 		public static function outScene(data:Object = null):void
 		{
 			var scene:Scene = _sceneVector.pop();
+			var key:String = Trolling.current.currentScene.key;
 			switchScene(scene.key, data);
+			deleteScene(key);
 		}
 		
 		public static function addScene(sceneClass:Class, key:String):void

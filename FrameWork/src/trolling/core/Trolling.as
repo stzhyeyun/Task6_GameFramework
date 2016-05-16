@@ -4,7 +4,6 @@ package trolling.core
 	import flash.display3D.Context3D;
 	import flash.errors.IllegalOperationError;
 	import flash.events.Event;
-	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.events.TouchEvent;
 	import flash.geom.Point;
@@ -65,6 +64,7 @@ package trolling.core
 			_current = this;
 			
 			trace(stage.width, stage.height);
+			trace(stage.frameRate);
 			_viewPort = viewPort;
 			
 			_stage = new Stage(stage.stageWidth, stage.stageHeight, stage.color);
@@ -370,20 +370,59 @@ package trolling.core
 					_touchs[key].hoverTarget.dispatchEvent(new TrollingEvent(TrollingEvent.TOUCH_HOVER, _touchs[key].points));
 				}
 			}
+			var prevTime:Number;
+			var currentTime:Number;
+			
+			prevTime = getTimer() / 100;
+			
 			Disposer.disposeObjects();
+			currentTime = getTimer() / 100;
+//			trace("dispose =" + (currentTime - prevTime));
+			prevTime = currentTime;
+			
 			_colliderManager.detectCollision();
+			currentTime = getTimer() / 100;
+//			trace("detectCollision =" + (currentTime - prevTime));
+			prevTime = currentTime;
+			
 			nextFrame();
+			currentTime = getTimer() / 100;
+//			trace("nextFrame =" + (currentTime - prevTime));
+			prevTime = currentTime;
+			
 			render();
+//			currentTime = getTimer() / 100;
+//			trace("render =" + (currentTime - prevTime));
+//			prevTime = currentTime;
 		}
 		
 		private function render():void
 		{
+			var prevTime:Number;
+			var currentTime:Number;
+			
 			_drawCall = 0;
 			_painter.context.setRenderToBackBuffer();
 			_painter.context.clear(Color.getRed(_stage.color)/255.0, Color.getGreen(_stage.color)/255.0, Color.getBlue(_stage.color)/255.0);
+			
+			prevTime = getTimer() / 100;
+			
+			_painter.matrixCalTime = 0;
+			_painter.positionCalTime = 0;
+			_painter.bufferCreateTime = 0;
 			_currentScene.setRenderData(_painter);
+//			currentTime = getTimer() / 100;
+//			trace("setRenderData =" + (currentTime - prevTime));
+//			prevTime = currentTime;
+//			trace("_painter.matrixCalTime = " + _painter.matrixCalTime);
+//			trace("_painter.positionCalTime = " + _painter.positionCalTime);
+//			trace("_painter.bufferCreateTime = " + _painter.bufferCreateTime);
+			
 			_painter.present();
-			trace(_drawCall);
+//			currentTime = getTimer() / 100;
+//			trace("present =" + (currentTime - prevTime));
+//			prevTime = currentTime;
+//			trace(_drawCall);
 		}
 		
 		private function onActivate(event:Event):void
