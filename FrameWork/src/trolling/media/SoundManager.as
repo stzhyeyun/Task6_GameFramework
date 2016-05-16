@@ -169,10 +169,11 @@ package trolling.media
 			var isInfinite:Boolean = false;
 			if (loops == Sound.INFINITE)
 			{
+				if (!isBgmActive) return;
+				
 				loops = 0;
 				isInfinite = true;
-				
-				if (!isBgmActive) return;
+				stopBgm();				
 			}
 			else
 			{

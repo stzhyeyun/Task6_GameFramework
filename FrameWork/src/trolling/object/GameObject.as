@@ -926,6 +926,12 @@ package trolling.object
 		public function set active(value:Boolean):void
 		{
 			_active = value;
+			
+			for(var componentType:String in _components)
+			{
+				var component:Component = _components[componentType];
+				component.isActive = value;
+			}
 		}
 
 		
