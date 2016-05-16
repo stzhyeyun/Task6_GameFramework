@@ -712,7 +712,7 @@ package trolling.object
 		 * @param blue
 		 * 게임오브젝트에 색상을 블렌딩 합니다. 
 		 */
-		public function blendColor(red:int, green:int, blue:int):void
+		public function blendColor(red:Number, green:Number, blue:Number):void
 		{
 			_red = red;
 			_green = green;
