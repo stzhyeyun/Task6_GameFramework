@@ -162,6 +162,45 @@ package trolling.object
 			child.parent = this;
 		}
 		
+		public function setChildProperty(child:GameObject, index:uint):void
+		{
+			if(!_children)
+				return;
+			if(index >= _children.length)
+				return;
+			if(child == null || child.parent != this)
+				return;
+			removeChild(child);
+			addChildAt(child, index);
+		}
+		
+		public function switchChildsProperty(child1:GameObject, child2:GameObject):void
+		{
+			if(!_children)
+				return;
+			if(child1 == null || child2 == null)
+				return;
+			if((_children.indexOf(child1) < 0) || (_children.indexOf(child2) < 0))
+				return;
+			var child1Index:int = getChildIndex(child1);
+			var child2Index:int = getChildIndex(child2);
+			if(child1Index > child2Index)
+			{
+				addChildAt(child1, child2Index);
+				addChildAt(child2, child1Index);
+			}
+			else
+			{
+				addChildAt(child2, child1Index);
+				addChildAt(child1, child2Index);
+			}
+		}
+		
+		public function getChildIndex(child:GameObject):int
+		{
+			return _children.indexOf(child);
+		}
+		
 		public function getChild(index:int):GameObject
 		{
 			if (!_children)

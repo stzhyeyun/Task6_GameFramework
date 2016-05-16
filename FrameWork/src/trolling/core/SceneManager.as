@@ -114,7 +114,7 @@ package trolling.core
 			
 			deleteScene(key);
 			addScene(sceneClass, key);
-			goScene(key, data);
+			switchScene(key, data);
 		}
 	}
 }
