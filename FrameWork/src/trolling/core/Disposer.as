@@ -1,6 +1,5 @@
 package trolling.core
 {	
-	import trolling.component.Component;
 	import trolling.object.GameObject;
 	
 	public class Disposer

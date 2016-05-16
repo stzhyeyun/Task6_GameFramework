@@ -40,13 +40,10 @@ package trolling.core
 				return;
 			}
 			
-			for (var i:int = 0; i < _colliders.length; i++)
+			var index:int = _colliders.indexOf(collider);
+			if (index != -1)
 			{
-				if (_colliders[i] == collider)
-				{
-					_colliders.removeAt(i);
-					break;
-				}
+				_colliders.removeAt(index);	
 			}
 		}
 		
