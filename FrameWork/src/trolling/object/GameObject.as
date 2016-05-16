@@ -373,60 +373,60 @@ package trolling.object
 						painter.batchDatas.push(batchData);
 					}
 					painter.currentBatchData.batchTriangles.push(triangleData);
+					
+					var coll:Collider = _components[ComponentType.COLLIDER];
+					if(coll != null && _colliderRender && coll.id != Collider.ID_NONE)
+					{	
+						painter.pushState();
+						var rect:Rectangle;
+						if(coll.id == Collider.ID_RECT)
+							rect = coll.rect.clone();
+						else if(coll.id == Collider.ID_CIRCLE)
+						{
+							var circle:Circle = coll.circle;
+							rect = new Rectangle();
+							rect.x = circle.center.x - circle.radius;
+							rect.y = circle.center.y - circle.radius;
+							rect.width = circle.radius*2;
+							rect.height = circle.radius*2;
+						}
+						
+						rect.width = drawRect.width*coll.ratioX;
+						rect.height = drawRect.height*coll.ratioY;
+						rect.x = (drawRect.width/2)-(rect.width/2);
+						rect.y = (drawRect.height/2)-(rect.height/2);
+						
+						
+						if(_pivot == PivotType.TOP_LEFT)
+							painter.matrix.prependTranslation((rect.x+(rect.width/2)), -(rect.y+(rect.height/2)), 0);
+						
+						matrixTemp = painter.matrix.clone();
+						
+						var triangleTemp:TriangleData = new TriangleData();
+						
+						matrixTemp.prependTranslation(rect.width/2, rect.height/2, 0);
+						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrixTemp.position.x, matrixTemp.position.y, 0,  1, 0,  1, 1, 1, 1]));
+						matrixTemp.prependTranslation(-rect.width/2, -rect.height/2, 0);
+						
+						matrixTemp.prependTranslation(rect.width/2, -rect.height/2, 0);
+						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrixTemp.position.x, matrixTemp.position.y, 0,  1, 1,  1, 1, 1, 1]));
+						matrixTemp.prependTranslation(-rect.width/2, rect.height/2, 0);
+						
+						matrixTemp.prependTranslation(-rect.width/2, -rect.height/2, 0);
+						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrixTemp.position.x, matrixTemp.position.y, 0,  0, 1,  1, 1, 1, 1]));
+						matrixTemp.prependTranslation(rect.width/2, rect.height/2, 0);
+						
+						matrixTemp.prependTranslation(-rect.width/2, rect.height/2, 0);
+						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrixTemp.position.x, matrixTemp.position.y, 0,  0, 0,  1, 1, 1, 1]));
+						matrixTemp.prependTranslation(rect.width/2, -rect.height/2, 0);
+						
+						painter.colliderRenderData.batchTriangles.push(triangleTemp);
+						
+						painter.popState();
+					}
 				}
 				
 				painter.alpha *= _alpha;
-				
-				var coll:Collider = _components[ComponentType.COLLIDER];
-				if(coll != null && _colliderRender && coll.id != Collider.ID_NONE)
-				{	
-					painter.pushState();
-					var rect:Rectangle;
-					if(coll.id == Collider.ID_RECT)
-						rect = coll.rect.clone();
-					else if(coll.id == Collider.ID_CIRCLE)
-					{
-						var circle:Circle = coll.circle;
-						rect = new Rectangle();
-						rect.x = circle.center.x - circle.radius;
-						rect.y = circle.center.y - circle.radius;
-						rect.width = circle.radius*2;
-						rect.height = circle.radius*2;
-					}
-					
-					rect.width = drawRect.width*coll.ratioX;
-					rect.height = drawRect.height*coll.ratioY;
-					rect.x = (drawRect.width/2)-(rect.width/2);
-					rect.y = (drawRect.height/2)-(rect.height/2);
-					
-					
-					if(_pivot == PivotType.TOP_LEFT)
-						painter.matrix.prependTranslation((rect.x+(rect.width/2)), -(rect.y+(rect.height/2)), 0);
-					
-					matrixTemp = painter.matrix.clone();
-					
-					var triangleTemp:TriangleData = new TriangleData();
-					
-					matrixTemp.prependTranslation(rect.width/2, rect.height/2, 0);
-					triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrixTemp.position.x, matrixTemp.position.y, 0,  0, 0,  1, 0, 0, 1]));
-					matrixTemp.prependTranslation(-rect.width/2, -rect.height/2, 0);
-					
-					matrixTemp.prependTranslation(rect.width/2, -rect.height/2, 0);
-					triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrixTemp.position.x, matrixTemp.position.y, 0,  0, 1,  1, 0, 0, 1]));
-					matrixTemp.prependTranslation(-rect.width/2, rect.height/2, 0);
-					
-					matrixTemp.prependTranslation(-rect.width/2, -rect.height/2, 0);
-					triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrixTemp.position.x, matrixTemp.position.y, 0,  -1, 1,  1, 0, 0, 1]));
-					matrixTemp.prependTranslation(rect.width/2, rect.height/2, 0);
-					
-					matrixTemp.prependTranslation(-rect.width/2, rect.height/2, 0);
-					triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrixTemp.position.x, matrixTemp.position.y, 0,  -1, 0,  1, 0, 0, 1]));
-					matrixTemp.prependTranslation(rect.width/2, -rect.height/2, 0);
-					
-					painter.currentBatchData.batchTriangles.push(triangleTemp);
-					
-					painter.popState();
-				}
 			}
 			for(var i:int = 0; i < numChildren; i++)
 			{

@@ -9,7 +9,6 @@ package trolling.rendering
 	import flash.display3D.Context3DVertexBufferFormat;
 	import flash.display3D.IndexBuffer3D;
 	import flash.display3D.VertexBuffer3D;
-	import flash.display3D.textures.Texture;
 	import flash.events.Event;
 	import flash.geom.Matrix3D;
 	import flash.geom.Rectangle;
@@ -36,6 +35,8 @@ package trolling.rendering
 		
 		private var _batchDatas:Vector.<BatchData>;
 		private var _currentBatchData:BatchData;
+		
+		private var _colliderRenderData:ColliderRenderData;
 		
 		private var _culling:String;
 		private var _alpha:Number = 1.0;
@@ -83,7 +84,6 @@ package trolling.rendering
 			_program.initProgram(_context);
 			setProgram();
 //			_indexBuffer = _context.createIndexBuffer(1024);
-			_batchDatas = new Vector.<BatchData>();
 			_context.setDepthTest(true, Context3DCompareMode.ALWAYS);
 			_context.setCulling(Context3DTriangleFace.BACK);
 			_context.setBlendFactors(
@@ -91,6 +91,7 @@ package trolling.rendering
 				Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA
 			);
 			_moleCallBack(_context);
+			initBatchDatas();
 			//_context.set
 		}
 		
@@ -163,15 +164,17 @@ package trolling.rendering
 		{
 			_batchDatas = new Vector.<BatchData>();
 			_currentBatchData = null;
+			_colliderRenderData = new ColliderRenderData();
 		}
 		
 		public function batchDraw():void
 		{
+			if(_colliderRenderData.batchTriangles.length != 0)
+				_batchDatas.push(_colliderRenderData);
 			var batchData:BatchData;
 			while(_batchDatas.length != 0)
 			{
 				batchData = _batchDatas.shift();
-				
 				_context.setTextureAt(0, batchData.batchTexture);
 				batchData.calculVecrtex();
 				setDrawData(batchData);
@@ -191,6 +194,7 @@ package trolling.rendering
 		{
 			_context.setVertexBufferAt(0, null);
 			_context.setVertexBufferAt(1, null);
+			_context.setVertexBufferAt(2, null);
 			_vertexBuffer.dispose();
 			_vertexBuffer = null
 		}
@@ -294,6 +298,16 @@ package trolling.rendering
 		public function set batchDatas(value:Vector.<BatchData>):void
 		{
 			_batchDatas = value;
+		}
+		
+		public function get colliderRenderData():ColliderRenderData
+		{
+			return _colliderRenderData;
+		}
+		
+		public function set colliderRenderData(value:ColliderRenderData):void
+		{
+			_colliderRenderData = value;
 		}
 	}
 }
