@@ -4,7 +4,6 @@ package trolling.core
 	import flash.display3D.Context3D;
 	import flash.errors.IllegalOperationError;
 	import flash.events.Event;
-	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.events.TouchEvent;
 	import flash.geom.Point;
