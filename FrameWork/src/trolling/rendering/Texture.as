@@ -3,8 +3,8 @@ package trolling.rendering
 	import flash.display.Bitmap;
 	import flash.display3D.textures.Texture;
 	import flash.geom.Rectangle;
-	
 	import trolling.utils.TextureUtil;
+	
 	
 	
 	public class Texture
@@ -60,10 +60,10 @@ package trolling.rendering
 			_width = position.width;
 			_height = position.height;
 			
-			_u = position.width / parentTexture.width;
-			_v = position.height / parentTexture.height;
-			_ux = position.x / parentTexture.width;
-			_vy = position.y / parentTexture.height;
+			_u = position.width / TextureUtil.nextPowerOfTwo(parentTexture.width);
+			_v = position.height / TextureUtil.nextPowerOfTwo(parentTexture.height);
+			_ux = position.x / TextureUtil.nextPowerOfTwo(parentTexture.width);
+			_vy = position.y / TextureUtil.nextPowerOfTwo(parentTexture.height);
 		}
 		
 		public function get height():Number
