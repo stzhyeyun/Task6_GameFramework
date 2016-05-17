@@ -38,6 +38,9 @@ package trolling.rendering
 
 		public function setFromBitmap(bitmap:Bitmap):void
 		{
+			if(_nativeTexture != null)
+				_nativeTexture.dispose();
+			
 			_width = bitmap.width;
 			_height = bitmap.height;
 			
@@ -54,6 +57,9 @@ package trolling.rendering
 		
 		public function setFromTexture(parentTexture:trolling.rendering.Texture, position:Rectangle):void
 		{
+			if(_nativeTexture != null)
+				_nativeTexture.dispose();
+			
 			if(parentTexture.nativeTexture == null)
 				return;
 			_nativeTexture = parentTexture.nativeTexture;

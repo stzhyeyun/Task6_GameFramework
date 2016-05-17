@@ -10,12 +10,13 @@ package trolling.rendering
 	import flash.display3D.IndexBuffer3D;
 	import flash.display3D.VertexBuffer3D;
 	import flash.events.Event;
-	import flash.geom.Matrix;
 	import flash.geom.Matrix3D;
 	import flash.geom.Rectangle;
 	import flash.geom.Vector3D;
+	import flash.system.System;
 	import flash.utils.getTimer;
 	
+	import trolling.core.StatsDisplay;
 	import trolling.core.Trolling;
 	
 	public class Painter
@@ -50,60 +51,13 @@ package trolling.rendering
 		
 		private var _stateStack:Vector.<RenderState> = new Vector.<RenderState>();
 
-		public function get matrix():Matrix
-		{
-			return _matrix;
-		}
-
-		public function set matrix(value:Matrix):void
-		{
-			_matrix = value;
-		}
-
-		public function get bufferCreateTime():Number
-		{
-			return _bufferCreateTime;
-		}
-
-		public function set bufferCreateTime(value:Number):void
-		{
-			_bufferCreateTime = value;
-		}
-
-		public function get positionCalTime():Number
-		{
-			return _positionCalTime;
-		}
-
-		public function set positionCalTime(value:Number):void
-		{
-			_positionCalTime = value;
-		}
-
-		public function get matrixCalTime():Number
-		{
-			return _matrixCalTime;
-		}
-
-		public function set matrixCalTime(value:Number):void
-		{
-			_matrixCalTime = value;
-		}
-
 		private var _moleCallBack:Function;
-		
-		private var _matrixCalTime:Number;
-		private var _positionCalTime:Number;
-		private var _bufferCreateTime:Number;
-		
-		private var _matrix:Matrix = new Matrix();
 		
 		public function Painter(stage3D:Stage3D)
 		{
 			_stage3D = stage3D;
 			_program = new Program();
 			_currentMatrix.identity();
-			_matrix.identity();
 			trace("Painter Creater");
 		}
 		
@@ -112,7 +66,6 @@ package trolling.rendering
 			var state:RenderState = new RenderState();
 			state.matrix3d = _currentMatrix.clone();
 			state.alpha = _alpha;
-			state.matrix = _matrix.clone();
 			_stateStack.push(state);
 		}
 		
@@ -121,7 +74,6 @@ package trolling.rendering
 			var state:RenderState = _stateStack.pop();
 			_currentMatrix = state.matrix3d.clone();
 			_alpha = state.alpha;
-			_matrix = state.matrix.clone();
 		}
 		
 		public function initPainter(resultFunc:Function):void
@@ -136,7 +88,6 @@ package trolling.rendering
 			_context = _stage3D.context3D;	
 			_program.initProgram(_context);
 			setProgram();
-//			_indexBuffer = _context.createIndexBuffer(1024);
 			_context.setDepthTest(true, Context3DCompareMode.ALWAYS);
 			_context.setCulling(Context3DTriangleFace.BACK);
 			_context.setBlendFactors(
@@ -145,7 +96,6 @@ package trolling.rendering
 			);
 			_moleCallBack(_context);
 			initBatchDatas();
-			//_context.set
 		}
 		
 		public function configureBackBuffer(stageRectangle:Rectangle, antiAlias:Boolean = true):void
@@ -189,35 +139,14 @@ package trolling.rendering
 		
 		private function createVertexBuffer(batchData:BatchData):void
 		{
-			var prevTime:Number;
-			var currentTime:Number;
-			
-			prevTime = getTimer();
-			
 			_vertexBuffer = _context.createVertexBuffer(batchData.batchVertex.length/9, 9);
 			_vertexBuffer.uploadFromVector(batchData.batchVertex, 0, batchData.batchVertex.length/9);
-			
-			currentTime = getTimer();
-			_bufferCreateTime += (currentTime - prevTime);
 		}
 		
 		private function createIndexBuffer(batchData:BatchData):void
 		{
-			var prevTime:Number;
-			var currentTime:Number;
-			
-			prevTime = getTimer();
-			
 			_indexBuffer = _context.createIndexBuffer(batchData.batchIndex.length);
 			_indexBuffer.uploadFromVector(batchData.batchIndex, 0, batchData.batchIndex.length);
-			
-			currentTime = getTimer();
-			_bufferCreateTime += (currentTime - prevTime);
-		}
-		
-		private function createBuffer():void
-		{
-			
 		}
 		
 		private function setVertextBuffer():void
@@ -229,7 +158,6 @@ package trolling.rendering
 		
 		public function present():void
 		{
-			batchDraw();
 			_context.present();
 			initBatchDatas();
 		}
@@ -254,14 +182,26 @@ package trolling.rendering
 				setDrawData(batchData);
 				draw();
 			}
+			if(Trolling.current.statsVisible)
+			{
+				var memory:Number = System.totalMemory * 0.000000954;
+				Trolling.current.statsTextField.text = "drawCall = " + Trolling.current.drawCall + "\n" + "memory = " + memory.toFixed(memory < 100 ? 1 : 0);
+				
+				var statsBatch:StatsDisplay = new StatsDisplay();
+				statsBatch.statsTextField = Trolling.current.statsTextField;
+				statsBatch.setStatsTriangle();
+				_context.setTextureAt(0, statsBatch.batchTexture);
+				statsBatch.calculVecrtex();
+				setDrawData(statsBatch);
+				draw();
+				statsBatch = null;
+			}
 		}
 		
 		public function draw():void
 		{
 			Trolling.current.drawCall++;
 			_context.drawTriangles(_indexBuffer);
-//			clearVertextBuffer();
-//			clearIndexBuffer();
 			clearBuffer();
 		}
 		

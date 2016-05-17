@@ -29,6 +29,7 @@
     <classEntry path="trolling.rendering.BatchData"/>
     <classEntry path="trolling.rendering.ColliderRenderData"/>
     <classEntry path="trolling.text.TextField"/>
+    <classEntry path="trolling.core.StatsDisplay"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

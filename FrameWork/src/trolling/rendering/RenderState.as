@@ -1,6 +1,5 @@
 package trolling.rendering
 {
-	import flash.geom.Matrix;
 	import flash.geom.Matrix3D;
 	
 	public class RenderState
@@ -8,21 +7,10 @@ package trolling.rendering
 		private var _alpha:Number;
 		private var _culling:String;
 		private var _matrix3d:Matrix3D;
-		private var _matrix:Matrix;
 		
 		public function RenderState()
 		{
 			
-		}
-
-		public function get matrix():Matrix
-		{
-			return _matrix;
-		}
-
-		public function set matrix(value:Matrix):void
-		{
-			_matrix = value;
 		}
 
 		public function get matrix3d():Matrix3D
