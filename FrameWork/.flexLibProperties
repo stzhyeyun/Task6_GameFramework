@@ -28,6 +28,7 @@
     <classEntry path="trolling.utils.Copy"/>
     <classEntry path="trolling.rendering.BatchData"/>
     <classEntry path="trolling.rendering.ColliderRenderData"/>
+    <classEntry path="trolling.text.TextField"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
