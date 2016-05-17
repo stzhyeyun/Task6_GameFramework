@@ -18,6 +18,35 @@ package trolling.core
 			
 		}
 		
+		public static function dispose():void
+		{
+			if (_sceneDic)
+			{
+				for (var key:Object in _sceneDic)
+				{
+					var scene:Scene = _sceneDic[key];
+					if (scene)
+					{
+						scene.dispose();
+					}
+				}
+			}
+			_sceneDic = null;
+			
+			if (_sceneVector)
+			{
+				for (var i:int = 0; i < _sceneVector.length; i++)
+				{
+					scene = _sceneVector[i];
+					if (scene)
+					{
+						scene.dispose();
+					}
+				}
+			}
+			_sceneVector = null;
+		}
+		
 		/**
 		 *현제의 Scene을  
 		 * @param key
