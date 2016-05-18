@@ -434,16 +434,16 @@ package trolling.object
 						var triangleTemp:TriangleData = new TriangleData();
 						
 						matrix3dTemp.prependTranslation(rect.width/2, rect.height/2, 0);
-						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0,  1, 0,  1, 1, 1, 1]));
+						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0,  1, 0,  1, 1, 1, 0.5]));
 						
 						matrix3dTemp.prependTranslation(0, -rect.height, 0);
-						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0,  1, 1,  1, 1, 1, 1]));
+						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0,  1, 1,  1, 1, 1, 0.5]));
 						
 						matrix3dTemp.prependTranslation(-rect.width, 0, 0);
-						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0,  0, 1,  1, 1, 1, 1]));
+						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0,  0, 1,  1, 1, 1, 0.5]));
 						
 						matrix3dTemp.prependTranslation(0, rect.height, 0);
-						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0,  0, 0,  1, 1, 1, 1]));
+						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0,  0, 0,  1, 1, 1, 0.5]));
 						
 						painter.colliderRenderData.batchTriangles.push(triangleTemp);
 						
