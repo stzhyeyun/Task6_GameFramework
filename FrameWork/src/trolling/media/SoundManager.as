@@ -145,7 +145,7 @@ package trolling.media
 		}
 		
 		/**
-		 * 지정한 Sound를 재생합니다.
+		 * 지정한 Sound를 재생합니다. 재생하고자 하는 Sound가 BGM(무한반봅 설정된 Sound)일 경우 현재 재생 중인 BGM은 정지됩니다. isBgmActive가 false일 경우 BGM, isSoundEffectActive가 false일 경우 사운드 이펙트의 재생 명령을 무시합니다.
 		 * @param name 재생하고자 하는 Sound의 이름입니다.
 		 * 
 		 */
@@ -255,6 +255,10 @@ package trolling.media
 			_channels = null;
 		}
 		
+		/**
+		 * 현재 재생 중인 모든 사운드 이펙트를 정지합니다. 
+		 * 
+		 */
 		public static function stopSoundEffect():void
 		{
 			var index:int = -1;
@@ -277,6 +281,10 @@ package trolling.media
 			}
 		}
 		
+		/**
+		 * 현재 재생 중인 BGM(무한반봅 설정된 Sound)을 정지합니다. 
+		 * 
+		 */
 		public static function stopBgm():void
 		{
 			var index:int = -1;
@@ -295,6 +303,10 @@ package trolling.media
 			}
 		}
 		
+		/**
+		 * 가장 최근에 정지한 BGM(무한반봅 설정된 Sound)을 다시 재생합니다. 
+		 * 
+		 */
 		public static function wakeBgm():void
 		{
 			if (!_bgm || !_isBgmActive)
@@ -443,7 +455,7 @@ package trolling.media
 		}
 		
 		/**
-		 * 배경음악(무한반복되도록 설정된 Sound)의 재생이 끝나면 다시 재생을 시작합니다.
+		 * BGM(무한반복되도록 설정된 Sound)의 재생이 끝나면 다시 재생을 시작합니다.
 		 * @param event Event.SOUND_COMPLETE
 		 * 
 		 */

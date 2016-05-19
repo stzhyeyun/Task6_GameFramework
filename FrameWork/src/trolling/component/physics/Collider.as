@@ -220,6 +220,11 @@ package trolling.component.physics
 			_ratioX = ratio;
 		}
 		
+		/**
+		 * ignoreTag를 추가합니다. 복수 지정할 수 있습니다. ignoreTag를 상호 지정하지 않고 단방향으로만 지정해도 충돌을 무시합니다. (ex. Enemy의 Collider에 Item을 ignoreTag로 지정하면 Item의 Collider에 ignoreTag를 별도 지정하지 않아도 Enemy와 Item의 충돌을 무시함) 
+		 * @param tag 충돌을 무시하고자 하는 GameObject의 Tag값입니다.
+		 * 
+		 */
 		public function addIgnoreTag(tag:String):void
 		{
 			if (!tag)
@@ -234,6 +239,11 @@ package trolling.component.physics
 			_ignoreTags.push(tag);
 		}
 		
+		/**
+		 * 등록한 ignoreTag를 제거합니다. 
+		 * @param tag 제거하고자 하는 ignoreTag입니다.
+		 * 
+		 */
 		public function removeIgnoreTag(tag:String):void
 		{
 			if (!tag || !_ignoreTags)
