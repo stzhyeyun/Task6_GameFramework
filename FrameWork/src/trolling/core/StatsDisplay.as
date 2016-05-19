@@ -24,8 +24,8 @@ package trolling.core
 			
 			var statsTriangle:TriangleData = new TriangleData();
 			statsTriangle.rawVertexData = statsTriangle.rawVertexData.concat(Vector.<Number>([-1, 1, 0, textureRect.x, textureRect.y, 1, 1, 1, 1]));
-			statsTriangle.rawVertexData = statsTriangle.rawVertexData.concat(Vector.<Number>([-0.83, 1, 0, textureRect.x+textureRect.width, textureRect.y, 1, 1, 1, 1]));
-			statsTriangle.rawVertexData = statsTriangle.rawVertexData.concat(Vector.<Number>([-0.83, 0.9, 0, textureRect.x+textureRect.width, textureRect.y+textureRect.height, 1, 1, 1, 1]));
+			statsTriangle.rawVertexData = statsTriangle.rawVertexData.concat(Vector.<Number>([-0.8, 1, 0, textureRect.x+textureRect.width, textureRect.y, 1, 1, 1, 1]));
+			statsTriangle.rawVertexData = statsTriangle.rawVertexData.concat(Vector.<Number>([-0.8, 0.9, 0, textureRect.x+textureRect.width, textureRect.y+textureRect.height, 1, 1, 1, 1]));
 			statsTriangle.rawVertexData = statsTriangle.rawVertexData.concat(Vector.<Number>([-1, 0.9, 0, textureRect.x, textureRect.y+textureRect.height, 1, 1, 1, 1]));
 			
 			this.batchTexture = textImage.texture.nativeTexture;

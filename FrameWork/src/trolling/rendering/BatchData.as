@@ -11,6 +11,10 @@ package trolling.rendering
 		
 		private var _batchTexture:flash.display3D.textures.Texture;
 		
+		/**
+		 *배칭데이터 
+		 * 
+		 */		
 		public function BatchData()
 		{
 			_batchTriangles = new Vector.<TriangleData>();

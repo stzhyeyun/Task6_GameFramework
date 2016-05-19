@@ -1,11 +1,7 @@
 package trolling.object
 {
-	import flash.display.BitmapData;
-	import flash.display.Shape;
-	import flash.display3D.Context3DTextureFormat;
-	import flash.display3D.textures.Texture;
+	import flash.display.DisplayObject;
 	import flash.events.EventDispatcher;
-	import flash.geom.Matrix;
 	import flash.geom.Matrix3D;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
@@ -27,7 +23,6 @@ package trolling.object
 	import trolling.utils.Circle;
 	import trolling.utils.PivotType;
 	
-	
 	public class GameObject extends EventDispatcher
 	{	
 		//change
@@ -44,6 +39,7 @@ package trolling.object
 		
 		private var _x:Number;
 		private var _y:Number;
+		private var _z:Number;
 		private var _pivot:String;
 		private var _width:Number;
 		private var _height:Number;
@@ -66,7 +62,7 @@ package trolling.object
 			this.addEventListener(TrollingEvent.ENTER_FRAME, onThrowEvent);
 			this.addEventListener(TrollingEvent.END_SCENE, onThrowEvent);
 			this.addEventListener(TrollingEvent.START_SCENE, onThrowEvent);
-			_x = _y = _width = _height = _rotate = 0.0;
+			_x = _y = _z = _width = _height = _rotate = 0.0;
 			_pivot = PivotType.TOP_LEFT;
 			_scaleX = _scaleY = _alpha = _red = _green = _blue = 1;
 			_components = new Dictionary();
@@ -74,7 +70,7 @@ package trolling.object
 			_visible = true;
 			_tag = null;
 		}
-		
+
 		/**
 		 *컴포넌트를 추가시켜주는 함수
 		 * 추가시킬 컴포넌트를 인자로 받습니다. 
@@ -302,11 +298,11 @@ package trolling.object
 		}
 		
 		/**
-		 *render함수 
+		 *렌더링을 하기위해서 데이터를 구축하는 함수입니다.
 		 * @param painter
 		 * 
 		 */		
-		public function setRenderData(painter:Painter):void
+		internal function setRenderData(painter:Painter):void
 		{	
 			if(!_visible)
 				return;
@@ -318,7 +314,7 @@ package trolling.object
 			painter.pushState();
 			if(this == Trolling.current.currentScene)
 			{
-				painter.matrix3d.appendTranslation(-1, 1, 0);
+				painter.matrix3d.prependTranslation(-1, 1, 0);
 				painter.matrix3d.prependScale(_scaleX, _scaleY, 1);
 			}
 			else
@@ -344,13 +340,13 @@ package trolling.object
 				
 				if(_pivot == PivotType.TOP_LEFT)
 				{
-					painter.matrix3d.prependTranslation((drawRect.x), -(drawRect.y), 0);
+					painter.matrix3d.prependTranslation((drawRect.x), -(drawRect.y), _z);
 					painter.matrix3d.prependRotation(_rotate, Vector3D.Z_AXIS);
 					painter.matrix3d.prependScale(_scaleX, _scaleY, 1);
 				}
 				else
 				{
-					painter.matrix3d.prependTranslation((drawRect.x+(drawRect.width/2)), -(drawRect.y+(drawRect.height/2)), 0);
+					painter.matrix3d.prependTranslation((drawRect.x+(drawRect.width/2)), -(drawRect.y+(drawRect.height/2)), _z);
 					painter.matrix3d.prependRotation(_rotate, Vector3D.Z_AXIS);
 					painter.matrix3d.prependScale(_scaleX, _scaleY, 1);
 				}
@@ -365,33 +361,33 @@ package trolling.object
 					textureRect.height = displayComponent.getRenderingResource().v;
 					
 					var matrix3dTemp:Matrix3D = painter.matrix3d.clone();
-					
+					trace("matrix3dTemp = " + matrix3dTemp.position);
 					if(_pivot == PivotType.TOP_LEFT)
 					{						
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0, textureRect.x, textureRect.y, _red, _green, _blue, _alpha*painter.alpha]));
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, matrix3dTemp.position.z, textureRect.x, textureRect.y, _red, _green, _blue, _alpha*painter.alpha]));
 						
 						matrix3dTemp.prependTranslation(drawRect.width, 0, 0);
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0, textureRect.x+textureRect.width, textureRect.y,_red, _green, _blue, _alpha*painter.alpha]));
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, matrix3dTemp.position.z, textureRect.x+textureRect.width, textureRect.y,_red, _green, _blue, _alpha*painter.alpha]));
 						
 						matrix3dTemp.prependTranslation(0, -drawRect.height, 0);
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0, textureRect.x+textureRect.width, textureRect.y+textureRect.height, _red, _green, _blue, _alpha*painter.alpha]));
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, matrix3dTemp.position.z, textureRect.x+textureRect.width, textureRect.y+textureRect.height, _red, _green, _blue, _alpha*painter.alpha]));
 						
 						matrix3dTemp.prependTranslation(-drawRect.width, 0, 0);
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0, textureRect.x, textureRect.y+textureRect.height, _red, _green, _blue, _alpha*painter.alpha]));		
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, matrix3dTemp.position.z, textureRect.x, textureRect.y+textureRect.height, _red, _green, _blue, _alpha*painter.alpha]));		
 					}
 					else
 					{
 						matrix3dTemp.prependTranslation((drawRect.width/2), (drawRect.height/2), 0);
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0, textureRect.x+textureRect.width, textureRect.y, _red, _green, _blue, _alpha*painter.alpha]));
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, matrix3dTemp.position.z, textureRect.x+textureRect.width, textureRect.y, _red, _green, _blue, _alpha*painter.alpha]));
 						
 						matrix3dTemp.prependTranslation(0, -drawRect.height, 0);
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0, textureRect.x+textureRect.width, textureRect.y+textureRect.height, _red, _green, _blue, _alpha*painter.alpha]));
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, matrix3dTemp.position.z, textureRect.x+textureRect.width, textureRect.y+textureRect.height, _red, _green, _blue, _alpha*painter.alpha]));
 						
 						matrix3dTemp.prependTranslation(-drawRect.width, 0, 0);
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0, textureRect.x, textureRect.y+textureRect.height, _red, _green, _blue, _alpha*painter.alpha]));
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, matrix3dTemp.position.z, textureRect.x, textureRect.y+textureRect.height, _red, _green, _blue, _alpha*painter.alpha]));
 						
 						matrix3dTemp.prependTranslation(0, drawRect.height, 0);
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0, textureRect.x, textureRect.y, _red, _green, _blue, _alpha*painter.alpha]));
+						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, matrix3dTemp.position.z, textureRect.x, textureRect.y, _red, _green, _blue, _alpha*painter.alpha]));
 					}
 					
 					if(painter.currentBatchData == null || painter.currentBatchData.batchTexture != displayComponent.getRenderingResource().nativeTexture)
@@ -430,20 +426,19 @@ package trolling.object
 							painter.matrix3d.prependTranslation((rect.x+(rect.width/2)), -(rect.y+(rect.height/2)), 0);
 						
 						matrix3dTemp = painter.matrix3d.clone();
-						
 						var triangleTemp:TriangleData = new TriangleData();
 						
 						matrix3dTemp.prependTranslation(rect.width/2, rect.height/2, 0);
-						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0,  1, 0,  1, 1, 1, 1]));
+						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, _z,  1, 0,  1, 1, 1, 1]));
 						
 						matrix3dTemp.prependTranslation(0, -rect.height, 0);
-						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0,  1, 1,  1, 1, 1, 1]));
+						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, _z,  1, 1,  1, 1, 1, 1]));
 						
 						matrix3dTemp.prependTranslation(-rect.width, 0, 0);
-						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0,  0, 1,  1, 1, 1, 1]));
+						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, _z,  0, 1,  1, 1, 1, 1]));
 						
 						matrix3dTemp.prependTranslation(0, rect.height, 0);
-						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, 0,  0, 0,  1, 1, 1, 1]));
+						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, _z,  0, 0,  1, 1, 1, 1]));
 						
 						painter.colliderRenderData.batchTriangles.push(triangleTemp);
 						
@@ -461,6 +456,11 @@ package trolling.object
 			painter.popState();
 		}
 		
+		/**
+		 *렌더링에 사용될 텍스쳐이미지를 선택하는 함수입니다. 
+		 * @return 
+		 * 
+		 */		
 		private function decideRenderingComponent():String
 		{
 			// 컴포넌트가 없음
@@ -526,6 +526,11 @@ package trolling.object
 			}
 		}
 		
+		/**
+		 *애니메이터에게 지정상태로 전이하도록 합니다. 
+		 * @param nextStateName
+		 * 
+		 */		
 		public function transition(nextStateName:String):void // [혜윤] 애니메이터에게 지정 상태로 전이하도록 합니다.
 		{
 			if (!_components || !_components[ComponentType.ANIMATOR])
@@ -544,13 +549,20 @@ package trolling.object
 		 * 
 		 */		
 		public function findClickedGameObject(point:Point):GameObject
-		{            
+		{
+			var childrenTemp:Vector.<GameObject> = new Vector.<GameObject>();
+			var j:int;
+			var k:int;
+			for(j = 0; j < _children.length; j++)
+				childrenTemp.push(_children[j]);
+			childrenTemp.sort(sortOfZpos);
+			
 			var target:GameObject = null;
-			for(var i:int = _children.length-1; i >= 0; i--)
+			for(var i:int = childrenTemp.length-1; i >= 0; i--)
 			{
-				if(_children[i].getBound().containsPoint(point) && _children[i].visible)
+				if(childrenTemp[i].getBound().containsPoint(point) && childrenTemp[i].visible && childrenTemp[i].z >= 0 && childrenTemp[i].z <= 1)
 				{
-					target = _children[i].findClickedGameObject(point);
+					target = childrenTemp[i].findClickedGameObject(point);
 					break;
 				}
 			}
@@ -558,7 +570,20 @@ package trolling.object
 			{
 				target = this;
 			}
+			else if(target != null)
+			{
+				if(target.z > this.z && this != Trolling.current.currentScene)
+					target = this;
+			}
 			return target;
+		}
+		
+		private function sortOfZpos(child1:GameObject, child2:GameObject):int
+		{
+			if(child1.z < child2.z)
+				return 1
+			else
+				return -1;
 		}
 		
 		/**
@@ -594,23 +619,11 @@ package trolling.object
 			{
 				for(var i:int = 0; i < _children.length; i++)
 					_children[i].dispatchEvent(new TrollingEvent(event.type));
-			} 
-			
-			//			for(var key:String in _components)
-			//			{
-			//				if(_components[key] != null)
-			//					Component(_components[key]).dispatchEvent(event);
-			//			}
-			//			
-			//			if(_children)
-			//			{
-			//				for(var i:int = 0; i < _children.length; i++)
-			//					_children[i].dispatchEvent(event);
-			//			}
+			}
 		}
 		
 		/**
-		 *Object의 크기보다 큰 이미지가 들어오면 크기를 자동으론 늘려줍니다.
+		 *Object가 크기가 정해져있지 않을 때 이미지가 들어오면 해당 이미지의 크기로 이미지를 자동으로 늘려줍니다.
 		 * @param compare
 		 * 
 		 */		
@@ -637,58 +650,77 @@ package trolling.object
 			
 			if(_pivot == PivotType.CENTER)
 			{
-				globalPoint.x -= ((_width*getScaleXToGlobal())/2);
-				globalPoint.y -= ((_height*getScaleYToGlobal())/2);
+				globalPoint.x -= ((_width*getGlobalScaleX())/2);
+				globalPoint.y -= ((_height*getGlobalScaleY())/2);
 			}
 			
 			return globalPoint;
 		}
 		
-		public function getGlobalMatrix():Matrix3D
+		/**
+		 *객체의 전체좌표를 구할 때 사용할 행렬을 반환합니다.
+		 * @return 
+		 * 
+		 */		
+		private function getGlobalMatrix():Matrix3D
 		{
 			var matrix:Matrix3D = new Matrix3D();
 			matrix.identity();
 			
-			matrix = getMatrix(matrix);
+			setGlobalMatrix(matrix);
 			
 			return matrix;
 		}
 		
-		private function getMatrix(matrix:Matrix3D):Matrix3D
+		/**
+		 *객체의 전체좌표를 구할 때 사용할 행렬을 계산합니다.
+		 * @param matrix
+		 * @return 
+		 * 
+		 */		
+		private function setGlobalMatrix(matrix:Matrix3D):void
 		{
 			var drawRect:Rectangle = getRectangle();
 			
 			if(_parent != null)
-				matrix = _parent.getMatrix(matrix);
+				_parent.setGlobalMatrix(matrix);
 			
 			matrix.prependTranslation((drawRect.x), (drawRect.y), 0);
 			matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
 			matrix.prependScale(_scaleX, _scaleY, 1);
-			
-			return matrix;
 		}
 		
-		public function getScaleXToGlobal():Number
+		/**
+		 *객체가 최종적으로 나타내는 X의 스케일값을 반환합니다.
+		 * @return 
+		 * 
+		 */		
+		public function getGlobalScaleX():Number
 		{
 			var scaleX:Number;
 			scaleX = _scaleX;
 			
 			if(_parent != null)
 			{
-				scaleX *= _parent.getScaleXToGlobal();
+				scaleX *= _parent.getGlobalScaleX();
 			}
 			
 			return scaleX;
 		}
 		
-		public function getScaleYToGlobal():Number
+		/**
+		 *객체가 최종적으로 나타내는 Y의 스케일값을 반환합니다. 
+		 * @return 
+		 * 
+		 */		
+		public function getGlobalScaleY():Number
 		{
 			var scaleY:Number;
 			scaleY = _scaleY;
 			
 			if(_parent != null)
 			{
-				scaleY *= _parent.getScaleYToGlobal();
+				scaleY *= _parent.getGlobalScaleY();
 			}
 			
 			return scaleY;
@@ -734,8 +766,8 @@ package trolling.object
 		{
 			var rect:Rectangle = new Rectangle();
 			rect.topLeft = getGlobalPoint();
-			rect.width = _width*getScaleXToGlobal();
-			rect.height = _height*getScaleYToGlobal();
+			rect.width = _width*getGlobalScaleX();
+			rect.height = _height*getGlobalScaleY();
 			
 			return rect;
 		}
@@ -829,6 +861,16 @@ package trolling.object
 		public function set width(value:Number):void
 		{
 			_width = value;
+		}
+		
+		public function get z():Number
+		{
+			return _z;
+		}
+		
+		public function set z(value:Number):void
+		{
+			_z = value;
 		}
 		
 		public function get y():Number
@@ -958,8 +1000,6 @@ package trolling.object
 				component.isActive = value;
 			}
 		}
-
-		
 	}
 }
 

@@ -26,7 +26,7 @@ package trolling.component.animation
 			addEventListener(TrollingEvent.START_SCENE, onStartScene);
 			addEventListener(TrollingEvent.END_SCENE, onEndScene);
 		}
-				
+			
 		public override function dispose():void
 		{
 			this.isActive = false;
