@@ -2,6 +2,7 @@ package trolling.object
 {
 	import flash.display.DisplayObject;
 	import flash.events.EventDispatcher;
+	import flash.geom.Matrix;
 	import flash.geom.Matrix3D;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
@@ -297,6 +298,26 @@ package trolling.object
 			}
 		}
 		
+		public function getChildVector():Vector.<GameObject>
+		{
+			var childTemp:Vector.<GameObject> = new Vector.<GameObject>();
+			for(var i:int = 0; i < _children.length; i++)
+				childTemp.push(_children[i]);
+			childTemp.sort(sortOfZpos);
+			
+			return childTemp;
+		}
+		
+		private function sortOfZpos(child1:GameObject, child2:GameObject):int
+		{
+			if(child1.z < child2.z)
+				return 1;
+			else if(child1.z == child2.z)
+				return 0;
+			else
+				return -1;
+		}
+		
 		/**
 		 *렌더링을 하기위해서 데이터를 구축하는 함수입니다.
 		 * @param painter
@@ -322,9 +343,6 @@ package trolling.object
 				var displayComponent:DisplayComponent = DisplayComponent(_components[componentType]);
 				
 				var drawRect:Rectangle = getRectangle();
-				
-				drawRect.x = _x;
-				drawRect.y = _y;
 				
 				drawRect.x = (drawRect.x*2) / (painter.viewPort.width);
 				drawRect.y = (drawRect.y*2) / (painter.viewPort.height);
@@ -361,7 +379,6 @@ package trolling.object
 					textureRect.height = displayComponent.getRenderingResource().v;
 					
 					var matrix3dTemp:Matrix3D = painter.matrix3d.clone();
-					trace("matrix3dTemp = " + matrix3dTemp.position);
 					if(_pivot == PivotType.TOP_LEFT)
 					{						
 						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, matrix3dTemp.position.z, textureRect.x, textureRect.y, _red, _green, _blue, _alpha*painter.alpha]));
@@ -550,12 +567,9 @@ package trolling.object
 		 */		
 		public function findClickedGameObject(point:Point):GameObject
 		{
-			var childrenTemp:Vector.<GameObject> = new Vector.<GameObject>();
+			var childrenTemp:Vector.<GameObject> = getChildVector();
 			var j:int;
 			var k:int;
-			for(j = 0; j < _children.length; j++)
-				childrenTemp.push(_children[j]);
-			childrenTemp.sort(sortOfZpos);
 			
 			var target:GameObject = null;
 			for(var i:int = childrenTemp.length-1; i >= 0; i--)
@@ -566,7 +580,7 @@ package trolling.object
 					break;
 				}
 			}
-			if(target == null && getGlobalRect().containsPoint(point))
+			if(target == null && getGlobalRect2().containsPoint(point))
 			{
 				target = this;
 			}
@@ -576,14 +590,6 @@ package trolling.object
 					target = this;
 			}
 			return target;
-		}
-		
-		private function sortOfZpos(child1:GameObject, child2:GameObject):int
-		{
-			if(child1.z < child2.z)
-				return 1
-			else
-				return -1;
 		}
 		
 		/**
@@ -635,60 +641,218 @@ package trolling.object
 				_height = compare.y+compare.height;
 		}
 		
-		/**
-		 *객체가 전체좌표에서 가지는 x,y값을 구합니다. 
-		 * @return 
-		 * 
-		 */		
-		public function getGlobalPoint():Point
-		{
-			var matrix:Matrix3D = getGlobalMatrix();
-			var globalPoint:Point = new Point();
-			
-			globalPoint.x = matrix.position.x;
-			globalPoint.y = matrix.position.y;
-			
-			if(_pivot == PivotType.CENTER)
-			{
-				globalPoint.x -= ((_width*getGlobalScaleX())/2);
-				globalPoint.y -= ((_height*getGlobalScaleY())/2);
-			}
-			
-			return globalPoint;
-		}
+//		/**
+//		 *객체가 전체좌표에서 가지는 x,y값을 구합니다. 
+//		 * @return 
+//		 * 
+//		 */		
+//		public function getGlobalPoint():Point
+//		{
+//			var matrix:Matrix3D = getGlobalMatrix();
+//			var globalPoint:Point = new Point();
+//			
+//			globalPoint.x = matrix.position.x;
+//			globalPoint.y = matrix.position.y;
+//			
+//			if(_pivot == PivotType.CENTER)
+//			{
+//				globalPoint.x -= ((_width*getGlobalScaleX())/2);
+//				globalPoint.y -= ((_height*getGlobalScaleY())/2);
+//			}
+//			
+//			return globalPoint;
+//		}
 		
 		/**
-		 *객체의 전체좌표를 구할 때 사용할 행렬을 반환합니다.
+		 *전체좌표계에서 이 오브젝트가 차지하는 사각형을 구할 수 있습니다. 
 		 * @return 
 		 * 
-		 */		
-		private function getGlobalMatrix():Matrix3D
+		 */	
+		public function getGlobalRect2():Rectangle
 		{
-			var matrix:Matrix3D = new Matrix3D();
-			matrix.identity();
+			var rect:Rectangle = new Rectangle();
+//			var matrix:Matrix3D = new Matrix3D();
+//			
+//			matrix = getMatrix(matrix);
+//			if(_pivot == PivotType.CENTER)
+//				matrix.appendTranslation(-_width/2, -_height/2, 0);
 			
-			setGlobalMatrix(matrix);
+//			var topLeft:Vector3D = getTopLeft();
+//			var bottomRight:Vector3D = getBottomRight();
+			
+			var topLeft:Point = getTopLeft();
+			var bottomRight:Point = getBottomRight();
+			
+//			topLeft = matrix.transformVector(topLeft);
+//			bottomRight = matrix.transformVector(bottomRight);
+			
+//			rect.topLeft.x = topLeft.x;
+//			rect.topLeft.y = topLeft.y;
+//			rect.bottomRight.x = bottomRight.x;
+//			rect.bottomRight.y = bottomRight.y;
+			rect.topLeft = topLeft;
+			rect.bottomRight = bottomRight;
+			
+//			rect.size = bottomRight;
+			
+			return rect;
+		}
+		
+		public function getGlobalPoint():Point
+		{
+//			var point:Point = new Point();
+//			var topLeft:Vector3D = getTopLeft();
+//			
+//			point.x = topLeft.x;
+//			point.y = topLeft.y;
+			
+			var point:Point = getTopLeft();
+				
+			return point;
+		}
+		
+		public function getBottomRight():Point
+		{
+//			var matrix:Matrix3D = new Matrix3D();
+//			if(_pivot == PivotType.CENTER)
+//				matrix.prependTranslation(-_width/2, -_height/2, 0);
+//			matrix = getMatrix3d(matrix);
+//			
+//			var bottomRight:Vector3D = new Vector3D(_width, _height, _z, 0);
+//			bottomRight = matrix.transformVector(bottomRight);
+			
+			var matrix:Matrix = getGlobalMatrix();
+			
+			var bottomRight:Point = new Point(_width, _height);
+			bottomRight = matrix.transformPoint(bottomRight);
+			
+			return bottomRight;
+		}
+		
+		public function getTopLeft():Point
+		{
+//			var matrix:Matrix3D = new Matrix3D();
+//			if(_pivot == PivotType.CENTER)
+//				matrix.prependTranslation(-_width/2, -_height/2, 0);
+//			matrix = getMatrix3d(matrix);
+//			
+//			var topLeft:Vector3D = new Vector3D(0, 0, _z, 0);
+//			topLeft = matrix.transformVector(topLeft);
+			
+			var matrix:Matrix = getGlobalMatrix();
+			
+//			trace(matrix.toString());
+			
+			var topLeft:Point = new Point(0,0);
+			topLeft = matrix.transformPoint(topLeft);
+			
+			return topLeft;
+		}
+		
+		public function getMatrix():Matrix
+		{
+			var matrix:Matrix = new Matrix();
+			if(_pivot == PivotType.CENTER)
+				matrix.translate(-_width/2, -_height/2);
+			
+			matrix.scale(_scaleX, _scaleY);
+			matrix.translate(_x, _y);
+			matrix.rotate(_rotate);
 			
 			return matrix;
 		}
 		
-		/**
-		 *객체의 전체좌표를 구할 때 사용할 행렬을 계산합니다.
-		 * @param matrix
-		 * @return 
-		 * 
-		 */		
-		private function setGlobalMatrix(matrix:Matrix3D):void
+		public function getGlobalMatrix():Matrix
 		{
-			var drawRect:Rectangle = getRectangle();
+			var matrix:Matrix = new Matrix();
+			if(_pivot == PivotType.CENTER)
+				matrix.translate(-_width/2, -_height/2);
+			
+			matrix = calculMatrix(matrix);
+			
+			return matrix;
+		}
+		
+		public function calculMatrix(matrix:Matrix):Matrix
+		{
+			matrix.scale(_scaleX, _scaleY);
+			matrix.translate(_x, _y);
+			matrix.rotate(_rotate);
 			
 			if(_parent != null)
-				_parent.setGlobalMatrix(matrix);
+				matrix = _parent.calculMatrix(matrix);
 			
-			matrix.prependTranslation((drawRect.x), (drawRect.y), 0);
-			matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
-			matrix.prependScale(_scaleX, _scaleY, 1);
+			return matrix;
 		}
+		
+		public function getGlobalMatrix3d():Matrix3D
+		{
+			var matrix:Matrix = getGlobalMatrix();
+			var matrix3d:Matrix3D = convertMatrix3d(matrix);
+			
+			return matrix3d;
+		}
+		
+		private function convertMatrix3d(matrix:Matrix):Matrix3D
+		{
+			var matrix3d:Matrix3D = new Matrix3D();
+			var vector0:Vector3D = new Vector3D(matrix.a, 0, 0, 0);
+			var vector1:Vector3D = new Vector3D(0, matrix.d, 0, 0);
+			var vector2:Vector3D = new Vector3D(0, 0, 1, 0);
+			var vector3:Vector3D = new Vector3D(matrix.tx, matrix.ty, 0, 0);
+			
+			matrix3d.copyColumnFrom(0, vector0);
+			matrix3d.copyColumnFrom(1, vector1);
+			matrix3d.copyColumnFrom(2, vector2);
+			matrix3d.copyColumnFrom(3, vector3);
+			
+			return matrix3d;
+		}
+		
+//		public function getMatrix3d(matrix:Matrix3D):Matrix3D
+//		{
+//			if(_parent != null)
+//				matrix = _parent.getMatrix3d(matrix);
+//			
+//			matrix.prependTranslation(_x, _y, _z);
+//			matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
+//			matrix.prependScale(_scaleX, _scaleY, 1);
+//			
+//			return matrix;
+//		}
+		
+//		/**
+//		 *객체의 전체좌표를 구할 때 사용할 행렬을 반환합니다.
+//		 * @return 
+//		 * 
+//		 */		
+//		private function getGlobalMatrix():Matrix3D
+//		{
+//			var matrix:Matrix3D = new Matrix3D();
+//			matrix.identity();
+//			
+//			setGlobalMatrix(matrix);
+//			
+//			return matrix;
+//		}
+		
+//		/**
+//		 *객체의 전체좌표를 구할 때 사용할 행렬을 계산합니다.
+//		 * @param matrix
+//		 * @return 
+//		 * 
+//		 */		
+//		private function setGlobalMatrix(matrix:Matrix3D):void
+//		{
+//			var drawRect:Rectangle = getRectangle();
+//			
+//			if(_parent != null)
+//				_parent.setGlobalMatrix(matrix);
+//			
+//			matrix.prependTranslation((drawRect.x), (drawRect.y), 0);
+//			matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
+//			matrix.prependScale(_scaleX/(1+_z), _scaleY/(1+_z), 1);
+//		}
 		
 		/**
 		 *객체가 최종적으로 나타내는 X의 스케일값을 반환합니다.
@@ -733,7 +897,7 @@ package trolling.object
 		 */		
 		public function getBound():Rectangle
 		{
-			var bound:Rectangle = getGlobalRect();
+			var bound:Rectangle = getGlobalRect2();
 			var numChildren:int = _children.length;
 			
 			for(var i:int = 0; i < numChildren; i++)
@@ -756,21 +920,47 @@ package trolling.object
 			}
 			return bound;
 		}
+	
+//		public function getBound():Rectangle
+//		{
+//			var bound:Rectangle = getGlobalRect();
+//			var numChildren:int = _children.length;
+//			
+//			for(var i:int = 0; i < numChildren; i++)
+//			{
+//				var childBound:Rectangle = _children[i].getBound();
+//				if(childBound.topLeft.x < bound.topLeft.x)
+//				{
+//					bound.width += (bound.x - childBound.x);
+//					bound.x = childBound.x;
+//				}
+//				if(childBound.topLeft.y < bound.topLeft.y)
+//				{
+//					bound.height += (bound.y - childBound.y);
+//					bound.y = childBound.y;
+//				}
+//				if(childBound.bottomRight.x > bound.bottomRight.x)
+//					bound.width += (childBound.bottomRight.x-bound.bottomRight.x);
+//				if(childBound.bottomRight.y > bound.bottomRight.y)
+//					bound.height += (childBound.bottomRight.y-bound.bottomRight.y);
+//			}
+//			return bound;
+//		}
 		
-		/**
-		 *전체좌표계에서 이 오브젝트가 차지하는 사각형을 구할 수 있습니다. 
-		 * @return 
-		 * 
-		 */		
-		private function getGlobalRect():Rectangle
-		{
-			var rect:Rectangle = new Rectangle();
-			rect.topLeft = getGlobalPoint();
-			rect.width = _width*getGlobalScaleX();
-			rect.height = _height*getGlobalScaleY();
-			
-			return rect;
-		}
+//		/**
+//		 *전체좌표계에서 이 오브젝트가 차지하는 사각형을 구할 수 있습니다. 
+//		 * @return 
+//		 * 
+//		 */		
+//		private function getGlobalRect():Rectangle
+//		{
+//			var rect:Rectangle = new Rectangle();
+//			rect.topLeft = getGlobalPoint();
+//			rect.width = _width*getGlobalScaleX();
+//			rect.height = _height*getGlobalScaleY();
+//			
+//			return rect;
+//		}
 		
 		/**
 		 * 
@@ -870,6 +1060,10 @@ package trolling.object
 		
 		public function set z(value:Number):void
 		{
+			if(value > 1)
+				value = 1;
+			else if(value < 0)
+				value = 0;
 			_z = value;
 		}
 		

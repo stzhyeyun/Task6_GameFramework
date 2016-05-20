@@ -135,14 +135,14 @@ package trolling.rendering
 			
 //			var vector0:Vector3D = new Vector3D(1, 0, 0, 0);
 //			var vector1:Vector3D = new Vector3D(0, 1, 0, 0);
-//			var vector2:Vector3D = new Vector3D(0, 0, 0.5, 0);
-//			var vector3:Vector3D = new Vector3D(1, -1, 1, 0);
+//			var vector2:Vector3D = new Vector3D(0, 0, 10/9, -(10/9));
+//			var vector3:Vector3D = new Vector3D(0, 0, 0, 0);
 //			
 //			_perspectiveMatrix.copyColumnFrom(0, vector0);
 //			_perspectiveMatrix.copyColumnFrom(1, vector1);
 //			_perspectiveMatrix.copyColumnFrom(2, vector2);
 //			_perspectiveMatrix.copyColumnFrom(3, vector3);
-//			_currentMatrix.append(perspectiveMatrix);
+//			_currentMatrix.prepend(perspectiveMatrix);
 		}
 		
 		public function setDrawData(batchData:BatchData):void
@@ -158,6 +158,8 @@ package trolling.rendering
 			
 			var matrix:Matrix3D = new Matrix3D();
 			matrix.identity();
+//			matrix.appendTranslation(-(Trolling.current.currentScene.width/2), (Trolling.current.currentScene.height/2), 0);
+//			matrix.prependScale((2/_viewPort.width), (2/_viewPort.height), 1);
 //			matrix.copyColumnFrom(0, vector0);
 //			matrix.copyColumnFrom(1, vector1);
 //			matrix.copyColumnFrom(2, vector2);
