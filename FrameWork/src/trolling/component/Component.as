@@ -17,6 +17,10 @@ package trolling.component
 			_isActive = true;
 		}
 		
+		/**
+		 *컴포넌트를 정지시킵니다. 
+		 * 
+		 */		
 		public function dispose():void
 		{
 			_type = null;

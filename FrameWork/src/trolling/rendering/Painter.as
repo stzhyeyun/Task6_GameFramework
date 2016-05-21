@@ -47,9 +47,21 @@ package trolling.rendering
 		private var _textureFlag:Boolean;
 		private var _program:Program;
 		
+		private var _perspectiveMatrix:Matrix3D = new Matrix3D();
+		
 		private var _capacity:uint;
 		
 		private var _stateStack:Vector.<RenderState> = new Vector.<RenderState>();
+
+		public function get perspectiveMatrix():Matrix3D
+		{
+			return _perspectiveMatrix;
+		}
+
+		public function set perspectiveMatrix(value:Matrix3D):void
+		{
+			_perspectiveMatrix = value;
+		}
 
 		private var _moleCallBack:Function;
 		
@@ -58,6 +70,7 @@ package trolling.rendering
 			_stage3D = stage3D;
 			_program = new Program();
 			_currentMatrix.identity();
+			trace("_currentMatrix.rawData = " + _currentMatrix.rawData);
 			trace("Painter Creater");
 		}
 		
@@ -94,6 +107,7 @@ package trolling.rendering
 				Context3DBlendFactor.SOURCE_ALPHA,
 				Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA
 			);
+			
 			_moleCallBack(_context);
 			initBatchDatas();
 		}
@@ -104,6 +118,7 @@ package trolling.rendering
 			_stage3D.y = stageRectangle.y;
 			
 			_viewPort = Trolling.current.viewPort;
+			trace(_viewPort);
 			
 			var alias:int;
 			if(antiAlias)
@@ -117,6 +132,17 @@ package trolling.rendering
 			
 			_backBufferWidth = stageRectangle.width;
 			_backBufferHeight = stageRectangle.height;
+			
+//			var vector0:Vector3D = new Vector3D(1, 0, 0, 0);
+//			var vector1:Vector3D = new Vector3D(0, 1, 0, 0);
+//			var vector2:Vector3D = new Vector3D(0, 0, 10/9, -(10/9));
+//			var vector3:Vector3D = new Vector3D(0, 0, 0, 0);
+//			
+//			_perspectiveMatrix.copyColumnFrom(0, vector0);
+//			_perspectiveMatrix.copyColumnFrom(1, vector1);
+//			_perspectiveMatrix.copyColumnFrom(2, vector2);
+//			_perspectiveMatrix.copyColumnFrom(3, vector3);
+//			_currentMatrix.prepend(perspectiveMatrix);
 		}
 		
 		public function setDrawData(batchData:BatchData):void
@@ -126,12 +152,20 @@ package trolling.rendering
 			setVertextBuffer();
 			_context.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 4, new <Number>[1, 1, 1, 1]);
 //			setUVVector(batchData);
-			//_matrix.appendRotation(90, Z_AXIS);
-			//_matrix.appendTranslation(0, -0.5, 0);
-			//			_context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, _matrix, true);
+//			_matrix.appendRotation(90, Z_AXIS);
+//			_matrix.appendTranslation(0, -0.5, 0);
+//						_context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, _matrix, true);
 			
 			var matrix:Matrix3D = new Matrix3D();
 			matrix.identity();
+//			matrix.appendTranslation(-(Trolling.current.currentScene.width/2), (Trolling.current.currentScene.height/2), 0);
+//			matrix.prependScale((2/_viewPort.width), (2/_viewPort.height), 1);
+//			matrix.copyColumnFrom(0, vector0);
+//			matrix.copyColumnFrom(1, vector1);
+//			matrix.copyColumnFrom(2, vector2);
+//			matrix.copyColumnFrom(3, vector3);
+			
+//			trace("matrix = " + matrix.rawData);
 			_context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, matrix, true);
 			
 			_context.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, new <Number>[1, 1, 1, 1], 1);

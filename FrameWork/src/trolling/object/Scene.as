@@ -1,5 +1,6 @@
 package trolling.object
-{
+{	
+	import trolling.rendering.Painter;
 	
 	public class Scene extends GameObject
 	{
@@ -31,6 +32,11 @@ package trolling.object
 		public function set key(value:String):void
 		{
 			_key = value;
+		}
+		
+		public function setRenderData(renderPainter:Painter):void
+		{
+			super.setRenderData(renderPainter);
 		}
 		
 		public override function set pivot(value:String):void

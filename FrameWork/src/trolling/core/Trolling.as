@@ -58,11 +58,12 @@ package trolling.core
 		private var _statsTextField:TextField;
 		private var _drawCall:uint;
 		
-		public function Trolling(stage:flash.display.Stage, viewPort:Rectangle = null, stage3D:Stage3D = null)
+		public function Trolling(stage:flash.display.Stage, viewPort:Rectangle = null, fullScreen:Rectangle = null, stage3D:Stage3D = null)
 		{
 			if (stage == null) throw new ArgumentError("Stage must not be null");
 			if (stage3D == null) stage3D = stage.stage3Ds[0];
 			if (viewPort == null) viewPort = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
+			if (fullScreen == null) fullScreen = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
 			
 			_current = this;
 			
@@ -70,7 +71,7 @@ package trolling.core
 			trace(stage.frameRate);
 			_viewPort = viewPort;
 			
-			_stage = new Stage(stage.stageWidth, stage.stageHeight, stage.color);
+			_stage = new Stage(fullScreen.width, fullScreen.height, stage.color);
 			trace("stage init");
 			_nativeStage = stage;
 			trace("addNativeOverlay");
@@ -241,79 +242,6 @@ package trolling.core
 			}
 		}
 		
-		public function get colliderManager():ColliderManager
-		{
-			return _colliderManager;
-		}
-		
-		public function set currentScene(value:Scene):void
-		{
-			_currentScene = value;
-		}
-		
-		public function get createQueue():Array
-		{
-			return _createQueue;
-		}
-		
-		public function set createQueue(value:Array):void
-		{
-			_createQueue = value;
-		}
-		
-		public function get currentScene():Scene
-		{
-			return _currentScene;
-		}
-		
-		public function get painter():Painter
-		{
-			return _painter;
-		}
-		
-		public function set painter(value:Painter):void
-		{
-			_painter = value;
-		}
-		
-		public static function get painter():Painter
-		{
-			return _current.painter;
-		}
-		
-		public function get profile():String
-		{
-			if(_context)
-				return _context.profile;
-			else
-				return null;
-		}
-		
-		public function get context():Context3D
-		{
-			return _context;
-		}
-		
-		public function set context(value:Context3D):void
-		{
-			_context = value;
-		}
-		
-		public static function get current():Trolling
-		{
-			return _current;
-		}
-		
-		public function get stage():Stage
-		{
-			return _stage;
-		}
-		
-		public function set stage(value:Stage):void
-		{
-			_stage = value;
-		}
-		
 		private function onInitPainter(context:Context3D):void
 		{
 			_painter.configureBackBuffer(new Rectangle(0, 0, stage.stageWidth, stage.stageHeight));
@@ -324,7 +252,7 @@ package trolling.core
 			trace("initRoot");
 			trace(_currentScene.key);
 			_nativeStage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
-			_statsTextField = new TextField(80, 40, "drawCall = 0", Color.RED, Color.argb(100, 100, 100, 100));
+			_statsTextField = new TextField(100, 40, "drawCall = 0", Color.RED, Color.argb(100, 100, 100, 100));
 		}
 		
 		private function createSceneFromQueue():void
@@ -404,6 +332,79 @@ package trolling.core
 			trace("디엑");
 			_nativeStage.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
 			SoundManager.stopAll();
+		}
+		
+		public function get colliderManager():ColliderManager
+		{
+			return _colliderManager;
+		}
+		
+		public function set currentScene(value:Scene):void
+		{
+			_currentScene = value;
+		}
+		
+		public function get createQueue():Array
+		{
+			return _createQueue;
+		}
+		
+		public function set createQueue(value:Array):void
+		{
+			_createQueue = value;
+		}
+		
+		public function get currentScene():Scene
+		{
+			return _currentScene;
+		}
+		
+		public function get painter():Painter
+		{
+			return _painter;
+		}
+		
+		public function set painter(value:Painter):void
+		{
+			_painter = value;
+		}
+		
+		public static function get painter():Painter
+		{
+			return _current.painter;
+		}
+		
+		public function get profile():String
+		{
+			if(_context)
+				return _context.profile;
+			else
+				return null;
+		}
+		
+		public function get context():Context3D
+		{
+			return _context;
+		}
+		
+		public function set context(value:Context3D):void
+		{
+			_context = value;
+		}
+		
+		public static function get current():Trolling
+		{
+			return _current;
+		}
+		
+		public function get stage():Stage
+		{
+			return _stage;
+		}
+		
+		public function set stage(value:Stage):void
+		{
+			_stage = value;
 		}
 		
 		public function get drawCall():uint
