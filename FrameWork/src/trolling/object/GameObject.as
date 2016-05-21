@@ -71,7 +71,7 @@ package trolling.object
 			_visible = true;
 			_tag = null;
 		}
-
+		
 		/**
 		 *컴포넌트를 추가시켜주는 함수
 		 * 추가시킬 컴포넌트를 인자로 받습니다. 
@@ -327,143 +327,121 @@ package trolling.object
 		{	
 			if(!_visible)
 				return;
+			painter.pushState();
+			painter.alpha *= _alpha;
+			
 			var numChildren:int = _children.length;
 			var componentType:String = decideRenderingComponent();
 			var triangleData:TriangleData;
 			var textureRect:Rectangle = new Rectangle(0, 0, 1, 1);
+			var displayComponent:DisplayComponent = DisplayComponent(_components[componentType]);
 			
-			painter.pushState();
-			if(this == Trolling.current.currentScene)
+			var topLeft:Vector3D = new Vector3D(0, 0, _z, 1);
+			var bottomRight:Vector3D = new Vector3D(_width, -_height, _z, 1);
+			
+			var matrix:Matrix3D = getMatrix();
+			var transVector:Vector3D = new Vector3D();
+			matrix.copyColumnTo(3, transVector);
+			transVector.y = -transVector.y;
+			matrix.copyColumnFrom(3, transVector);
+			painter.matrix3d.prepend(matrix);
+			var matrix3dTemp:Matrix3D = painter.matrix3d.clone();
+			
+			if(componentType != NONE && displayComponent.getRenderingResource() != null)
 			{
-				painter.matrix3d.prependTranslation(-1, 1, 0);
-				painter.matrix3d.prependScale(_scaleX, _scaleY, 1);
-			}
-			else
-			{
-				var displayComponent:DisplayComponent = DisplayComponent(_components[componentType]);
+				textureRect.x = displayComponent.getRenderingResource().ux;
+				textureRect.y = displayComponent.getRenderingResource().vy;
+				textureRect.width = displayComponent.getRenderingResource().u;
+				textureRect.height = displayComponent.getRenderingResource().v;
 				
-				var drawRect:Rectangle = getRectangle();
+				//				var matrix3dTemp:Matrix3D = convertMatrix(matrix);
 				
-				drawRect.x = (drawRect.x*2) / (painter.viewPort.width);
-				drawRect.y = (drawRect.y*2) / (painter.viewPort.height);
+				//				matrix3dTemp.prepend(painter.matrix3d);
 				
-				drawRect.width = drawRect.width*2 / painter.viewPort.width;
-				drawRect.height = drawRect.height*2 / painter.viewPort.height;
+				var perspectiveMatrix:Matrix3D = new Matrix3D();
+				var vector0:Vector3D = new Vector3D(1, 0, 0, 0);
+				var vector1:Vector3D = new Vector3D(0, 1, 0, 0);
+				var vector2:Vector3D = new Vector3D(0, 0, 2, -2);
+				var vector3:Vector3D = new Vector3D(0, 0, 1, 0);
 				
-				if(_pivot == PivotType.CENTER)
+				perspectiveMatrix.copyColumnFrom(0, vector0);
+				perspectiveMatrix.copyColumnFrom(1, vector1);
+				perspectiveMatrix.copyColumnFrom(2, vector2);
+				perspectiveMatrix.copyColumnFrom(3, vector3);
+				
+				//				trace("perspectiveMatrix = " + perspectiveMatrix.rawData);
+				
+				//				var matrix3dTemp:Matrix3D = new Matrix3D();
+				//				matrix3dTemp.identity();
+				//				
+				//				var matrix3d:Matrix3D = convertMatrix(getMatrix());
+				//				
+				////				matrix3d.append(painter.matrix3d);
+				//				
+				//				matrix3dTemp.append(matrix3d);
+				//				matrix3dTemp.append(painter.matrix3d);
+				
+				//				painter.matrix3d.append(matrix3d);
+				
+				//				if(this.name == "test")
+				//				{
+				//					trace(matrix3dTemp.rawData);
+				//				}
+				//				matrix3dTemp.append(perspectiveMatrix);
+				//				matrix3dTemp.append(perspectiveMatrix);
+				matrix3dTemp.appendTranslation(-(painter.viewPort.width/2), (painter.viewPort.height/2), 0);
+				matrix3dTemp.appendScale((2/painter.viewPort.width), (2/painter.viewPort.height), 1);
+				//				matrix3dTemp.appendRotation(-90, Vector3D.Z_AXIS);
+				//				matrix.append(perspectiveMatrix);
+				//				perspectiveMatrix.prepend(matrix3dTemp);
+				//				perspectiveMatrix.prepend(matrix3dTemp);
+				//				if(this.name == "test")
+				//				{
+				//					trace(matrix3dTemp.rawData);
+				//					trace("pretopLeft = " + topLeft);
+				//					trace("preBottomRight = " + bottomRight);
+				//				}
+				//				topLeft = matrix3d.transformVector(topLeft);
+				//				bottomRight = matrix3d.transformVector(bottomRight);
+				topLeft = matrix3dTemp.transformVector(topLeft);
+				bottomRight = matrix3dTemp.transformVector(bottomRight);
+				//				topLeft = perspectiveMatrix.transformVector(topLeft);
+				//				bottomRight = perspectiveMatrix.transformVector(bottomRight);
+				
+				//				topLeft = matrix3dTemp.deltaTransformVector(topLeft);
+				//				bottomRight = matrix3dTemp.deltaTransformVector(bottomRight);
+				if(this.name == "test")
 				{
-					drawRect.x -= (drawRect.width/2);
-					drawRect.y -= (drawRect.height/2);
+					//					trace(perspectiveMatrix.rawData);
+					//					trace("pretopLeft = " + topLeft);
+					//					trace("preBottomRight = " + bottomRight);
 				}
 				
-				if(_pivot == PivotType.TOP_LEFT)
+				//				topLeft = perspectiveMatrix.transformVector(topLeft);
+				//				bottomRight = perspectiveMatrix.transformVector(bottomRight);
+				//				topLeft = perspectiveMatrix.transformVector(topLeft);
+				//				bottomRight = perspectiveMatrix.transformVector(bottomRight);
+				if(this.name == "test")
 				{
-					painter.matrix3d.prependTranslation((drawRect.x), -(drawRect.y), _z);
-					painter.matrix3d.prependRotation(_rotate, Vector3D.Z_AXIS);
-					painter.matrix3d.prependScale(_scaleX, _scaleY, 1);
-				}
-				else
-				{
-					painter.matrix3d.prependTranslation((drawRect.x+(drawRect.width/2)), -(drawRect.y+(drawRect.height/2)), _z);
-					painter.matrix3d.prependRotation(_rotate, Vector3D.Z_AXIS);
-					painter.matrix3d.prependScale(_scaleX, _scaleY, 1);
+					//					trace("topLeft = " + topLeft);
+					//					trace("BottomRight = " + bottomRight);
 				}
 				
-				if(componentType != NONE && displayComponent.getRenderingResource() != null)
-				{
-					triangleData = new TriangleData();
-					
-					textureRect.x = displayComponent.getRenderingResource().ux;
-					textureRect.y = displayComponent.getRenderingResource().vy;
-					textureRect.width = displayComponent.getRenderingResource().u;
-					textureRect.height = displayComponent.getRenderingResource().v;
-					
-					var matrix3dTemp:Matrix3D = painter.matrix3d.clone();
-					if(_pivot == PivotType.TOP_LEFT)
-					{						
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, matrix3dTemp.position.z, textureRect.x, textureRect.y, _red, _green, _blue, _alpha*painter.alpha]));
-						
-						matrix3dTemp.prependTranslation(drawRect.width, 0, 0);
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, matrix3dTemp.position.z, textureRect.x+textureRect.width, textureRect.y,_red, _green, _blue, _alpha*painter.alpha]));
-						
-						matrix3dTemp.prependTranslation(0, -drawRect.height, 0);
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, matrix3dTemp.position.z, textureRect.x+textureRect.width, textureRect.y+textureRect.height, _red, _green, _blue, _alpha*painter.alpha]));
-						
-						matrix3dTemp.prependTranslation(-drawRect.width, 0, 0);
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, matrix3dTemp.position.z, textureRect.x, textureRect.y+textureRect.height, _red, _green, _blue, _alpha*painter.alpha]));		
-					}
-					else
-					{
-						matrix3dTemp.prependTranslation((drawRect.width/2), (drawRect.height/2), 0);
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, matrix3dTemp.position.z, textureRect.x+textureRect.width, textureRect.y, _red, _green, _blue, _alpha*painter.alpha]));
-						
-						matrix3dTemp.prependTranslation(0, -drawRect.height, 0);
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, matrix3dTemp.position.z, textureRect.x+textureRect.width, textureRect.y+textureRect.height, _red, _green, _blue, _alpha*painter.alpha]));
-						
-						matrix3dTemp.prependTranslation(-drawRect.width, 0, 0);
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, matrix3dTemp.position.z, textureRect.x, textureRect.y+textureRect.height, _red, _green, _blue, _alpha*painter.alpha]));
-						
-						matrix3dTemp.prependTranslation(0, drawRect.height, 0);
-						triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, matrix3dTemp.position.z, textureRect.x, textureRect.y, _red, _green, _blue, _alpha*painter.alpha]));
-					}
-					
-					if(painter.currentBatchData == null || painter.currentBatchData.batchTexture != displayComponent.getRenderingResource().nativeTexture)
-					{
-						var batchData:BatchData = new BatchData();
-						batchData.batchTexture = displayComponent.getRenderingResource().nativeTexture;
-						painter.currentBatchData = batchData;
-						painter.batchDatas.push(batchData);
-					}
-					painter.currentBatchData.batchTriangles.push(triangleData);
-					
-					var coll:Collider = _components[ComponentType.COLLIDER];
-					if(coll != null && _colliderRender && coll.id != Collider.ID_NONE)
-					{	
-						painter.pushState();
-						var rect:Rectangle;
-						if(coll.id == Collider.ID_RECT)
-							rect = coll.rect.clone();
-						else if(coll.id == Collider.ID_CIRCLE)
-						{
-							var circle:Circle = coll.circle;
-							rect = new Rectangle();
-							rect.x = circle.center.x - circle.radius;
-							rect.y = circle.center.y - circle.radius;
-							rect.width = circle.radius*2;
-							rect.height = circle.radius*2;
-						}
-						
-						rect.width = drawRect.width*coll.ratioX;
-						rect.height = drawRect.height*coll.ratioY;
-						rect.x = (drawRect.width/2)-(rect.width/2);
-						rect.y = (drawRect.height/2)-(rect.height/2);
-						
-						
-						if(_pivot == PivotType.TOP_LEFT)
-							painter.matrix3d.prependTranslation((rect.x+(rect.width/2)), -(rect.y+(rect.height/2)), 0);
-						
-						matrix3dTemp = painter.matrix3d.clone();
-						var triangleTemp:TriangleData = new TriangleData();
-						
-						matrix3dTemp.prependTranslation(rect.width/2, rect.height/2, 0);
-						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, _z,  1, 0,  1, 1, 1, 1]));
-						
-						matrix3dTemp.prependTranslation(0, -rect.height, 0);
-						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, _z,  1, 1,  1, 1, 1, 1]));
-						
-						matrix3dTemp.prependTranslation(-rect.width, 0, 0);
-						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, _z,  0, 1,  1, 1, 1, 1]));
-						
-						matrix3dTemp.prependTranslation(0, rect.height, 0);
-						triangleTemp.rawVertexData = triangleTemp.rawVertexData.concat(Vector.<Number>([matrix3dTemp.position.x, matrix3dTemp.position.y, _z,  0, 0,  1, 1, 1, 1]));
-						
-						painter.colliderRenderData.batchTriangles.push(triangleTemp);
-						
-						painter.popState();
-					}
-				}
+				triangleData = new TriangleData();
 				
-				painter.alpha *= _alpha;
+				triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([topLeft.x, topLeft.y, _z, textureRect.x, textureRect.y, _red, _green, _blue, painter.alpha]));
+				triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([bottomRight.x, topLeft.y, _z, textureRect.x+textureRect.width, textureRect.y, _red, _green, _blue, painter.alpha]));
+				triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([bottomRight.x, bottomRight.y, _z, textureRect.x+textureRect.width, textureRect.y+textureRect.height, _red, _green, _blue, painter.alpha]));
+				triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([topLeft.x, bottomRight.y, _z, textureRect.x, textureRect.y+textureRect.height, _red, _green, _blue, painter.alpha]));
+				
+				if(painter.currentBatchData == null || painter.currentBatchData.batchTexture != displayComponent.getRenderingResource().nativeTexture)
+				{
+					var batchData:BatchData = new BatchData();
+					batchData.batchTexture = displayComponent.getRenderingResource().nativeTexture;
+					painter.currentBatchData = batchData;
+					painter.batchDatas.push(batchData);
+				}
+				painter.currentBatchData.batchTriangles.push(triangleData);
 			}
 			for(var i:int = 0; i < numChildren; i++)
 			{
@@ -641,27 +619,27 @@ package trolling.object
 				_height = compare.y+compare.height;
 		}
 		
-//		/**
-//		 *객체가 전체좌표에서 가지는 x,y값을 구합니다. 
-//		 * @return 
-//		 * 
-//		 */		
-//		public function getGlobalPoint():Point
-//		{
-//			var matrix:Matrix3D = getGlobalMatrix();
-//			var globalPoint:Point = new Point();
-//			
-//			globalPoint.x = matrix.position.x;
-//			globalPoint.y = matrix.position.y;
-//			
-//			if(_pivot == PivotType.CENTER)
-//			{
-//				globalPoint.x -= ((_width*getGlobalScaleX())/2);
-//				globalPoint.y -= ((_height*getGlobalScaleY())/2);
-//			}
-//			
-//			return globalPoint;
-//		}
+		//		/**
+		//		 *객체가 전체좌표에서 가지는 x,y값을 구합니다. 
+		//		 * @return 
+		//		 * 
+		//		 */		
+		//		public function getGlobalPoint():Point
+		//		{
+		//			var matrix:Matrix3D = getGlobalMatrix();
+		//			var globalPoint:Point = new Point();
+		//			
+		//			globalPoint.x = matrix.position.x;
+		//			globalPoint.y = matrix.position.y;
+		//			
+		//			if(_pivot == PivotType.CENTER)
+		//			{
+		//				globalPoint.x -= ((_width*getGlobalScaleX())/2);
+		//				globalPoint.y -= ((_height*getGlobalScaleY())/2);
+		//			}
+		//			
+		//			return globalPoint;
+		//		}
 		
 		/**
 		 *전체좌표계에서 이 오브젝트가 차지하는 사각형을 구할 수 있습니다. 
@@ -671,129 +649,168 @@ package trolling.object
 		public function getGlobalRect2():Rectangle
 		{
 			var rect:Rectangle = new Rectangle();
-//			var matrix:Matrix3D = new Matrix3D();
-//			
-//			matrix = getMatrix(matrix);
-//			if(_pivot == PivotType.CENTER)
-//				matrix.appendTranslation(-_width/2, -_height/2, 0);
+			//			var matrix:Matrix3D = new Matrix3D();
+			//			
+			//			matrix = getMatrix(matrix);
+			//			if(_pivot == PivotType.CENTER)
+			//				matrix.appendTranslation(-_width/2, -_height/2, 0);
 			
-//			var topLeft:Vector3D = getTopLeft();
-//			var bottomRight:Vector3D = getBottomRight();
+			//			var topLeft:Vector3D = getTopLeft();
+			//			var bottomRight:Vector3D = getBottomRight();
+			var topLeftVector:Vector3D = getTopLeft();
+			var bottomRightVector:Vector3D = getBottomRight();
 			
-			var topLeft:Point = getTopLeft();
-			var bottomRight:Point = getBottomRight();
+			var topLeft:Point = new Point(topLeftVector.x, topLeftVector.y);
+			var bottomRight:Point = new Point(bottomRightVector.x, bottomRightVector.y);
 			
-//			topLeft = matrix.transformVector(topLeft);
-//			bottomRight = matrix.transformVector(bottomRight);
+			//			topLeft = matrix.transformVector(topLeft);
+			//			bottomRight = matrix.transformVector(bottomRight);
 			
-//			rect.topLeft.x = topLeft.x;
-//			rect.topLeft.y = topLeft.y;
-//			rect.bottomRight.x = bottomRight.x;
-//			rect.bottomRight.y = bottomRight.y;
+			//			rect.topLeft.x = topLeft.x;
+			//			rect.topLeft.y = topLeft.y;
+			//			rect.bottomRight.x = bottomRight.x;
+			//			rect.bottomRight.y = bottomRight.y;
 			rect.topLeft = topLeft;
 			rect.bottomRight = bottomRight;
 			
-//			rect.size = bottomRight;
+			//			rect.size = bottomRight;
 			
 			return rect;
 		}
 		
 		public function getGlobalPoint():Point
 		{
-//			var point:Point = new Point();
-//			var topLeft:Vector3D = getTopLeft();
-//			
-//			point.x = topLeft.x;
-//			point.y = topLeft.y;
+			//			var point:Point = new Point();
+			//			var topLeft:Vector3D = getTopLeft();
+			//			
+			//			point.x = topLeft.x;
+			//			point.y = topLeft.y;
 			
-			var point:Point = getTopLeft();
-				
+			var topLeftVector:Vector3D = getTopLeft();
+			
+			var point:Point = new Point(topLeftVector.x, topLeftVector.y);
+			
 			return point;
 		}
 		
-		public function getBottomRight():Point
+		//		public function getBottomRight():Point
+		//		{
+		//			//			var matrix:Matrix3D = new Matrix3D();
+		//			//			if(_pivot == PivotType.CENTER)
+		//			//				matrix.prependTranslation(-_width/2, -_height/2, 0);
+		//			//			matrix = getMatrix3d(matrix);
+		//			//			
+		//			//			var bottomRight:Vector3D = new Vector3D(_width, _height, _z, 0);
+		//			//			bottomRight = matrix.transformVector(bottomRight);
+		//			
+		//			
+		//			var bottomRight:Point = new Point(_width, _height);
+		//			bottomRight = matrix.transformPoint(bottomRight);
+		//			
+		//			return bottomRight;
+		//		}
+		//		
+		//		public function getTopLeft():Point
+		//		{
+		//			//			var matrix:Matrix3D = new Matrix3D();
+		//			//			if(_pivot == PivotType.CENTER)
+		//			//				matrix.prependTranslation(-_width/2, -_height/2, 0);
+		//			//			matrix = getMatrix3d(matrix);
+		//			//			
+		//			//			var topLeft:Vector3D = new Vector3D(0, 0, _z, 0);
+		//			//			topLeft = matrix.transformVector(topLeft);
+		//			
+		//			
+		//			//			trace(matrix.toString());
+		//			
+		//			var topLeft:Point = new Point(0,0);
+		//			topLeft = matrix.transformPoint(topLeft);
+		//			
+		//			return topLeft;
+		//		}
+		
+		public function getBottomRight():Vector3D
 		{
-//			var matrix:Matrix3D = new Matrix3D();
-//			if(_pivot == PivotType.CENTER)
-//				matrix.prependTranslation(-_width/2, -_height/2, 0);
-//			matrix = getMatrix3d(matrix);
-//			
-//			var bottomRight:Vector3D = new Vector3D(_width, _height, _z, 0);
-//			bottomRight = matrix.transformVector(bottomRight);
+			//			var matrix:Matrix3D = new Matrix3D();
+			//			if(_pivot == PivotType.CENTER)
+			//				matrix.prependTranslation(-_width/2, -_height/2, 0);
+			//			matrix = getMatrix3d(matrix);
+			//			
+			//			var bottomRight:Vector3D = new Vector3D(_width, _height, _z, 0);
+			//			bottomRight = matrix.transformVector(bottomRight);
 			
-			var matrix:Matrix = getGlobalMatrix();
+			var matrix:Matrix3D = getGlobalMatrix();
 			
-			var bottomRight:Point = new Point(_width, _height);
-			bottomRight = matrix.transformPoint(bottomRight);
+			var bottomRight:Vector3D = new Vector3D(_width, _height, _z, 1);
+			bottomRight = matrix.transformVector(bottomRight);
 			
 			return bottomRight;
 		}
 		
-		public function getTopLeft():Point
+		public function getTopLeft():Vector3D
 		{
-//			var matrix:Matrix3D = new Matrix3D();
-//			if(_pivot == PivotType.CENTER)
-//				matrix.prependTranslation(-_width/2, -_height/2, 0);
-//			matrix = getMatrix3d(matrix);
-//			
-//			var topLeft:Vector3D = new Vector3D(0, 0, _z, 0);
-//			topLeft = matrix.transformVector(topLeft);
+			//			var matrix:Matrix3D = new Matrix3D();
+			//			if(_pivot == PivotType.CENTER)
+			//				matrix.prependTranslation(-_width/2, -_height/2, 0);
+			//			matrix = getMatrix3d(matrix);
+			//			
+			//			var topLeft:Vector3D = new Vector3D(0, 0, _z, 0);
+			//			topLeft = matrix.transformVector(topLeft);
 			
-			var matrix:Matrix = getGlobalMatrix();
+			var matrix:Matrix3D = getGlobalMatrix();
 			
-//			trace(matrix.toString());
-			
-			var topLeft:Point = new Point(0,0);
-			topLeft = matrix.transformPoint(topLeft);
+			var topLeft:Vector3D = new Vector3D(0, 0, _z, 1);
+			topLeft = matrix.transformVector(topLeft);
 			
 			return topLeft;
 		}
 		
-		public function getMatrix():Matrix
+		public function getMatrix():Matrix3D
 		{
-			var matrix:Matrix = new Matrix();
-			if(_pivot == PivotType.CENTER)
-				matrix.translate(-_width/2, -_height/2);
+			var matrix:Matrix3D = new Matrix3D();
 			
-			matrix.scale(_scaleX, _scaleY);
-			matrix.translate(_x, _y);
-			matrix.rotate(_rotate);
+			if(_parent != null && _parent.pivot == PivotType.CENTER)
+				matrix.prependTranslation(_parent.width/2, _parent.height/2, 0);
+			
+			if(_pivot == PivotType.CENTER)
+				matrix.prependTranslation(_width/2, _height/2, 0);
+			matrix.prependScale(_scaleX, _scaleY, 1);
+			if(_pivot == PivotType.CENTER)
+				matrix.prependTranslation(-_width/2, -_height/2, 0);
+			matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
+			matrix.appendTranslation(_x, _y, _z);
+			
+			if(_pivot == PivotType.CENTER)
+				matrix.appendTranslation(-_width/2, -_height/2, 0);
 			
 			return matrix;
 		}
 		
-		public function getGlobalMatrix():Matrix
+		public function getGlobalMatrix():Matrix3D
 		{
-			var matrix:Matrix = new Matrix();
-			if(_pivot == PivotType.CENTER)
-				matrix.translate(-_width/2, -_height/2);
+			var matrix:Matrix3D = new Matrix3D();
 			
 			matrix = calculMatrix(matrix);
 			
+			//			if(_pivot == PivotType.CENTER)
+			//				matrix.appendTranslation(-_width/2, -_height/2, 0);
+			
+			//			if(_pivot == PivotType.CENTER)
+			//				matrix.appendTranslation(-_width/2, -_height/2, 0);
+			
 			return matrix;
 		}
 		
-		public function calculMatrix(matrix:Matrix):Matrix
+		public function calculMatrix(matrix:Matrix3D):Matrix3D
 		{
-			matrix.scale(_scaleX, _scaleY);
-			matrix.translate(_x, _y);
-			matrix.rotate(_rotate);
-			
 			if(_parent != null)
 				matrix = _parent.calculMatrix(matrix);
+			matrix.prepend(getMatrix());
 			
 			return matrix;
 		}
 		
-		public function getGlobalMatrix3d():Matrix3D
-		{
-			var matrix:Matrix = getGlobalMatrix();
-			var matrix3d:Matrix3D = convertMatrix3d(matrix);
-			
-			return matrix3d;
-		}
-		
-		private function convertMatrix3d(matrix:Matrix):Matrix3D
+		private function convertMatrix(matrix:Matrix):Matrix3D
 		{
 			var matrix3d:Matrix3D = new Matrix3D();
 			var vector0:Vector3D = new Vector3D(matrix.a, 0, 0, 0);
@@ -809,50 +826,50 @@ package trolling.object
 			return matrix3d;
 		}
 		
-//		public function getMatrix3d(matrix:Matrix3D):Matrix3D
-//		{
-//			if(_parent != null)
-//				matrix = _parent.getMatrix3d(matrix);
-//			
-//			matrix.prependTranslation(_x, _y, _z);
-//			matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
-//			matrix.prependScale(_scaleX, _scaleY, 1);
-//			
-//			return matrix;
-//		}
+		//		public function getMatrix3d(matrix:Matrix3D):Matrix3D
+		//		{
+		//			if(_parent != null)
+		//				matrix = _parent.getMatrix3d(matrix);
+		//			
+		//			matrix.prependTranslation(_x, _y, _z);
+		//			matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
+		//			matrix.prependScale(_scaleX, _scaleY, 1);
+		//			
+		//			return matrix;
+		//		}
 		
-//		/**
-//		 *객체의 전체좌표를 구할 때 사용할 행렬을 반환합니다.
-//		 * @return 
-//		 * 
-//		 */		
-//		private function getGlobalMatrix():Matrix3D
-//		{
-//			var matrix:Matrix3D = new Matrix3D();
-//			matrix.identity();
-//			
-//			setGlobalMatrix(matrix);
-//			
-//			return matrix;
-//		}
+		//		/**
+		//		 *객체의 전체좌표를 구할 때 사용할 행렬을 반환합니다.
+		//		 * @return 
+		//		 * 
+		//		 */		
+		//		private function getGlobalMatrix():Matrix3D
+		//		{
+		//			var matrix:Matrix3D = new Matrix3D();
+		//			matrix.identity();
+		//			
+		//			setGlobalMatrix(matrix);
+		//			
+		//			return matrix;
+		//		}
 		
-//		/**
-//		 *객체의 전체좌표를 구할 때 사용할 행렬을 계산합니다.
-//		 * @param matrix
-//		 * @return 
-//		 * 
-//		 */		
-//		private function setGlobalMatrix(matrix:Matrix3D):void
-//		{
-//			var drawRect:Rectangle = getRectangle();
-//			
-//			if(_parent != null)
-//				_parent.setGlobalMatrix(matrix);
-//			
-//			matrix.prependTranslation((drawRect.x), (drawRect.y), 0);
-//			matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
-//			matrix.prependScale(_scaleX/(1+_z), _scaleY/(1+_z), 1);
-//		}
+		//		/**
+		//		 *객체의 전체좌표를 구할 때 사용할 행렬을 계산합니다.
+		//		 * @param matrix
+		//		 * @return 
+		//		 * 
+		//		 */		
+		//		private function setGlobalMatrix(matrix:Matrix3D):void
+		//		{
+		//			var drawRect:Rectangle = getRectangle();
+		//			
+		//			if(_parent != null)
+		//				_parent.setGlobalMatrix(matrix);
+		//			
+		//			matrix.prependTranslation((drawRect.x), (drawRect.y), 0);
+		//			matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
+		//			matrix.prependScale(_scaleX/(1+_z), _scaleY/(1+_z), 1);
+		//		}
 		
 		/**
 		 *객체가 최종적으로 나타내는 X의 스케일값을 반환합니다.
@@ -920,47 +937,47 @@ package trolling.object
 			}
 			return bound;
 		}
-	
-//		public function getBound():Rectangle
-//		{
-//			var bound:Rectangle = getGlobalRect();
-//			var numChildren:int = _children.length;
-//			
-//			for(var i:int = 0; i < numChildren; i++)
-//			{
-//				var childBound:Rectangle = _children[i].getBound();
-//				if(childBound.topLeft.x < bound.topLeft.x)
-//				{
-//					bound.width += (bound.x - childBound.x);
-//					bound.x = childBound.x;
-//				}
-//				if(childBound.topLeft.y < bound.topLeft.y)
-//				{
-//					bound.height += (bound.y - childBound.y);
-//					bound.y = childBound.y;
-//				}
-//				if(childBound.bottomRight.x > bound.bottomRight.x)
-//					bound.width += (childBound.bottomRight.x-bound.bottomRight.x);
-//				if(childBound.bottomRight.y > bound.bottomRight.y)
-//					bound.height += (childBound.bottomRight.y-bound.bottomRight.y);
-//			}
-//			return bound;
-//		}
 		
-//		/**
-//		 *전체좌표계에서 이 오브젝트가 차지하는 사각형을 구할 수 있습니다. 
-//		 * @return 
-//		 * 
-//		 */		
-//		private function getGlobalRect():Rectangle
-//		{
-//			var rect:Rectangle = new Rectangle();
-//			rect.topLeft = getGlobalPoint();
-//			rect.width = _width*getGlobalScaleX();
-//			rect.height = _height*getGlobalScaleY();
-//			
-//			return rect;
-//		}
+		//		public function getBound():Rectangle
+		//		{
+		//			var bound:Rectangle = getGlobalRect();
+		//			var numChildren:int = _children.length;
+		//			
+		//			for(var i:int = 0; i < numChildren; i++)
+		//			{
+		//				var childBound:Rectangle = _children[i].getBound();
+		//				if(childBound.topLeft.x < bound.topLeft.x)
+		//				{
+		//					bound.width += (bound.x - childBound.x);
+		//					bound.x = childBound.x;
+		//				}
+		//				if(childBound.topLeft.y < bound.topLeft.y)
+		//				{
+		//					bound.height += (bound.y - childBound.y);
+		//					bound.y = childBound.y;
+		//				}
+		//				if(childBound.bottomRight.x > bound.bottomRight.x)
+		//					bound.width += (childBound.bottomRight.x-bound.bottomRight.x);
+		//				if(childBound.bottomRight.y > bound.bottomRight.y)
+		//					bound.height += (childBound.bottomRight.y-bound.bottomRight.y);
+		//			}
+		//			return bound;
+		//		}
+		
+		//		/**
+		//		 *전체좌표계에서 이 오브젝트가 차지하는 사각형을 구할 수 있습니다. 
+		//		 * @return 
+		//		 * 
+		//		 */		
+		//		private function getGlobalRect():Rectangle
+		//		{
+		//			var rect:Rectangle = new Rectangle();
+		//			rect.topLeft = getGlobalPoint();
+		//			rect.width = _width*getGlobalScaleX();
+		//			rect.height = _height*getGlobalScaleY();
+		//			
+		//			return rect;
+		//		}
 		
 		/**
 		 * 
@@ -1178,12 +1195,12 @@ package trolling.object
 		{
 			_tag = value;
 		}
-
+		
 		public function get active():Boolean
 		{
 			return _active;
 		}
-
+		
 		public function set active(value:Boolean):void
 		{
 			_active = value;
@@ -1196,4 +1213,3 @@ package trolling.object
 		}
 	}
 }
-
