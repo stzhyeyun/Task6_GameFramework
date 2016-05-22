@@ -1,6 +1,6 @@
 package trolling.component
 {
-	import trolling.rendering.Texture;
+	import trolling.texture.Texture;
 	
 	public class DisplayComponent extends Component
 	{

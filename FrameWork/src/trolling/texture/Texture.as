@@ -1,9 +1,8 @@
-package trolling.rendering
+package trolling.texture
 {
 	import flash.display.Bitmap;
 	import flash.display3D.textures.Texture;
 	import flash.geom.Rectangle;
-	import trolling.utils.TextureUtil;
 	
 	
 	
@@ -21,25 +20,13 @@ package trolling.rendering
 		public function Texture(bitmap:Bitmap = null)
 		{
 			if(bitmap != null)
-			{
-//				_width = bitmap.width;
-//				_height = bitmap.height;
-//				
-//				var textureInfo:Array = TextureUtil.fromBitmapData(bitmap.bitmapData);
-//				
-//				_nativeTexture = textureInfo[0];
-//				_u = textureInfo[1];
-//				_v = textureInfo[2];
-//				_ux = 1;
-//				_vy = 1;
 				setFromBitmap(bitmap);
-			}
 		}
 
 		public function setFromBitmap(bitmap:Bitmap):void
 		{
-			if(_nativeTexture != null)
-				_nativeTexture.dispose();
+//			if(_nativeTexture != null)
+//				_nativeTexture.dispose();
 			
 			_width = bitmap.width;
 			_height = bitmap.height;
@@ -47,18 +34,16 @@ package trolling.rendering
 			var textureInfo:Array = TextureUtil.fromBitmapData(bitmap.bitmapData);
 			
 			_nativeTexture = textureInfo[0];
-			_u = textureInfo[1];
-//			trace("_u = " + _u);
+			_u = textureInfo[1];;
 			_v = textureInfo[2];
-//			trace("_v = " + _v);
 			_ux = 0;
 			_vy = 0;
 		}
 		
-		public function setFromTexture(parentTexture:trolling.rendering.Texture, position:Rectangle):void
+		public function setFromTexture(parentTexture:trolling.texture.Texture, position:Rectangle):void
 		{
-			if(_nativeTexture != null)
-				_nativeTexture.dispose();
+//			if(_nativeTexture != null)
+//				_nativeTexture.dispose();
 			
 			if(parentTexture.nativeTexture == null)
 				return;
@@ -97,19 +82,9 @@ package trolling.rendering
 			return _vy;
 		}
 		
-		public function set vy(value:Number):void
-		{
-			_vy = value;
-		}
-		
 		public function get ux():Number
 		{
 			return _ux;
-		}
-		
-		public function set ux(value:Number):void
-		{
-			_ux = value;
 		}
 		
 		public function get nativeTexture():flash.display3D.textures.Texture

@@ -2,14 +2,12 @@ package trolling.text
 {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
-	import flash.text.Font;
-	import flash.text.FontStyle;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
 	
 	import trolling.component.graphic.Image;
 	import trolling.object.GameObject;
-	import trolling.rendering.Texture;
+	import trolling.texture.Texture;
 	import trolling.utils.Color;
 
 	public class TextField extends GameObject

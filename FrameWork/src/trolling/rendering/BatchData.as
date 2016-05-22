@@ -20,7 +20,7 @@ package trolling.rendering
 			_batchTriangles = new Vector.<TriangleData>();
 		}
 		
-		public function calculVecrtex():void
+		public function calculVertex():void
 		{
 			_batchVertex = new Vector.<Number>();
 			_batchIndex = new Vector.<uint>();

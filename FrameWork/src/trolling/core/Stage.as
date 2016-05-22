@@ -1,6 +1,6 @@
-package trolling.object
+package trolling.core
 {	
-	public class Stage
+	internal class Stage
 	{	
 		private var _width:Number;
 		private var _height:Number;

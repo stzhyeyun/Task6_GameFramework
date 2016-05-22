@@ -19,7 +19,6 @@ package trolling.core
 	import trolling.media.SoundManager;
 	import trolling.object.GameObject;
 	import trolling.object.Scene;
-	import trolling.object.Stage;
 	import trolling.rendering.Painter;
 	import trolling.text.TextField;
 	import trolling.utils.Color;
@@ -99,30 +98,30 @@ package trolling.core
 //			stage.addEventListener(KeyboardEvent.KEY_DOWN, onKey, false, 0, true);
 //			stage.addEventListener(KeyboardEvent.KEY_UP, onKey, false, 0, true);
 //			stage.addEventListener(Event.RESIZE, onResize, false, 0, true);
-			calculVFR(stage);
+//			calculVFR(stage);
 			
 //			trace("_vfr = " + _vfr);
 		}
 
-		private function calculVFR(stage:flash.display.Stage):void
-		{
-			_vfr = 0;
-			
-			stage.addEventListener(Event.ENTER_FRAME, onEnteredFrame);
-			var time:Number = getTimer() / 1000.0;
-			
-			function onEnteredFrame():void
-			{
-				_vfr++;
-				
-				var timeTemp:Number = getTimer() / 1000.0;
-				if((timeTemp - time) >= 1.0)
-				{
-					stage.removeEventListener(Event.ENTER_FRAME, onEnteredFrame);
-					trace("_vfr = " + _vfr);
-				}
-			}
-		}
+//		private function calculVFR(stage:flash.display.Stage):void
+//		{
+//			_vfr = 0;
+//			
+//			stage.addEventListener(Event.ENTER_FRAME, onEnteredFrame);
+//			var time:Number = getTimer() / 1000.0;
+//			
+//			function onEnteredFrame():void
+//			{
+//				_vfr++;
+//				
+//				var timeTemp:Number = getTimer() / 1000.0;
+//				if((timeTemp - time) >= 1.0)
+//				{
+//					stage.removeEventListener(Event.ENTER_FRAME, onEnteredFrame);
+//					trace("_vfr = " + _vfr);
+//				}
+//			}
+//		}
 		
 		private function onTouch(event:Event):void
 		{

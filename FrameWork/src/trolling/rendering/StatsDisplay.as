@@ -1,14 +1,12 @@
-package trolling.core
+package trolling.rendering
 {
 	import flash.geom.Rectangle;
 	
 	import trolling.component.ComponentType;
 	import trolling.component.graphic.Image;
-	import trolling.rendering.BatchData;
-	import trolling.rendering.TriangleData;
 	import trolling.text.TextField;
 
-	public class StatsDisplay extends BatchData
+	internal class StatsDisplay extends BatchData
 	{
 		private var _statsTextField:TextField;
 		

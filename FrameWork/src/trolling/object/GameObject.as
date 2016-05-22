@@ -1,6 +1,5 @@
 package trolling.object
 {
-	import flash.display.DisplayObject;
 	import flash.events.EventDispatcher;
 	import flash.geom.Matrix;
 	import flash.geom.Matrix3D;
@@ -14,14 +13,12 @@ package trolling.object
 	import trolling.component.ComponentType;
 	import trolling.component.DisplayComponent;
 	import trolling.component.animation.Animator;
-	import trolling.component.physics.Collider;
 	import trolling.core.Disposer;
 	import trolling.core.Trolling;
 	import trolling.event.TrollingEvent;
 	import trolling.rendering.BatchData;
 	import trolling.rendering.Painter;
 	import trolling.rendering.TriangleData;
-	import trolling.utils.Circle;
 	import trolling.utils.PivotType;
 	
 	public class GameObject extends EventDispatcher
@@ -33,7 +30,6 @@ package trolling.object
 		private var _tag:String;
 		
 		private var _parent:GameObject = null;
-		private var _depth:Number;
 		
 		private var _components:Dictionary;
 		private var _children:Vector.<GameObject> = new Vector.<GameObject>();
@@ -159,6 +155,12 @@ package trolling.object
 			child.parent = this;
 		}
 		
+		/**
+		 *자식 객체들 중 하나를 Vector에서 위치를 변경합니다. 
+		 * @param child
+		 * @param index
+		 * 
+		 */		
 		public function setChildProperty(child:GameObject, index:uint):void
 		{
 			if(!_children)
@@ -171,6 +173,12 @@ package trolling.object
 			addChildAt(child, index);
 		}
 		
+		/**
+		 *인자로 받은 두개의 child위치를 변경합니다. 
+		 * @param child1
+		 * @param child2
+		 * 
+		 */		
 		public function switchChildsProperty(child1:GameObject, child2:GameObject):void
 		{
 			if(!_children)
@@ -193,12 +201,24 @@ package trolling.object
 			}
 		}
 		
+		/**
+		 * 인자로 받은 GameObject가 children(Vector)에서 가지는 인덱스 값을 반환합니다.(vector에 존재하지 않을경우 -1이 반환됩니다.)
+		 * @param child
+		 * @return 
+		 * 
+		 */		
 		public function getChildIndex(child:GameObject):int
 		{
 			return _children.indexOf(child);
 		}
 		
-		public function getChild(index:int):GameObject
+		/**
+		 * 인자로받은 index값에 있는 GameObject를 반환합니다.(index값이 children의 길이보다 크다면 null값이 반환됩니다.) 
+		 * @param index
+		 * @return 
+		 * 
+		 */		
+		public function getChild(index:uint):GameObject
 		{
 			if (!_children)
 			{
@@ -206,7 +226,7 @@ package trolling.object
 				return null;
 			}
 			
-			if (index >= 0 && index < _children.length)
+			if (index < _children.length)
 			{
 				return _children[index];
 			}
@@ -288,17 +308,305 @@ package trolling.object
 				}
 			}
 			
-			if (_components)
+//			if (_components)
+//			{
+//				for (var key:String in _components)
+//				{
+//					var component:Component = _components[key];
+//					component.dispose();
+//				}
+//			}
+		}
+		
+		/**
+		 *애니메이터에게 지정상태로 전이하도록 합니다. 
+		 * @param nextStateName
+		 * 
+		 */		
+		public function transition(nextStateName:String):void // [혜윤] 애니메이터에게 지정 상태로 전이하도록 합니다.
+		{
+			if (!_components || !_components[ComponentType.ANIMATOR])
 			{
-				for (var key:String in _components)
+				return;
+			}
+			
+			var animator:Animator = _components[ComponentType.ANIMATOR];
+			animator.transition(nextStateName);
+		}
+		
+		/**
+		 *클릭된 좌표의 가장 위쪽에 있는 객체를 찾아냅니다. 
+		 * @param point
+		 * @return 
+		 * 
+		 */		
+		public function findClickedGameObject(point:Point):GameObject
+		{
+			var childrenTemp:Vector.<GameObject> = getChildVectorClone();
+			var j:int;
+			var k:int;
+			
+			var target:GameObject = null;
+			for(var i:int = childrenTemp.length-1; i >= 0; i--)
+			{
+				if(childrenTemp[i].getBound().containsPoint(point) && childrenTemp[i].visible && childrenTemp[i].z >= 0 && childrenTemp[i].z <= 1)
 				{
-					var component:Component = _components[key];
-					component.dispose();
+					target = childrenTemp[i].findClickedGameObject(point);
+					break;
 				}
+			}
+			if(target == null && getGlobalRect().containsPoint(point))
+			{
+				target = this;
+			}
+			else if(target != null)
+			{
+				if(target.z > this.z && this != Trolling.current.currentScene)
+					target = this;
+			}
+			return target;
+		}
+		
+		/**
+		 *객체의 x,y,width,height값을 받아옵니다. 
+		 * @return 
+		 * 
+		 */		
+		public function getRectangle():Rectangle
+		{
+			var rectangle:Rectangle = new Rectangle(_x, _y, _width, _height);
+			return rectangle;
+		}
+		
+		/**
+		 *전체좌표계에서 이 오브젝트가 차지하는 사각형을 구할 수 있습니다. 
+		 * @return 
+		 * 
+		 */	
+		public function getGlobalRect():Rectangle
+		{
+			var rect:Rectangle = new Rectangle();
+			var topLeftVector:Vector3D = getTopLeft();
+			var bottomRightVector:Vector3D = getBottomRight();
+			
+			var topLeft:Point = new Point(topLeftVector.x, topLeftVector.y);
+			var bottomRight:Point = new Point(bottomRightVector.x, bottomRightVector.y);
+			
+			rect.topLeft = topLeft;
+			rect.bottomRight = bottomRight;
+
+			return rect;
+		}
+		
+		public function getGlobalPoint():Point
+		{
+			var topLeftVector:Vector3D = getTopLeft();
+			
+			var point:Point = new Point(topLeftVector.x, topLeftVector.y);
+			
+			return point;
+		}
+		
+		/**
+		 *객체가 최종적으로 나타내는 X의 스케일값을 반환합니다.
+		 * @return 
+		 * 
+		 */		
+		public function getGlobalScaleX():Number
+		{
+			var scaleX:Number;
+			scaleX = _scaleX;
+			
+			if(_parent != null)
+			{
+				scaleX *= _parent.getGlobalScaleX();
+			}
+			
+			return scaleX;
+		}
+		
+		/**
+		 *객체가 최종적으로 나타내는 Y의 스케일값을 반환합니다. 
+		 * @return 
+		 * 
+		 */		
+		public function getGlobalScaleY():Number
+		{
+			var scaleY:Number;
+			scaleY = _scaleY;
+			
+			if(_parent != null)
+			{
+				scaleY *= _parent.getGlobalScaleY();
+			}
+			
+			return scaleY;
+		}
+		
+		/**
+		 *Object와 Children까지 모두 합하여 범위를 구합니다.
+		 * @return 
+		 * 
+		 */		
+		public function getBound():Rectangle
+		{
+			var bound:Rectangle = getGlobalRect();
+			var numChildren:int = _children.length;
+			
+			for(var i:int = 0; i < numChildren; i++)
+			{
+				var childBound:Rectangle = _children[i].getBound();
+				if(childBound.topLeft.x < bound.topLeft.x)
+				{
+					bound.width += (bound.x - childBound.x);
+					bound.x = childBound.x;
+				}
+				if(childBound.topLeft.y < bound.topLeft.y)
+				{
+					bound.height += (bound.y - childBound.y);
+					bound.y = childBound.y;
+				}
+				if(childBound.bottomRight.x > bound.bottomRight.x)
+					bound.width += (childBound.bottomRight.x-bound.bottomRight.x);
+				if(childBound.bottomRight.y > bound.bottomRight.y)
+					bound.height += (childBound.bottomRight.y-bound.bottomRight.y);
+			}
+			return bound;
+		}
+		
+		/**
+		 * 
+		 * @param red
+		 * @param green
+		 * @param blue
+		 * 게임오브젝트에 색상을 블렌딩 합니다. 
+		 */
+		public function blendColor(red:Number, green:Number, blue:Number):void
+		{
+			_red = red;
+			_green = green;
+			_blue = blue;
+		}
+		
+		/**
+		 *프레임워크 전체에 알려줘야하는 이벤트들은 해당 함수를 사용해서 알려줍니다.
+		 * @param event
+		 * 
+		 */		
+		private function onThrowEvent(event:TrollingEvent):void
+		{
+			if (!_active)
+			{
+				return;	
+			}
+			
+			for(var key:String in _components)
+			{
+				if(_components[key] != null)
+					Component(_components[key]).dispatchEvent(new TrollingEvent(event.type));
+			}
+			
+			if(_children)
+			{
+				for(var i:int = 0; i < _children.length; i++)
+					_children[i].dispatchEvent(new TrollingEvent(event.type));
 			}
 		}
 		
-		public function getChildVector():Vector.<GameObject>
+		/**
+		 *Object가 크기가 정해져있지 않을 때 이미지가 들어오면 해당 이미지의 크기로 이미지를 자동으로 늘려줍니다.
+		 * @param compare
+		 * 
+		 */		
+		private function setBound(compare:Rectangle):void
+		{
+			if(_width == 0)
+				_width = compare.x+compare.width;
+			if(_height == 0)
+				_height = compare.y+compare.height;
+		}
+		
+		private function getBottomRight():Vector3D
+		{
+			var matrix:Matrix3D = getGlobalMatrix();
+			
+			var bottomRight:Vector3D = new Vector3D(_width, _height, _z, 1);
+			bottomRight = matrix.transformVector(bottomRight);
+			
+			return bottomRight;
+		}
+		
+		private function getTopLeft():Vector3D
+		{	
+			var matrix:Matrix3D = getGlobalMatrix();
+			
+			var topLeft:Vector3D = new Vector3D(0, 0, _z, 1);
+			topLeft = matrix.transformVector(topLeft);
+			
+			return topLeft;
+		}
+		
+		private function getMatrix():Matrix3D
+		{
+			var matrix:Matrix3D = new Matrix3D();
+			
+			if(_parent != null && _parent.pivot == PivotType.CENTER)
+				matrix.prependTranslation(_parent.width/2, _parent.height/2, 0);
+			
+			if(_pivot == PivotType.CENTER)
+				matrix.prependTranslation(_width/2, _height/2, 0);
+			matrix.prependScale(_scaleX, _scaleY, 1);
+			if(_pivot == PivotType.CENTER)
+				matrix.prependTranslation(-_width/2, -_height/2, 0);
+			matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
+			matrix.appendTranslation(_x, _y, _z);
+			
+			if(_pivot == PivotType.CENTER)
+				matrix.appendTranslation(-_width/2, -_height/2, 0);
+			
+			return matrix;
+		}
+		
+		private function getGlobalMatrix():Matrix3D
+		{
+			var matrix:Matrix3D = new Matrix3D();
+			
+			matrix = calculMatrix(matrix);
+			
+			return matrix;
+		}
+		
+		private function calculMatrix(matrix:Matrix3D):Matrix3D
+		{
+			if(_parent != null)
+				matrix = _parent.calculMatrix(matrix);
+			matrix.prepend(getMatrix());
+			
+			return matrix;
+		}
+		
+		private function convertMatrix(matrix:Matrix):Matrix3D
+		{
+			var matrix3d:Matrix3D = new Matrix3D();
+			var vector0:Vector3D = new Vector3D(matrix.a, 0, 0, 0);
+			var vector1:Vector3D = new Vector3D(0, matrix.d, 0, 0);
+			var vector2:Vector3D = new Vector3D(0, 0, 1, 0);
+			var vector3:Vector3D = new Vector3D(matrix.tx, matrix.ty, 0, 0);
+			
+			matrix3d.copyColumnFrom(0, vector0);
+			matrix3d.copyColumnFrom(1, vector1);
+			matrix3d.copyColumnFrom(2, vector2);
+			matrix3d.copyColumnFrom(3, vector3);
+			
+			return matrix3d;
+		}
+		
+		/**
+		 * children(Vector)의 복사본을 반환합니다.(이 때 child의 z값에 따라서 배열을 정렬한 후 반환해줍니다.) 
+		 * @return 
+		 * 
+		 */		
+		private function getChildVectorClone():Vector.<GameObject>
 		{
 			var childTemp:Vector.<GameObject> = new Vector.<GameObject>();
 			for(var i:int = 0; i < _children.length; i++)
@@ -316,118 +624,6 @@ package trolling.object
 				return 0;
 			else
 				return -1;
-		}
-		
-		/**
-		 *렌더링을 하기위해서 데이터를 구축하는 함수입니다.
-		 * @param painter
-		 * 
-		 */		
-		internal function setRenderData(painter:Painter):void
-		{	
-			if(!_visible)
-				return;
-			painter.pushState();
-			painter.alpha *= _alpha;
-			
-			var numChildren:int = _children.length;
-			var componentType:String = decideRenderingComponent();
-			var triangleData:TriangleData;
-			var textureRect:Rectangle = new Rectangle(0, 0, 1, 1);
-			var displayComponent:DisplayComponent = DisplayComponent(_components[componentType]);
-			
-			var topLeft:Vector3D = new Vector3D(0, 0, _z, 1);
-			var bottomRight:Vector3D = new Vector3D(_width, -_height, _z, 1);
-			
-			var matrix:Matrix3D = getMatrix();
-			var transVector:Vector3D = new Vector3D();
-			matrix.copyColumnTo(3, transVector);
-			transVector.y = -transVector.y;
-			matrix.copyColumnFrom(3, transVector);
-			painter.matrix3d.prepend(matrix);
-			var matrix3dTemp:Matrix3D = painter.matrix3d.clone();
-			
-			if(componentType != NONE && displayComponent.getRenderingResource() != null)
-			{
-				textureRect.x = displayComponent.getRenderingResource().ux;
-				textureRect.y = displayComponent.getRenderingResource().vy;
-				textureRect.width = displayComponent.getRenderingResource().u;
-				textureRect.height = displayComponent.getRenderingResource().v;
-				
-				//				var matrix3dTemp:Matrix3D = convertMatrix(matrix);
-				
-				//				matrix3dTemp.prepend(painter.matrix3d);
-				
-				var perspectiveMatrix:Matrix3D = new Matrix3D();
-				var vector0:Vector3D = new Vector3D(1, 0, 0, 0);
-				var vector1:Vector3D = new Vector3D(0, 1, 0, 0);
-				var vector2:Vector3D = new Vector3D(0, 0, 2, -2);
-				var vector3:Vector3D = new Vector3D(0, 0, 1, 0);
-				
-				perspectiveMatrix.copyColumnFrom(0, vector0);
-				perspectiveMatrix.copyColumnFrom(1, vector1);
-				perspectiveMatrix.copyColumnFrom(2, vector2);
-				perspectiveMatrix.copyColumnFrom(3, vector3);
-				
-				//				trace("perspectiveMatrix = " + perspectiveMatrix.rawData);
-				
-				//				var matrix3dTemp:Matrix3D = new Matrix3D();
-				//				matrix3dTemp.identity();
-				//				
-				//				var matrix3d:Matrix3D = convertMatrix(getMatrix());
-				//				
-				////				matrix3d.append(painter.matrix3d);
-				//				
-				//				matrix3dTemp.append(matrix3d);
-				//				matrix3dTemp.append(painter.matrix3d);
-				
-				//				painter.matrix3d.append(matrix3d);
-				
-				//				if(this.name == "test")
-				//				{
-				//					trace(matrix3dTemp.rawData);
-				//				}
-				//				matrix3dTemp.append(perspectiveMatrix);
-				//				matrix3dTemp.append(perspectiveMatrix);
-				matrix3dTemp.appendTranslation(-(painter.viewPort.width/2), (painter.viewPort.height/2), 0);
-				matrix3dTemp.appendScale((2/painter.viewPort.width), (2/painter.viewPort.height), 1);
-				//				matrix3dTemp.appendRotation(-90, Vector3D.Z_AXIS);
-				//				matrix.append(perspectiveMatrix);
-				//				perspectiveMatrix.prepend(matrix3dTemp);
-				//				perspectiveMatrix.prepend(matrix3dTemp);
-				//				if(this.name == "test")
-				//				{
-				//					trace(matrix3dTemp.rawData);
-				//					trace("pretopLeft = " + topLeft);
-				//					trace("preBottomRight = " + bottomRight);
-				//				}
-				//				topLeft = matrix3d.transformVector(topLeft);
-				//				bottomRight = matrix3d.transformVector(bottomRight);
-				topLeft = matrix3dTemp.transformVector(topLeft);
-				bottomRight = matrix3dTemp.transformVector(bottomRight);
-				
-				triangleData = new TriangleData();
-				
-				triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([topLeft.x, topLeft.y, _z, textureRect.x, textureRect.y, _red, _green, _blue, painter.alpha]));
-				triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([bottomRight.x, topLeft.y, _z, textureRect.x+textureRect.width, textureRect.y, _red, _green, _blue, painter.alpha]));
-				triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([bottomRight.x, bottomRight.y, _z, textureRect.x+textureRect.width, textureRect.y+textureRect.height, _red, _green, _blue, painter.alpha]));
-				triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([topLeft.x, bottomRight.y, _z, textureRect.x, textureRect.y+textureRect.height, _red, _green, _blue, painter.alpha]));
-				
-				if(painter.currentBatchData == null || painter.currentBatchData.batchTexture != displayComponent.getRenderingResource().nativeTexture)
-				{
-					var batchData:BatchData = new BatchData();
-					batchData.batchTexture = displayComponent.getRenderingResource().nativeTexture;
-					painter.currentBatchData = batchData;
-					painter.batchDatas.push(batchData);
-				}
-				painter.currentBatchData.batchTriangles.push(triangleData);
-			}
-			for(var i:int = 0; i < numChildren; i++)
-			{
-				var child:GameObject = _children[i];
-				child.setRenderData(painter);
-			}
-			painter.popState();
 		}
 		
 		/**
@@ -501,286 +697,116 @@ package trolling.object
 		}
 		
 		/**
-		 *애니메이터에게 지정상태로 전이하도록 합니다. 
-		 * @param nextStateName
+		 *렌더링을 하기위해서 데이터를 구축하는 함수입니다.
+		 * @param painter
 		 * 
 		 */		
-		public function transition(nextStateName:String):void // [혜윤] 애니메이터에게 지정 상태로 전이하도록 합니다.
-		{
-			if (!_components || !_components[ComponentType.ANIMATOR])
-			{
-				return;
-			}
-			
-			var animator:Animator = _components[ComponentType.ANIMATOR];
-			animator.transition(nextStateName);
-		}
-		
-		/**
-		 *클릭된 좌표의 가장 위쪽에 있는 객체를 찾아냅니다. 
-		 * @param point
-		 * @return 
-		 * 
-		 */		
-		public function findClickedGameObject(point:Point):GameObject
-		{
-			var childrenTemp:Vector.<GameObject> = getChildVector();
-			var j:int;
-			var k:int;
-			
-			var target:GameObject = null;
-			for(var i:int = childrenTemp.length-1; i >= 0; i--)
-			{
-				if(childrenTemp[i].getBound().containsPoint(point) && childrenTemp[i].visible && childrenTemp[i].z >= 0 && childrenTemp[i].z <= 1)
-				{
-					target = childrenTemp[i].findClickedGameObject(point);
-					break;
-				}
-			}
-			if(target == null && getGlobalRect2().containsPoint(point))
-			{
-				target = this;
-			}
-			else if(target != null)
-			{
-				if(target.z > this.z && this != Trolling.current.currentScene)
-					target = this;
-			}
-			return target;
-		}
-		
-		/**
-		 *객체의 x,y,width,height값을 받아옵니다. 
-		 * @return 
-		 * 
-		 */		
-		public function getRectangle():Rectangle
-		{
-			var rectangle:Rectangle = new Rectangle(_x, _y, _width, _height);
-			return rectangle;
-		}
-		
-		/**
-		 *프레임워크 전체에 알려줘야하는 이벤트들은 해당 함수를 사용해서 알려줍니다.
-		 * @param event
-		 * 
-		 */		
-		private function onThrowEvent(event:TrollingEvent):void
-		{
-			if (!_active)
-			{
-				return;	
-			}
-			
-			for(var key:String in _components)
-			{
-				if(_components[key] != null)
-					Component(_components[key]).dispatchEvent(new TrollingEvent(event.type));
-			}
-			
-			if(_children)
-			{
-				for(var i:int = 0; i < _children.length; i++)
-					_children[i].dispatchEvent(new TrollingEvent(event.type));
-			}
-		}
-		
-		/**
-		 *Object가 크기가 정해져있지 않을 때 이미지가 들어오면 해당 이미지의 크기로 이미지를 자동으로 늘려줍니다.
-		 * @param compare
-		 * 
-		 */		
-		private function setBound(compare:Rectangle):void
-		{
-			if(_width == 0)
-				_width = compare.x+compare.width;
-			if(_height == 0)
-				_height = compare.y+compare.height;
-		}
-		
-		/**
-		 *전체좌표계에서 이 오브젝트가 차지하는 사각형을 구할 수 있습니다. 
-		 * @return 
-		 * 
-		 */	
-		public function getGlobalRect2():Rectangle
-		{
-			var rect:Rectangle = new Rectangle();
-			var topLeftVector:Vector3D = getTopLeft();
-			var bottomRightVector:Vector3D = getBottomRight();
-			
-			var topLeft:Point = new Point(topLeftVector.x, topLeftVector.y);
-			var bottomRight:Point = new Point(bottomRightVector.x, bottomRightVector.y);
-			
-			rect.topLeft = topLeft;
-			rect.bottomRight = bottomRight;
-
-			return rect;
-		}
-		
-		public function getGlobalPoint():Point
-		{
-			var topLeftVector:Vector3D = getTopLeft();
-			
-			var point:Point = new Point(topLeftVector.x, topLeftVector.y);
-			
-			return point;
-		}
-		
-		public function getBottomRight():Vector3D
-		{
-			var matrix:Matrix3D = getGlobalMatrix();
-			
-			var bottomRight:Vector3D = new Vector3D(_width, _height, _z, 1);
-			bottomRight = matrix.transformVector(bottomRight);
-			
-			return bottomRight;
-		}
-		
-		public function getTopLeft():Vector3D
+		internal function setRenderData(painter:Painter):void
 		{	
-			var matrix:Matrix3D = getGlobalMatrix();
+			if(!_visible)
+				return;
+			painter.pushState();
+			painter.alpha *= _alpha;
+			
+			var numChildren:int = _children.length;
+			var componentType:String = decideRenderingComponent();
+			var triangleData:TriangleData;
+			var textureRect:Rectangle = new Rectangle(0, 0, 1, 1);
+			var displayComponent:DisplayComponent = DisplayComponent(_components[componentType]);
 			
 			var topLeft:Vector3D = new Vector3D(0, 0, _z, 1);
-			topLeft = matrix.transformVector(topLeft);
+			var bottomRight:Vector3D = new Vector3D(_width, -_height, _z, 1);
 			
-			return topLeft;
-		}
-		
-		public function getMatrix():Matrix3D
-		{
-			var matrix:Matrix3D = new Matrix3D();
+			var matrix:Matrix3D = getMatrix();
+			var transVector:Vector3D = new Vector3D();
+			matrix.copyColumnTo(3, transVector);
+			transVector.y = -transVector.y;
+			matrix.copyColumnFrom(3, transVector);
+			painter.matrix3d.prepend(matrix);
+			var matrix3dTemp:Matrix3D = painter.matrix3d.clone();
 			
-			if(_parent != null && _parent.pivot == PivotType.CENTER)
-				matrix.prependTranslation(_parent.width/2, _parent.height/2, 0);
-			
-			if(_pivot == PivotType.CENTER)
-				matrix.prependTranslation(_width/2, _height/2, 0);
-			matrix.prependScale(_scaleX, _scaleY, 1);
-			if(_pivot == PivotType.CENTER)
-				matrix.prependTranslation(-_width/2, -_height/2, 0);
-			matrix.prependRotation(_rotate, Vector3D.Z_AXIS);
-			matrix.appendTranslation(_x, _y, _z);
-			
-			if(_pivot == PivotType.CENTER)
-				matrix.appendTranslation(-_width/2, -_height/2, 0);
-			
-			return matrix;
-		}
-		
-		public function getGlobalMatrix():Matrix3D
-		{
-			var matrix:Matrix3D = new Matrix3D();
-			
-			matrix = calculMatrix(matrix);
-			
-			return matrix;
-		}
-		
-		public function calculMatrix(matrix:Matrix3D):Matrix3D
-		{
-			if(_parent != null)
-				matrix = _parent.calculMatrix(matrix);
-			matrix.prepend(getMatrix());
-			
-			return matrix;
-		}
-		
-		private function convertMatrix(matrix:Matrix):Matrix3D
-		{
-			var matrix3d:Matrix3D = new Matrix3D();
-			var vector0:Vector3D = new Vector3D(matrix.a, 0, 0, 0);
-			var vector1:Vector3D = new Vector3D(0, matrix.d, 0, 0);
-			var vector2:Vector3D = new Vector3D(0, 0, 1, 0);
-			var vector3:Vector3D = new Vector3D(matrix.tx, matrix.ty, 0, 0);
-			
-			matrix3d.copyColumnFrom(0, vector0);
-			matrix3d.copyColumnFrom(1, vector1);
-			matrix3d.copyColumnFrom(2, vector2);
-			matrix3d.copyColumnFrom(3, vector3);
-			
-			return matrix3d;
-		}
-		
-		/**
-		 *객체가 최종적으로 나타내는 X의 스케일값을 반환합니다.
-		 * @return 
-		 * 
-		 */		
-		public function getGlobalScaleX():Number
-		{
-			var scaleX:Number;
-			scaleX = _scaleX;
-			
-			if(_parent != null)
+			if(componentType != NONE && displayComponent.getRenderingResource() != null)
 			{
-				scaleX *= _parent.getGlobalScaleX();
+				textureRect.x = displayComponent.getRenderingResource().ux;
+				textureRect.y = displayComponent.getRenderingResource().vy;
+				textureRect.width = displayComponent.getRenderingResource().u;
+				textureRect.height = displayComponent.getRenderingResource().v;
+				
+				//				var matrix3dTemp:Matrix3D = convertMatrix(matrix);
+				
+				//				matrix3dTemp.prepend(painter.matrix3d);
+				
+				var perspectiveMatrix:Matrix3D = new Matrix3D();
+				var vector0:Vector3D = new Vector3D(2/painter.viewPort.width, 0, 0, 0);
+				var vector1:Vector3D = new Vector3D(0, 2/painter.viewPort.height, 0, 0);
+				var vector2:Vector3D = new Vector3D(0, 0, 2, -2);
+				var vector3:Vector3D = new Vector3D(0, 0, 1, 0);
+				
+				perspectiveMatrix.copyColumnFrom(0, vector0);
+				perspectiveMatrix.copyColumnFrom(1, vector1);
+				perspectiveMatrix.copyColumnFrom(2, vector2);
+				perspectiveMatrix.copyColumnFrom(3, vector3);
+				
+				//				trace("perspectiveMatrix = " + perspectiveMatrix.rawData);
+				
+				//				var matrix3dTemp:Matrix3D = new Matrix3D();
+				//				matrix3dTemp.identity();
+				//				
+				//				var matrix3d:Matrix3D = convertMatrix(getMatrix());
+				//				
+				////				matrix3d.append(painter.matrix3d);
+				//				
+				//				matrix3dTemp.append(matrix3d);
+				//				matrix3dTemp.append(painter.matrix3d);
+				
+				//				painter.matrix3d.append(matrix3d);
+				
+				//				if(this.name == "test")
+				//				{
+				//					trace(matrix3dTemp.rawData);
+				//				}
+				//				matrix3dTemp.append(perspectiveMatrix);
+				//				matrix3dTemp.append(perspectiveMatrix);
+				matrix3dTemp.appendTranslation(-(painter.viewPort.width/2), (painter.viewPort.height/2), 0);
+				matrix3dTemp.append(perspectiveMatrix);
+				//				matrix3dTemp.appendScale((2/painter.viewPort.width), (2/painter.viewPort.height), 1);
+				//				matrix3dTemp.appendRotation(-90, Vector3D.Z_AXIS);
+				//				matrix.append(perspectiveMatrix);
+				//				perspectiveMatrix.prepend(matrix3dTemp);
+				//				perspectiveMatrix.prepend(matrix3dTemp);
+				//				if(this.name == "test")
+				//				{
+				//					trace(matrix3dTemp.rawData);
+				//					trace("pretopLeft = " + topLeft);
+				//					trace("preBottomRight = " + bottomRight);
+				//				}
+				//				topLeft = matrix3d.transformVector(topLeft);
+				//				bottomRight = matrix3d.transformVector(bottomRight);
+				topLeft = matrix3dTemp.transformVector(topLeft);
+				bottomRight = matrix3dTemp.transformVector(bottomRight);
+				
+				triangleData = new TriangleData();
+				
+				triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([topLeft.x, topLeft.y, _z, textureRect.x, textureRect.y, _red, _green, _blue, painter.alpha]));
+				triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([bottomRight.x, topLeft.y, _z, textureRect.x+textureRect.width, textureRect.y, _red, _green, _blue, painter.alpha]));
+				triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([bottomRight.x, bottomRight.y, _z, textureRect.x+textureRect.width, textureRect.y+textureRect.height, _red, _green, _blue, painter.alpha]));
+				triangleData.rawVertexData = triangleData.rawVertexData.concat(Vector.<Number>([topLeft.x, bottomRight.y, _z, textureRect.x, textureRect.y+textureRect.height, _red, _green, _blue, painter.alpha]));
+				
+				if(painter.currentBatchData == null || painter.currentBatchData.batchTexture != displayComponent.getRenderingResource().nativeTexture)
+				{
+					var batchData:BatchData = new BatchData();
+					batchData.batchTexture = displayComponent.getRenderingResource().nativeTexture;
+					painter.currentBatchData = batchData;
+					painter.batchDatas.push(batchData);
+				}
+				painter.currentBatchData.batchTriangles.push(triangleData);
 			}
-			
-			return scaleX;
-		}
-		
-		/**
-		 *객체가 최종적으로 나타내는 Y의 스케일값을 반환합니다. 
-		 * @return 
-		 * 
-		 */		
-		public function getGlobalScaleY():Number
-		{
-			var scaleY:Number;
-			scaleY = _scaleY;
-			
-			if(_parent != null)
-			{
-				scaleY *= _parent.getGlobalScaleY();
-			}
-			
-			return scaleY;
-		}
-		
-		/**
-		 *Object와 Children까지 모두 합하여 범위를 구합니다.
-		 * @return 
-		 * 
-		 */		
-		public function getBound():Rectangle
-		{
-			var bound:Rectangle = getGlobalRect2();
-			var numChildren:int = _children.length;
-			
 			for(var i:int = 0; i < numChildren; i++)
 			{
-				var childBound:Rectangle = _children[i].getBound();
-				if(childBound.topLeft.x < bound.topLeft.x)
-				{
-					bound.width += (bound.x - childBound.x);
-					bound.x = childBound.x;
-				}
-				if(childBound.topLeft.y < bound.topLeft.y)
-				{
-					bound.height += (bound.y - childBound.y);
-					bound.y = childBound.y;
-				}
-				if(childBound.bottomRight.x > bound.bottomRight.x)
-					bound.width += (childBound.bottomRight.x-bound.bottomRight.x);
-				if(childBound.bottomRight.y > bound.bottomRight.y)
-					bound.height += (childBound.bottomRight.y-bound.bottomRight.y);
+				var child:GameObject = _children[i];
+				child.setRenderData(painter);
 			}
-			return bound;
-		}
-		
-		/**
-		 * 
-		 * @param red
-		 * @param green
-		 * @param blue
-		 * 게임오브젝트에 색상을 블렌딩 합니다. 
-		 */
-		public function blendColor(red:Number, green:Number, blue:Number):void
-		{
-			_red = red;
-			_green = green;
-			_blue = blue;
+			painter.popState();
 		}
 		
 		/**

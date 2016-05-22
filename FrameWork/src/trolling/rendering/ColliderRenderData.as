@@ -7,7 +7,7 @@ package trolling.rendering
 	import trolling.core.Trolling;
 	import trolling.utils.Color;
 
-	public class ColliderRenderData extends BatchData
+	internal class ColliderRenderData extends BatchData
 	{	
 		private var _colliderTexture:flash.display3D.textures.Texture;
 		

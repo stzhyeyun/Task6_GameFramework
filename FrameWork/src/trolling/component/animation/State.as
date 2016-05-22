@@ -3,7 +3,7 @@ package trolling.component.animation
 	import flash.events.EventDispatcher;
 	
 	import trolling.event.TrollingEvent;
-	import trolling.rendering.Texture;
+	import trolling.texture.Texture;
 	
 	public class State extends EventDispatcher
 	{

@@ -1,4 +1,4 @@
-package trolling.utils
+package trolling.texture
 {
 	import flash.display.BitmapData;
 	import flash.display3D.Context3DTextureFormat;
@@ -8,7 +8,7 @@ package trolling.utils
 	
 	import trolling.core.Trolling;
 	
-	public class TextureUtil
+	internal class TextureUtil
 	{	
 		public function TextureUtil()
 		{

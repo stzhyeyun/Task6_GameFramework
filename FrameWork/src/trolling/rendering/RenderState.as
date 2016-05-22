@@ -2,7 +2,7 @@ package trolling.rendering
 {
 	import flash.geom.Matrix3D;
 	
-	public class RenderState
+	internal class RenderState
 	{
 		private var _alpha:Number;
 		private var _culling:String;

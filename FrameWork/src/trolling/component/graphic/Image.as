@@ -2,7 +2,7 @@ package trolling.component.graphic
 {
 	import trolling.component.ComponentType;
 	import trolling.component.DisplayComponent;
-	import trolling.rendering.Texture;
+	import trolling.texture.Texture;
 	
 	public class Image extends DisplayComponent
 	{

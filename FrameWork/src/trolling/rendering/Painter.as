@@ -16,7 +16,6 @@ package trolling.rendering
 	import flash.system.System;
 	import flash.utils.getTimer;
 	
-	import trolling.core.StatsDisplay;
 	import trolling.core.Trolling;
 	
 	public class Painter
@@ -41,29 +40,13 @@ package trolling.rendering
 		
 		private var _colliderRenderData:ColliderRenderData;
 		
-		private var _culling:String;
 		private var _alpha:Number = 1.0;
 		private var _currentMatrix:Matrix3D = new Matrix3D();
-		private var _textureFlag:Boolean;
 		private var _program:Program;
-		
-		private var _perspectiveMatrix:Matrix3D = new Matrix3D();
-		
-		private var _capacity:uint;
 		
 		private var _stateStack:Vector.<RenderState> = new Vector.<RenderState>();
 
-		public function get perspectiveMatrix():Matrix3D
-		{
-			return _perspectiveMatrix;
-		}
-
-		public function set perspectiveMatrix(value:Matrix3D):void
-		{
-			_perspectiveMatrix = value;
-		}
-
-		private var _moleCallBack:Function;
+		private var _completeCallBackFunc:Function;
 		
 		public function Painter(stage3D:Stage3D)
 		{
@@ -91,25 +74,9 @@ package trolling.rendering
 		
 		public function initPainter(resultFunc:Function):void
 		{
-			_stage3D.addEventListener(Event.CONTEXT3D_CREATE, initMolehill);
+			_stage3D.addEventListener(Event.CONTEXT3D_CREATE, initContext);
 			_stage3D.requestContext3D();
-			_moleCallBack = resultFunc;
-		}
-		
-		private function initMolehill(event:Event):void
-		{
-			_context = _stage3D.context3D;	
-			_program.initProgram(_context);
-			setProgram();
-			_context.setDepthTest(true, Context3DCompareMode.ALWAYS);
-			_context.setCulling(Context3DTriangleFace.BACK);
-			_context.setBlendFactors(
-				Context3DBlendFactor.SOURCE_ALPHA,
-				Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA
-			);
-			
-			_moleCallBack(_context);
-			initBatchDatas();
+			_completeCallBackFunc = resultFunc;
 		}
 		
 		public function configureBackBuffer(stageRectangle:Rectangle, antiAlias:Boolean = true):void
@@ -132,43 +99,92 @@ package trolling.rendering
 			
 			_backBufferWidth = stageRectangle.width;
 			_backBufferHeight = stageRectangle.height;
-			
-//			var vector0:Vector3D = new Vector3D(1, 0, 0, 0);
-//			var vector1:Vector3D = new Vector3D(0, 1, 0, 0);
-//			var vector2:Vector3D = new Vector3D(0, 0, 10/9, -(10/9));
-//			var vector3:Vector3D = new Vector3D(0, 0, 0, 0);
-//			
-//			_perspectiveMatrix.copyColumnFrom(0, vector0);
-//			_perspectiveMatrix.copyColumnFrom(1, vector1);
-//			_perspectiveMatrix.copyColumnFrom(2, vector2);
-//			_perspectiveMatrix.copyColumnFrom(3, vector3);
-//			_currentMatrix.prepend(perspectiveMatrix);
 		}
 		
-		public function setDrawData(batchData:BatchData):void
+		public function batchDraw():void
+		{
+			if(_colliderRenderData.batchTriangles.length != 0)
+				_batchDatas.push(_colliderRenderData);
+			var batchData:BatchData;
+			while(_batchDatas.length != 0)
+			{
+				batchData = _batchDatas.shift();
+				_context.setTextureAt(0, batchData.batchTexture);
+				batchData.calculVertex();
+				setDrawData(batchData);
+				draw();
+			}
+			if(Trolling.current.statsVisible)
+			{
+				var memory:Number = System.totalMemory * 0.000000954;
+				Trolling.current.statsTextField.text = "drawCall = " + Trolling.current.drawCall + "\n" + "memory = " + memory.toFixed(memory < 100 ? 1 : 0);
+				
+				var statsBatch:StatsDisplay = new StatsDisplay();
+				statsBatch.statsTextField = Trolling.current.statsTextField;
+				statsBatch.setStatsTriangle();
+				_context.setTextureAt(0, statsBatch.batchTexture);
+				statsBatch.calculVertex();
+				setDrawData(statsBatch);
+				draw();
+				statsBatch = null;
+			}
+		}
+		
+		public function present():void
+		{
+			_context.present();
+			initBatchDatas();
+		}
+		
+		private function setDrawData(batchData:BatchData):void
 		{	
 			createVertexBuffer(batchData);
 			createIndexBuffer(batchData);
 			setVertextBuffer();
 			_context.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 4, new <Number>[1, 1, 1, 1]);
-//			setUVVector(batchData);
-//			_matrix.appendRotation(90, Z_AXIS);
-//			_matrix.appendTranslation(0, -0.5, 0);
-//						_context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, _matrix, true);
-			
 			var matrix:Matrix3D = new Matrix3D();
 			matrix.identity();
-//			matrix.appendTranslation(-(Trolling.current.currentScene.width/2), (Trolling.current.currentScene.height/2), 0);
-//			matrix.prependScale((2/_viewPort.width), (2/_viewPort.height), 1);
-//			matrix.copyColumnFrom(0, vector0);
-//			matrix.copyColumnFrom(1, vector1);
-//			matrix.copyColumnFrom(2, vector2);
-//			matrix.copyColumnFrom(3, vector3);
+			//			matrix.appendTranslation(-(Trolling.current.currentScene.width/2), (Trolling.current.currentScene.height/2), 0);
+			//			matrix.prependScale((2/_viewPort.width), (2/_viewPort.height), 1);
+			//			matrix.copyColumnFrom(0, vector0);
+			//			matrix.copyColumnFrom(1, vector1);
+			//			matrix.copyColumnFrom(2, vector2);
+			//			matrix.copyColumnFrom(3, vector3);
 			
-//			trace("matrix = " + matrix.rawData);
+			//			trace("matrix = " + matrix.rawData);
 			_context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, matrix, true);
 			
 			_context.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, new <Number>[1, 1, 1, 1], 1);
+		}
+		
+		private function draw():void
+		{
+			Trolling.current.drawCall++;
+			_context.drawTriangles(_indexBuffer);
+			clearBuffer();
+		}
+		
+		private function initBatchDatas():void
+		{
+			_batchDatas = new Vector.<BatchData>();
+			_currentBatchData = null;
+			_colliderRenderData = new ColliderRenderData();
+		}
+		
+		private function initContext(event:Event):void
+		{
+			_context = _stage3D.context3D;	
+			_program.initProgram(_context);
+			setProgram();
+			_context.setDepthTest(true, Context3DCompareMode.ALWAYS);
+			_context.setCulling(Context3DTriangleFace.BACK);
+			_context.setBlendFactors(
+				Context3DBlendFactor.SOURCE_ALPHA,
+				Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA
+			);
+			
+			_completeCallBackFunc(_context);
+			initBatchDatas();
 		}
 		
 		private function createVertexBuffer(batchData:BatchData):void
@@ -188,55 +204,6 @@ package trolling.rendering
 			_context.setVertexBufferAt(0, _vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
 			_context.setVertexBufferAt(1, _vertexBuffer, 3, Context3DVertexBufferFormat.FLOAT_2);
 			_context.setVertexBufferAt(2, _vertexBuffer, 5, Context3DVertexBufferFormat.FLOAT_4);
-		}
-		
-		public function present():void
-		{
-			_context.present();
-			initBatchDatas();
-		}
-		
-		public function initBatchDatas():void
-		{
-			_batchDatas = new Vector.<BatchData>();
-			_currentBatchData = null;
-			_colliderRenderData = new ColliderRenderData();
-		}
-		
-		public function batchDraw():void
-		{
-			if(_colliderRenderData.batchTriangles.length != 0)
-				_batchDatas.push(_colliderRenderData);
-			var batchData:BatchData;
-			while(_batchDatas.length != 0)
-			{
-				batchData = _batchDatas.shift();
-				_context.setTextureAt(0, batchData.batchTexture);
-				batchData.calculVecrtex();
-				setDrawData(batchData);
-				draw();
-			}
-			if(Trolling.current.statsVisible)
-			{
-				var memory:Number = System.totalMemory * 0.000000954;
-				Trolling.current.statsTextField.text = "drawCall = " + Trolling.current.drawCall + "\n" + "memory = " + memory.toFixed(memory < 100 ? 1 : 0);
-				
-				var statsBatch:StatsDisplay = new StatsDisplay();
-				statsBatch.statsTextField = Trolling.current.statsTextField;
-				statsBatch.setStatsTriangle();
-				_context.setTextureAt(0, statsBatch.batchTexture);
-				statsBatch.calculVecrtex();
-				setDrawData(statsBatch);
-				draw();
-				statsBatch = null;
-			}
-		}
-		
-		public function draw():void
-		{
-			Trolling.current.drawCall++;
-			_context.drawTriangles(_indexBuffer);
-			clearBuffer();
 		}
 		
 		private function clearBuffer():void
@@ -277,16 +244,6 @@ package trolling.rendering
 			_viewPort = value;
 		}
 		
-		public function get textureFlag():Boolean
-		{
-			return _textureFlag;
-		}
-		
-		public function set textureFlag(value:Boolean):void
-		{
-			_textureFlag = value;
-		}
-		
 		public function get matrix3d():Matrix3D
 		{
 			return _currentMatrix;
@@ -295,16 +252,6 @@ package trolling.rendering
 		public function set matrix3d(value:Matrix3D):void
 		{
 			_currentMatrix = value;
-		}
-		
-		public function get culling():String
-		{
-			return _culling;
-		}
-		
-		public function set culling(value:String):void
-		{
-			_culling = value;
 		}
 		
 		public function get program():Program

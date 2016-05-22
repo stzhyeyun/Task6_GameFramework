@@ -1,6 +1,7 @@
 package trolling.core
 {
 	//change
+	import flash.errors.IllegalOperationError;
 	import flash.utils.Dictionary;
 	
 	import trolling.event.TrollingEvent;
@@ -15,7 +16,8 @@ package trolling.core
 		
 		public function SceneManager()
 		{
-			
+			throw new IllegalOperationError(
+				"'SceneManager'는 인스턴스화 할 수 없습니다!! ");
 		}
 		
 		public static function dispose():void
@@ -73,6 +75,8 @@ package trolling.core
 		
 		public static function outScene(data:Object = null):void
 		{
+			if(_sceneVector.length <= 0)
+				return;
 			var scene:Scene = _sceneVector.pop();
 			var key:String = Trolling.current.currentScene.key;
 			switchScene(scene.key, data);
